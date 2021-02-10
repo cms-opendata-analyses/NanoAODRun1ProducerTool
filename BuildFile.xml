@@ -17,6 +17,4 @@
 <use name="RecoVertex/PrimaryVertexProducer"/>
 <use name="RecoVertex/VertexPrimitives"/>
 <use name="RecoVertex/TrimmedKalmanVertexFinder"/>
-<lib name="DAFVertexFinder"/>
-<lib name="VertexFitter"/>
 <flags EDM_PLUGIN="1"/>
