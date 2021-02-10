@@ -1,1 +1,9 @@
-instructions how to deal with this repository will come here
+code repository for nanoAODplus v1
+----------------------------------
+
+   for first instructions how to load and compile the code with 
+   CMSSW 5_3_32 (DESY version), see
+compile_5_3_32.readme.txt
+
+More instructions how to compile and run in various configurations 
+will come here soon. 
