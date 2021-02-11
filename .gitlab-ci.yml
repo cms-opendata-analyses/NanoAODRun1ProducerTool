@@ -1,0 +1,30 @@
+stages:
+  - compile
+
+variables:
+  CMS_PATH: /cvmfs/cms.cern.ch
+  CMSSW_RELEASE: CMSSW_5_3_32
+
+cmssw_compile:
+  stage: compile
+  tags:
+    - cvmfs
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc6-cms:latest
+    entrypoint: [""]
+  artifacts:
+    # artifacts:untracked ignores configuration in the repository’s .gitignore file.
+    untracked: true
+    expire_in: 20 minutes
+    paths:
+      - ${CMSSW_RELEASE}
+  script:
+    - shopt -s expand_aliases
+    - set +u && source ${CMS_PATH}/cmsset_default.sh; set -u
+    - cmsrel ${CMSSW_RELEASE}
+    - cd ${CMSSW_RELEASE}/src
+    - cmsenv
+    - mkdir -p NanoAOD/NanoAnalyzer
+    # Mind trailing slashes
+    - rsync -av "${CI_PROJECT_DIR}/" "${CMSSW_BASE}/src/NanoAOD/NanoAnalyzer/"
+    - scram b
