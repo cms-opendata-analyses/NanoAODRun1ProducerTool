@@ -1,28 +1,37 @@
 The following are instructions on how to set up and compile the code on 
-an sl7 cms workgroup server at DESY, with CMSSW_4_2_8 (2010 data and MC).
+an sl7 cms workgroup server on lxplus or at DESY, 
+with CMSSW_4_2_8 (2010 data and MC).
 They will be complemented by instructions for other configurations.
 
-  open a "fresh" xterm window on your sl7 machine:
+  open a "fresh" xterm window on your sl7 machine at DESY or CERN:
 xterm &
+  or
+ssh lxplus.cern.ch
 
-once (1st time only):
+once (1st time only, might only be needed later to access files for running):
 ---------------------
 install grid certificate (userkey.pem) in .globus
 set permissions to _r_______
 
 every time:
 -----------
-   initialize cms grid proxy: (might need to repeat later if proxy expired)
+   initialize cms grid proxy: 
+   (can do later, might need to repeat later if proxy expired)
 voms-proxy-init -voms cms
 give passphrase
 
+   at DESY only (no action needed on lxplus):
    initialize cmssw environment:
 module use -a /afs/desy.de/group/cms/modulefiles
 module load cmssw
 
    start sl5 singularity shell:
+   at DESY:
 cmssw-env --cmsos slc5 --bind /nfs:/nfs
                       the latter is for access to the local disk area /nfs/dust
+   on lxplus:
+cmssw-env --cmsos slc5
+
    check release (optional):
 Singularity> cat /etc/redhat-release
            -> Scientific Linux CERN SLC release 5.11 (Boron)
