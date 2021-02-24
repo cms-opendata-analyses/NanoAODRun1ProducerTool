@@ -71,7 +71,7 @@ every time
 cd NanoAOD/NanoAnalyzer
    here you will now find the content of
    https://gitlab.cern.ch/cms-opendata/cms-opendata-nanoaodplus/nanoaodplus_v1
-   thechnically, the NanoAnalyzer is a so-called EDAnalyzer
+   technically, the NanoAnalyzer is a so-called EDAnalyzer
    (originally set up with mkdanlzr)
 
    to compile:

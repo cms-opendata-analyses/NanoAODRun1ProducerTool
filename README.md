@@ -6,7 +6,7 @@ code repository for nanoAODplus v1
 compile_5_3_32.readme.txt
 
    for first instructions how to load and compile the code with 
-   CMSSW 4_2_8 (*** compilation error to be fixed ***), see
+   CMSSW 4_2_8, see
 compile_4_2_8.readme.txt
 
 More instructions how to compile and run in various configurations 

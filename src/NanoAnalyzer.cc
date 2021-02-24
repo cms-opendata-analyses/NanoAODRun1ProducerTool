@@ -303,7 +303,10 @@ using std::unordered_map;
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/JetExtendedAssociation.h"
 #include "DataFormats/JetReco/interface/JetID.h"
+#ifndef CMSSW42X
+// does not yet work for 2010 data, being fixed
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#endif
 //#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 //#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #endif
@@ -4286,7 +4289,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 ////////////////////////////////////////////////////////
 
+#ifndef CMSSW42X
   const JetCorrector* corrector = JetCorrector::getJetCorrector(mJetCorr, iSetup);
+#endif
 
   const float jet_min_pt = 15;
   value_jet_n = 0;
@@ -4306,6 +4311,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // cout << value_jet_n << " jet pt " << value_jet_pt[value_jet_n] << endl;
 
+#ifndef CMSSW42X
       double jec = corrector->correction(*it, iEvent, iSetup);
 
       // copy original (uncorrected) jet;
@@ -4316,6 +4322,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //      cout<<jec<<" "<<it->pt()<<" "<<corjet.pt()<<endl;
 
       value_jet_pt[value_jet_n] = corjet.pt();
+#else
+      value_jet_pt[value_jet_n] = it->pt();
+#endif
 
 #ifdef miniAOD
       int pfConstituents = 0;
