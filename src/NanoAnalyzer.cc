@@ -1348,13 +1348,13 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // nuha
   iEvent.getByToken(hConvTkn, hConversions);
   
-  // dEdx (from example M. Soares)
-  int stripmap = 1;
-  edm::Handle<edm::ValueMap<reco::DeDxData>> dedxStMap;
-  if (!iEvent.getByToken(dedxMapStripTag_,dedxStMap)) stripmap=0;  
-  int pixmap = 1;
-  edm::Handle<edm::ValueMap<reco::DeDxData>> dedxPixMap;
-  if (!iEvent.getByToken(dedxMapPixelTag_,dedxPixMap)) pixmap=0;  
+  //// dEdx (from example M. Soares)
+  //int stripmap = 1;
+  //edm::Handle<edm::ValueMap<reco::DeDxData>> dedxStMap;
+  //if (!iEvent.getByToken(dedxMapStripTag_,dedxStMap)) stripmap=0;  
+  //int pixmap = 1;
+  //edm::Handle<edm::ValueMap<reco::DeDxData>> dedxPixMap;
+  //if (!iEvent.getByToken(dedxMapPixelTag_,dedxPixMap)) pixmap=0;  
 #endif
 
 #ifdef miniAOD
