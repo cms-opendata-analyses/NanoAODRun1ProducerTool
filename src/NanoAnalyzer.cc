@@ -1101,7 +1101,7 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   // ultra-legacy
   pffatjetTkn = consumes<reco::PFJetCollection>(edm::InputTag("ak8PFJets"));
   trackjetTkn = consumes<reco::TrackJetCollection>(edm::InputTag("ak5TrackJets"));
-#elif CMSSW7XX
+#elif defined CMSSW7XX
   // 2015
   // ak8 jets and track jets do not yet/no longer exist in CMSSW_7_6_X (or 7_5 MC)? use ak4
   pffatjetTkn = consumes<reco::PFJetCollection>(edm::InputTag("ak4PFJets"));
