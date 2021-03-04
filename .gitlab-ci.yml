@@ -22,7 +22,7 @@ variables:
     - cmsenv
     - mkdir -p NanoAOD/NanoAnalyzer
     # Mind trailing slashes
-    - rsync -av "${CI_PROJECT_DIR}/" "${CMSSW_BASE}/src/NanoAOD/NanoAnalyzer/"
+    - rsync -av --exclude '**.git/' --exclude '**/.SCRAM/' "${CI_PROJECT_DIR}/" "${CMSSW_BASE}/src/NanoAOD/NanoAnalyzer/"
     - scram b
 
 
