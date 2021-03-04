@@ -1,6 +1,6 @@
 The following are instructions on how to set up and compile the code on 
 an sl7 cms workgroup server on lxplus or at DESY, 
-with CMSSW_5_3_32 (2011/12 data and MC).
+with CMSSW_7_6_4 (2015 data and MC).
 They will be complemented by instructions for other configurations.
 
   open a "fresh" xterm window on your sl7 machine at DESY or CERN:
@@ -33,7 +33,7 @@ once (first time only):
 cmsrel CMSSW_7_6_4 
    (ignore potential "Release ... is not available" error message)
    this will create the corresponding directory with subdirectories
-   and reset the compiler version to slc6_amd64_gcc493
+   and reset the compiler version to slc7_amd64_gcc493
 
 every time
 ----------
@@ -46,7 +46,7 @@ kinit "yourCERNusername"@CERN.CH
 
 once (first time only)
 ----------------------
-    in the src directory, set up .../CMSSW_5_3_32/src/NanoAOD/NanoAnalyzer/:
+    in the src directory, set up .../CMSSW_7_6_4/src/NanoAOD/NanoAnalyzer/:
 git clone https://:@gitlab.cern.ch:8443/cms-opendata/cms-opendata-nanoaodplus/nanoaodplus_v1.git NanoAOD/NanoAnalyzer
 
 every time
@@ -57,8 +57,14 @@ cd NanoAOD/NanoAnalyzer
    technically, the NanoAnalyzer is a so-called EDAnalyzer
    (originally set up with mkdanlzr)
 
+whenever you want to update the code to the latest version (not first time) 
+---------------------------------------------------------------------------
+git pull
+
    set the right environment
 cmsenv
 
    compile:
 scram b
+
+Instructions how to run will follow

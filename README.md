@@ -13,5 +13,9 @@ compile_4_2_8.readme.txt
    CMSSW 7_6_4 (for 2015 5 and 13 TeV pp data), see
 compile_7_6_4.readme.txt
 
+   for instructions how to load and compile the code with 
+   CMSSW 10_6_4 (for validation against 2017 and 2018 UL data), see
+compile_10_6_4.readme.txt
+
 More instructions how to compile and run in various configurations 
 will be added. 

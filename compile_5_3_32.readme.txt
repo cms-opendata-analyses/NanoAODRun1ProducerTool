@@ -73,6 +73,10 @@ cd NanoAOD/NanoAnalyzer
    technically, the NanoAnalyzer is a so-called EDAnalyzer
    (originally set up with mkdanlzr)
 
+whenever you want to update the code to the latest version (not first time) 
+---------------------------------------------------------------------------
+git pull
+
    to compile:
 scram b
 
