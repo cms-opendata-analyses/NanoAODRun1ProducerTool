@@ -1,0 +1,8 @@
+some useful git commands (see git manual for full set):
+
+git status    gives status of all modified already committed and
+              all not yet comitted files (some of the latter might
+              not be committed on purpose)
+
+git log       lists commit logs of all commits, mpost recent first
+              (see also history_and_todo.txt for more compact doc)
