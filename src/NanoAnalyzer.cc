@@ -73,7 +73,7 @@
 // activate this when packedPFcandidate covariance matrix is also provided 
 // without track details
 // (Run 2/3 only, needs update of PatCandidates.h and Lookup tables)
-#define covwithoutdetails 
+//#define covwithoutdetails 
 #endif
 
 // system include files
@@ -303,10 +303,7 @@ using std::unordered_map;
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/JetExtendedAssociation.h"
 #include "DataFormats/JetReco/interface/JetID.h"
-#ifndef CMSSW42X
-// does not yet work for 2010 data, being fixed
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
-#endif
 //#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 //#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #endif
@@ -527,6 +524,8 @@ private:
   Float_t GenPV_z;
   Int_t GenPV_recIdx;              // pointer to rec vertex list if matched 
   Int_t GenPV_chmult;              // charged multiplicity
+  //Josry prompt/nonprompt Dstar/D0 Flag
+  vector<Int_t> GenPart_promptFlag;
 
   /////////////////////////// for trigger objects ////////////////////////////
 
@@ -920,6 +919,9 @@ private:
   std::vector<std::string> custom_flag;
   std::vector<uint8_t> custom_bit;
 
+  // Josry prompt/nonprompt flag extension
+  int promptFlag;
+
 }; // end of class member
 
 //
@@ -1052,6 +1054,8 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
 
   dcyvtxx = 0.; dcyvtxy = 0.; dcyvtxz = 0.;
   motx = 0.; moty = 0.; motz = 0.; 
+  // Josry prompt/nonprompt Flag extension
+  promptFlag = -1;
 
   // initialize nonstandard Trigger variables
 #include "NanoTriggerInit.h" 
@@ -1937,6 +1941,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   GenPart_sparpdgId.clear();
   GenPart_numberOfDaughters.clear();
   GenPart_nstchgdaug.clear();
+  //Josry prompt/nonprompt Flag extension
+  GenPart_promptFlag.clear();
   GenPart_vx.clear();
   GenPart_vy.clear();
   GenPart_vz.clear();
@@ -2169,6 +2175,17 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         moty = genp.vy();
         motz = genp.vz();
 
+        // Josry prompt/nonprompt Dstar/D Flag extension 
+        float sqrtQuadSum = -9999;
+        //taken from MuDhistos:
+        //sqrtQuadSum = sqrt( std::abs(GenPart_mvx[gg]-GenPV_x) * std::abs(GenPart_mvx[gg]-GenPV_x) + std::abs(GenPart_mvy[gg]-GenPV_y) * std::abs(GenPart_mvy[gg]-GenPV_y) + std::abs(GenPart_mvz[gg]-GenPV_z) * std::abs(GenPart_mvz[gg]-GenPV_z) );
+        // GenPart_mvx  is here    motx
+        // GenPV_x      is here    genp.vx()
+        promptFlag = -1;
+        sqrtQuadSum = sqrt( std::abs(motx-GenPV_x) * std::abs(motx-GenPV_x) + std::abs(moty-GenPV_y) * std::abs(moty-GenPV_y) + std::abs(motz-GenPV_z) * std::abs(motz-GenPV_z) );
+        if ( sqrtQuadSum == 0 )  promptFlag = 1;
+        else promptFlag = 0;
+
         // cout << "hello interesting" << endl;
 
         // muons
@@ -2234,6 +2251,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  GenPart_sparpdgId.push_back(sparpdgId);
 	  GenPart_numberOfDaughters.push_back(genp.numberOfDaughters());
 	  GenPart_nstchgdaug.push_back(nstchgdaug);
+          GenPart_promptFlag.push_back(promptFlag);
           GenPart_vx.push_back(dcyvtxx);
           GenPart_vy.push_back(dcyvtxy);
           GenPart_vz.push_back(dcyvtxz);
@@ -4290,9 +4308,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 ////////////////////////////////////////////////////////
 
-#ifndef CMSSW42X
   const JetCorrector* corrector = JetCorrector::getJetCorrector(mJetCorr, iSetup);
-#endif
 
   const float jet_min_pt = 15;
   value_jet_n = 0;
@@ -4312,9 +4328,18 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // cout << value_jet_n << " jet pt " << value_jet_pt[value_jet_n] << endl;
 
-#ifndef CMSSW42X
-      double jec = corrector->correction(*it, iEvent, iSetup);
+#ifdef CMSSW42X
+// https://github.com/cms-sw/cmssw/blob/CMSSW_4_2_X/JetMETCorrections/Objects/interface/JetCorrector.h (lines 36-39)
+// https://kmishra.net/talks/2012/CMSDAS_IntroTalk_2012-1.pdf (slide 17)
 
+      int ijet = it - jets->begin();
+      edm::RefToBase<reco::Jet> jetRef(edm::Ref<reco::PFJetCollection>(jets,ijet));
+      double jec = corrector->correction(*it, jetRef, iEvent, iSetup);
+#else
+// https://github.com/cms-sw/cmssw/blob/master/JetMETCorrections/Objects/interface/JetCorrector.h (line 33)
+
+      double jec = corrector->correction(*it, iEvent, iSetup);
+#endif
       // copy original (uncorrected) jet;
       reco::PFJet corjet = *it;
       // apply JEC
@@ -4323,9 +4348,6 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //      cout<<jec<<" "<<it->pt()<<" "<<corjet.pt()<<endl;
 
       value_jet_pt[value_jet_n] = corjet.pt();
-#else
-      value_jet_pt[value_jet_n] = it->pt();
-#endif
 
 #ifdef miniAOD
       int pfConstituents = 0;
@@ -4668,6 +4690,8 @@ NanoAnalyzer::beginJob()
   GenPart_sparpdgId.reserve(nReserve_GenPart);
   GenPart_numberOfDaughters.reserve(nReserve_GenPart);
   GenPart_nstchgdaug.reserve(nReserve_GenPart);
+  // Josry2 prompt/nonprompt extension
+  GenPart_promptFlag.reserve(nReserve_GenPart);
   GenPart_vx.reserve(nReserve_GenPart);
   GenPart_vy.reserve(nReserve_GenPart);
   GenPart_vz.reserve(nReserve_GenPart);
@@ -4918,6 +4942,7 @@ NanoAnalyzer::beginJob()
       t_event->Branch("GenPart_sparpdgId", GenPart_sparpdgId.data(), "GenPart_sparpdgId[nGenPart]/I");
       t_event->Branch("GenPart_numberOfDaughters", GenPart_numberOfDaughters.data(), "GenPart_numberOfDaughters[nGenPart]/I");
       t_event->Branch("GenPart_nstchgdaug", GenPart_nstchgdaug.data(), "GenPart_nstchgdaug[nGenPart]/I");
+      t_event->Branch("GenPart_promptFlag", GenPart_promptFlag.data(), "GenPart_promptFlag[nGenPart]/I");
       t_event->Branch("GenPart_vx", GenPart_vx.data(), "GenPart_vx[nGenPart]/F");
       t_event->Branch("GenPart_vy", GenPart_vy.data(), "GenPart_vy[nGenPart]/F");
       t_event->Branch("GenPart_vz", GenPart_vz.data(), "GenPart_vz[nGenPart]/F");
