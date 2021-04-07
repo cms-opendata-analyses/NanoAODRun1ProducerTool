@@ -76,6 +76,12 @@
 //#define covwithoutdetails 
 #endif
 
+// turn this on to deactivate code related to jet corrections
+//  (e.g. in case of problems with the configuration, and only if you do 
+//   *not* use jets in your analysis)
+//  default should be flag off!
+//#define noJetCor 
+
 // system include files
 #include <memory>
 #include <iostream>
@@ -1098,13 +1104,18 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   // should use ak4PFJetsCHS in miniAOD/nanoAOD Compatibility mode
   pfjetTkn = consumes<reco::PFJetCollection>(edm::InputTag("ak4PFJets"));
   genjetTkn = consumes<reco::GenJetCollection>(edm::InputTag("ak4GenJets"));//Qun
+  // jet correction label, will this work? doesn't so far ...
+  mJetCorr = "ak4PFL1FastL2L3Residual";
+
 #ifndef CMSSW11plus
   // not Run 3
   // should use ak8PFJetsCHS in miniAOD/nanoAOD Compatibility mode
 #ifdef CMSSW106plus
   // ultra-legacy
-  pffatjetTkn = consumes<reco::PFJetCollection>(edm::InputTag("ak8PFJets"));
-  trackjetTkn = consumes<reco::TrackJetCollection>(edm::InputTag("ak5TrackJets"));
+  //pffatjetTkn = consumes<reco::PFJetCollection>(edm::InputTag("ak8PFJets"));
+  //trackjetTkn = consumes<reco::TrackJetCollection>(edm::InputTag("ak5TrackJets"));
+  pffatjetTkn = consumes<reco::PFJetCollection>(edm::InputTag("ak8PFJetsCHS"));
+  trackjetTkn = consumes<reco::TrackJetCollection>(edm::InputTag("ak4TrackJets"));
 #elif defined CMSSW7XX
   // 2015
   // ak8 jets and track jets do not yet/no longer exist in CMSSW_7_6_X (or 7_5 MC)? use ak4
@@ -3130,7 +3141,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         if (mu_relPFIsoR04 != -9999.) {
 	  Muon_pfRelIso03_all.push_back(mu_relPFIsoR03);
 	  Muon_pfRelIso04_all.push_back(mu_relPFIsoR04);
-          // temporarily, until have figured out pielup correction 
+          // temporarily, until have figured out pileup correction 
           mu_pfIso = int(mu_relPFIsoR03<0.3)+int(mu_relPFIsoR03<0.25)+int(mu_relPFIsoR03<0.2)+int(mu_relPFIsoR03<0.15)+int(mu_relPFIsoR03<0.1)+int(mu_relPFIsoR03<0.05);
         } // if
 	else { // for CMSSW 4-2-8
@@ -4308,8 +4319,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 ////////////////////////////////////////////////////////
 
+#ifndef noJetCor
   const JetCorrector* corrector = JetCorrector::getJetCorrector(mJetCorr, iSetup);
-
+#endif
   const float jet_min_pt = 15;
   value_jet_n = 0;
   // for (auto it = jets->begin(); it != jets->end(); ++it) {
@@ -4327,6 +4339,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       value_jet_mass[value_jet_n] = it->mass();
 
       // cout << value_jet_n << " jet pt " << value_jet_pt[value_jet_n] << endl;
+
+#ifndef noJetCor
+      // do the jet corrections (if not turned off by #define noJetCor)
 
 #ifdef CMSSW42X
 // https://github.com/cms-sw/cmssw/blob/CMSSW_4_2_X/JetMETCorrections/Objects/interface/JetCorrector.h (lines 36-39)
@@ -4348,6 +4363,12 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //      cout<<jec<<" "<<it->pt()<<" "<<corjet.pt()<<endl;
 
       value_jet_pt[value_jet_n] = corjet.pt();
+
+#else
+
+      value_jet_pt[value_jet_n] = it->pt();
+
+#endif
 
 #ifdef miniAOD
       int pfConstituents = 0;
@@ -4528,6 +4549,9 @@ cout<<"---------------------------------"<<endl;*/
 
   const float gjet_min_pt = 10;
   value_gjet_n = 0;
+
+  if (!isData) {
+
 #ifndef miniAOD
   for (reco::GenJetCollection::const_iterator it = genjets->begin(); it != genjets->end(); ++it) {
 #endif
@@ -4546,7 +4570,8 @@ cout<<"---------------------------------"<<endl;*/
         continue;
       }
     }
-  }
+   }
+  } // isData
 
     // cout << "hello after GenJets" << endl; 
 
@@ -5267,12 +5292,14 @@ NanoAnalyzer::beginJob()
   // input values to jetId not stored (for the time being)
   t_event->Branch("Jet_jetId",value_jet_id, "Jet_jetId[nJet]/i");
 
+ if (!isData) {
   // GenJets //Qun
   t_event->Branch("nGenJet", &value_gjet_n, "nGenJet/i");
   t_event->Branch("GenJet_pt", value_gjet_pt, "GenJet_pt[nGenJet]/F");
   t_event->Branch("GenJet_eta", value_gjet_eta, "GenJet_eta[nGenJet]/F");
   t_event->Branch("GenJet_phi", value_gjet_phi, "GenJet_phi[nGenJet]/F");
   t_event->Branch("GenJet_mass", value_gjet_mass, "GenJet_mass[nGenJet]/F");
+ }
 
   // FatJets
   t_event->Branch("nFatJet", &value_fatjet_n, "nFatJet/i");
