@@ -8,7 +8,7 @@
 // for implementation history, see testnanoreadme.txt *
 // ****************************************************
 // Direct contributors:  A. Anuar, A. Bermudez, A. Geiser (coordinator), 
-// N.Z. Jomhari, S. Wunsch, Q. Wang, H. Yang, 2018-2021. 
+// N.Z. Jomhari, S. Wunsch, Q. Wang, H. Yang, Y. Yang, 2018-2021. 
 
 // ******************************************
 // automatically set appropriate CMSSW flag *
@@ -77,8 +77,8 @@
 #endif
 
 // turn this on to deactivate code related to jet corrections
-//  (e.g. in case of problems with the configuration, and only if you do 
-//   *not* use jets in your analysis)
+//  (e.g. in case of problems with the configuration, and only if jets are
+//   *not* used in the analysis)
 //  default should be flag off!
 //#define noJetCor 
 
@@ -380,6 +380,10 @@ private:
 
   // as it says on the tin
   void update_HLT_branch();
+
+  // branch title creation 
+  void eventDoc();
+  void createTitle(const std::string &name, const std::string &title); 
 
   // HLT config for reading the table and its associated process name
   //HLTConfigProvider hlt_cfg;   // superseded above
@@ -4900,11 +4904,12 @@ NanoAnalyzer::beginJob()
     // store JSON info
     t_event->Branch("GoodLumisection", &GoodLumisection, "GoodLumisection/O");
     // store dataset info
-    t_event->Branch("Dataset_MC", &MCdataset, "Dataset_MC/O");
+    t_event->Branch("Dataset_isMC", &MCdataset, "Dataset_isMC/O");
     t_event->Branch("Dataset_ZeroBias", &ZeroBiasdataset, "Dataset_ZeroBias/O");
     t_event->Branch("Dataset_MinimumBias", &MinimumBiasdataset, "Dataset_MinimumBias/O");
     t_event->Branch("Dataset_Jet", &Jetdataset, "Dataset_Jet/O");
     t_event->Branch("Dataset_MultiJet", &MultiJetdataset, "Dataset_MultiJet/O");
+    t_event->Branch("Dataset_JetMETTauMonitor", &JetMETTauMonitordataset, "Dataset_JetMETTauMonitor/O");
     t_event->Branch("Dataset_Mu", &Mudataset, "Dataset_Mu/O");
     t_event->Branch("Dataset_MuMonitor", &MuMonitordataset, "Dataset_MuMonitor/O");
     t_event->Branch("Dataset_DoubleMu", &DoubleMudataset, "Dataset_DoubleMu/O");
@@ -4918,26 +4923,27 @@ NanoAnalyzer::beginJob()
     t_event->Branch("Dataset_Photon", &Photondataset, "Dataset_Photon/O");
     t_event->Branch("Dataset_EGMonitor", &EGMonitordataset, "Dataset_EGMonitor/O");
     t_event->Branch("Dataset_MuEG", &MuEGdataset, "Dataset_MuEG/O");
+    t_event->Branch("Dataset_METFwd", &METFwddataset, "Dataset_METFwd/O");
     t_event->Branch("Dataset_Commissioning", &Commissioningdataset, "Dataset_Commissioning/O");
     // and info on which other data sets this event occurs
-    t_event->Branch("Alsoon_ZeroBias", &ZeroBiasTrig, "Alsoon_ZeroBiasTrig/O");
-    t_event->Branch("Alsoon_MinimumBias", &MinimumBiasTrig, "Alsoon_MinimumBiasTrig/O");
-    t_event->Branch("Alsoon_Jet", &JetTrig, "Alsoon_JetTrig/O");
-    t_event->Branch("Alsoon_MultiJet", &MultiJetTrig, "Alsoon_MultiJetTrig/O");
-    t_event->Branch("Alsoon_JetMETTauMonitor", &JetMETTauMonitorTrig, "Alsoon_JetMETTauMonitorTrig/O");
+    t_event->Branch("Alsoon_ZeroBias", &ZeroBiasTrig, "Alsoon_ZeroBias/O");
+    t_event->Branch("Alsoon_MinimumBias", &MinimumBiasTrig, "Alsoon_MinimumBias/O");
+    t_event->Branch("Alsoon_Jet", &JetTrig, "Alsoon_Jet/O");
+    t_event->Branch("Alsoon_MultiJet", &MultiJetTrig, "Alsoon_MultiJet/O");
+    t_event->Branch("Alsoon_JetMETTauMonitor", &JetMETTauMonitorTrig, "Alsoon_JetMETTauMonitor/O");
     t_event->Branch("Alsoon_Mu", &MuTrig, "Alsoon_Mu/O");
-    t_event->Branch("Alsoon_MuHad", &MuHadTrig, "Alsoon_MuHad/O");
+    t_event->Branch("Alsoon_MuMonitor", &MuMonitorTrig, "Alsoon_MuMonitor/O");
     t_event->Branch("Alsoon_DoubleMu", &DoubleMuTrig, "Alsoon_DoubleMu/O");
-    t_event->Branch("Alsoon_MuEG", &MuEGTrig, "Alsoon_MuEG/O");
+    t_event->Branch("Alsoon_MuHad", &MuHadTrig, "Alsoon_MuHad/O");
+    t_event->Branch("Alsoon_MuOnia", &MuOniaTrig, "Alsoon_MuOnia/O");
+    t_event->Branch("Alsoon_Charmonium", &CharmoniumTrig, "Alsoon_Charmonium/O");
+    t_event->Branch("Alsoon_BParking", &BParkingTrig, "Alsoon_BParking/O");
+    t_event->Branch("Alsoon_BTau", &BTauTrig, "Alsoon_BTau/O");
     t_event->Branch("Alsoon_Electron", &ElectronTrig, "Alsoon_Electron/O");
     t_event->Branch("Alsoon_DoubleElectron", &DoubleElectronTrig, "Alsoon_DoubleElectron/O");
     t_event->Branch("Alsoon_Photon", &PhotonTrig, "Alsoon_Photon/O");
-    t_event->Branch("Alsoon_MuMonitor", &MuMonitorTrig, "Alsoon_MuMonitor/O");
     t_event->Branch("Alsoon_EGMonitor", &EGMonitorTrig, "Alsoon_EGMonitor/O");
-    t_event->Branch("Alsoon_MuOnia", &MuOniaTrig, "Alsoon_MuOnia/O");
-    t_event->Branch("Alsoon_Charmonium", &CharmoniumTrig, "Alsoon_Charmonium/O");
-    t_event->Branch("Alsoon_BTau", &BTauTrig, "Alsoon_BTau/O");
-    t_event->Branch("Alsoon_BParking", &BParkingTrig, "Alsoon_BParking/O");
+    t_event->Branch("Alsoon_MuEG", &MuEGTrig, "Alsoon_MuEG/O");
     t_event->Branch("Alsoon_METFwd", &METFwdTrig, "Alsoon_METFwd/O");
     t_event->Branch("Alsoon_Commissioning", &CommissioningTrig, "Alsoon_Commissioning/O");
 
@@ -5339,7 +5345,7 @@ NanoAnalyzer::beginJob()
 // trigger objects
   t_event->Branch("nTrigObj", &nTrigObj, "nTrigObj/I");    
   t_event->Branch("TrigObj_id", TrigObj_id.data(), "TrigObj_id[nTrigObj]/I");
-  t_event->Branch("TrigObj_filterBits", TrigObj_filterBits.data(), "TrigObj_FilterBits[nTrigObj]/I");
+  t_event->Branch("TrigObj_filterBits", TrigObj_filterBits.data(), "TrigObj_filterBits[nTrigObj]/I");
   t_event->Branch("TrigObj_pt", TrigObj_pt.data(), "TrigObj_pt[nTrigObj]/F");
   t_event->Branch("TrigObj_phi", TrigObj_phi.data(), "TrigObj_phi[nTrigObj]/F");
   t_event->Branch("TrigObj_eta", TrigObj_eta.data(), "TrigObj_eta[nTrigObj]/F");
@@ -5373,6 +5379,9 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Trig_HTThresh", &HTThresh, "Trig_HTThresh/I");
   t_event->Branch("Trig_BThresh", &BThresh, "Trig_BThresh/I");
   t_event->Branch("Trig_METThresh", &METThresh, "Trig_METThresh/I");
+
+  // branch title creation
+  eventDoc();
 
 } // end of beginJob
 
@@ -5487,3 +5496,438 @@ void NanoAnalyzer::endRun(edm::Run const&, edm::EventSetup const&)
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(NanoAnalyzer);
+
+// branch title creation
+void NanoAnalyzer::eventDoc() { 
+
+  createTitle("run", "run/i"); 
+  createTitle("event", "event/l"); 
+  createTitle("luminosityBlock", "luminosityBlock/i");  
+  createTitle("CMSSW",                   "CMSSW version used for the processing"); 
+  createTitle("GoodLumisection",         "flag: good lumi section, from Golden JSON (not all datasets)"); 
+  
+  createTitle("Dataset_isMC",            "flag: event is from MC dataset");
+  // flags from trigger-based auto-recognition 
+  createTitle("Dataset_ZeroBias",        "flag: event from ZeroBias dataset"); 
+  createTitle("Dataset_MinimumBias",     "flag: event from MinimumBias dataset"); 
+  createTitle("Dataset_Jet",             "flag: event from Jet dataset"); 
+  createTitle("Dataset_MultiJet",        "flag: event from MultiJet dataset"); 
+  createTitle("Dataset_JetMETTauMonitor","flag: event from JetMETTauMonitor dataset"); 
+  createTitle("Dataset_Mu",              "flag: event from Mu or SingleMuon dataset");
+  createTitle("Dataset_MuMonitor",       "flag: event from MuMonitor dataset");
+  createTitle("Dataset_DoubleMu",        "flag: event from DoubleMu(Parked) dataset"); 
+  createTitle("Dataset_MuHad",           "flag: event from MuHad dataset"); 
+  createTitle("Dataset_MuOnia",          "flag: event from MuOnia dataset"); 
+  createTitle("Dataset_Charmonium",      "flag: event from Charmonium dataset"); 
+  createTitle("Dataset_BParking",        "flag: event from BParking dataset"); 
+  createTitle("Dataset_BTau",            "flag: event from BTau dataset"); 
+  createTitle("Dataset_Electron",        "flag: event from EG or Electron dataset"); 
+  createTitle("Dataset_DoubleElectron",  "flag: event from DoubleElectron dataset"); 
+  createTitle("Dataset_Photon",          "flag: event from Photon dataset"); 
+  createTitle("Dataset_EGMonitor",       "flag: event from EGMonitor dataset"); 
+  createTitle("Dataset_MuEG",            "flag: event from MuEG dataset");
+  createTitle("Dataset_METFwd",          "flag: event from METFwd dataset"); 
+  createTitle("Dataset_Commissioning",   "flag: event from Commissioning dataset");
+  
+  createTitle("Alsoon_ZeroBias",         "flag: event also on ZeroBias dataset"); 
+  createTitle("Alsoon_MinimumBias",      "flag: event also on MinimumBias dataset");
+  createTitle("Alsoon_Jet",              "flag: event also on Jet dataset"); 
+  createTitle("Alsoon_MultiJet",         "flag: event also on MultiJet dataset"); 
+  createTitle("Alsoon_JetMETTauMonitor", "flag: event also on JetMETTauMonitor dataset"); 
+  createTitle("Alsoon_Mu",               "flag: event also on Mu or SingleMuon dataset");
+  createTitle("Alsoon_MuMonitor",        "flag: event also on MuMonitor dataset"); 
+  createTitle("Alsoon_DoubleMu",         "flag: event also on DoubleMu(Parked) dataset");
+  createTitle("Alsoon_MuHad",            "flag: event also on MuHad dataset"); 
+  createTitle("Alsoon_MuOnia",           "flag: event also on MuOnia dataset"); 
+  createTitle("Alsoon_Charmonium",       "flag: event also on Charmonium dataset"); 
+  createTitle("Alsoon_BParking",         "flag: event also on BParking dataset");
+  createTitle("Alsoon_BTau",             "flag: event also on BTau dataset"); 
+  createTitle("Alsoon_Electron",         "flag: event also on EG or Electron dataset"); 
+  createTitle("Alsoon_DoubleElectron",   "flag: event also on DoubleElectron dataset");
+  createTitle("Alsoon_Photon",           "flag: event also on Photon datset");
+  createTitle("Alsoon_EGMonitor",        "flag: event also on EGMonitor dataset");
+  createTitle("Alsoon_MuEG",             "flag: event also on MuEG dataset");
+  createTitle("Alsoon_METFwd",           "flag: event also on METFwd dataset"); 
+  createTitle("Alsoon_Commissioning",    "flag: event also on Commissioning dataset"); 
+
+  if (!isData) {
+    
+  createTitle("nGenPart", "interesting gen particles"); 
+  createTitle("GenPart_pt", "pt"); 
+  createTitle("GenPart_eta", "eta"); 
+  createTitle("GenPart_phi", "phi");
+  createTitle("GenPart_mass", "mass (not for all particles); if 0 when it should not be: look up from PDG");
+  createTitle("GenPart_pdgId", "PDG id"); 
+  createTitle("GenPart_status", "Particle status. 1=stable"); 
+  createTitle("GenPart_statusFlags", "gen status flags stored bitwise, bits are: 0 : isPrompt, 1 : isDecayedLeptonHadron, 2 : isTauDecayProduct, 3 : isPromptTauDecayProduct, 4 : isDirectTauDecayProduct, 5 : isDirectPromptTauDecayProduct, 6 : isDirectHadronDecayProduct, 7 : isHardProcess, 8 : fromHardProcess, 9 : isHardProcessTauDecayProduct, 10 : isDirectHardProcessTauDecayProduct, 11 : fromHardProcessBeforeFSR, 12 : isFirstCopy, 13 : isLastCopy, 14 : isLastCopyBeforeFSR, "); 
+  createTitle("GenPart_genPartIdxMother", "index of the mother particle");
+  
+  if (nanoext) {
+      
+  createTitle("GenPart_Id", "unique genparticle identifier for list-independent cross referencing"); 
+  createTitle("GenPart_isNano", "will also be found on official nanoAOD"); 
+  createTitle("GenPart_parpdgId", "pdg id of immediate parent"); 
+  createTitle("GenPart_sparpdgId", "pdg id of remote parent"); 
+  createTitle("GenPart_numberOfDaughters", "number of daughters in decay");
+  createTitle("GenPart_nstchgdaug", "number of stable charged daughters in decay"); 
+  createTitle("GenPart_promptFlag", "GenPart_promptFlag"); 
+  createTitle("GenPart_vx", "x position of decay vertex");
+  createTitle("GenPart_vy", "y position of decay vertex");
+  createTitle("GenPart_vz", "z position of decay vertex");
+  createTitle("GenPart_mvx", "x position of mother origin vertex");
+  createTitle("GenPart_mvy", "y position of mother origin vertex");
+  createTitle("GenPart_mvz", "z position of mother origin vertex");
+  createTitle("GenPart_recIdx", "identifier of associated reconstructed track (-1 if none)"); 
+  
+  createTitle("GenPV_x", "x position of generated main vertex"); 
+  createTitle("GenPV_y", "y position of generated main vertex");
+  createTitle("GenPV_z", "z position of generated main vertex"); 
+  createTitle("GenPV_recIdx", "identifyer of corresponding reconstructed vertex");
+  createTitle("GenPV_chmult", "charged multiplicity at this vertex"); 
+  
+  }
+  
+  }
+  
+  createTitle("nTrk", "number of tracks in input track collection"); 
+  
+  createTitle("nIsoTrack", "isolated tracks after basic selection (((pt>5 && (abs(pdgId) == 11 || abs(pdgId) == 13)) || pt > 10) && (abs(pdgId) < 15 || abs(eta) < 2.5) && abs(dxy) < 0.2 && abs(dz) < 0.1 && ((pfIsolationDR03().chargedHadronIso < 5 && pt < 25) || pfIsolationDR03().chargedHadronIso/pt < 0.2)) and lepton veto"); 
+  
+  createTitle("PV_npvs", "total number of reconstructed primary vertices");
+  createTitle("PV_npvsGood", "number of good reconstructed primary vertices. selection:!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2"); 
+  createTitle("PV_chi2", "main primary vertex reduced chi2");
+  createTitle("PV_ndof", "main primary vertex number of degree of freedom");
+  createTitle("PV_score", "main primary vertex score, i.e. sum pt2 of clustered objects"); 
+  createTitle("PV_x", "main primary vertex position x coordinate"); 
+  createTitle("PV_y", "main primary vertex position y coordinate"); 
+  createTitle("PV_z", "main primary vertex position z coordinate");
+  
+  createTitle("nOtherPV", "other primary vertices"); 
+  createTitle("OtherPV_z", "Z position of other primary vertices, excluding the main PV"); 
+  
+  if (nanoext) {  
+  
+  createTitle("nPVtx", "primary vertices (AOD, with or w/o cuts)");
+  createTitle("PVtx_Id", "unique id of reconstructed primary vertex for list-independent cross-referencing");
+  createTitle("PVtx_isMain", "is the main primary vertex, PV");
+  createTitle("PVtx_isMainSim", "is the main simulated vertex"); 
+  createTitle("PVtx_isGood", "satisfies good vertex cuts"); 
+  createTitle("PVtx_isValid", "PVtx_isValid"); 
+  createTitle("PVtx_isFake", "PVtx_isFake"); 
+  createTitle("PVtx_isTrigUnique", "is the unique Trigger vertex; only set if no other vertices contribute to trigger"); 
+  createTitle("PVtx_isUnbiased", "is unbiased by the main relevant trigger (e.g. inclusive muon trigger on muon dataset)");
+  createTitle("PVtx_ntrk", "number of tracks associated to this vertex (including nonfitted close secondaries)");
+  createTitle("PVtx_ntrkfit", "number of tracks used in the vertex fit");
+  createTitle("PVtx_chi2", "primary vertex reduced chi2");
+  createTitle("PVtx_ndof", "number of degrees of freedom (including weights)");
+  createTitle("PVtx_score", "sum pt2 score"); 
+  createTitle("PVtx_sumPt", "sum pt of all tracks"); 
+  createTitle("PVtx_Rho", "radial distance to beam spot");
+  createTitle("PVtx_x", "x position of vertex");
+  createTitle("PVtx_y", "y position of vertex"); 
+  createTitle("PVtx_z", "z position of vertex");
+  
+  if (covout) {
+      
+  createTitle("PVtx_Covxx", "PVtx_Covxx, covariance matrix of primary vertex"); 
+  createTitle("PVtx_Covyx", "PVtx_Covyx");
+  createTitle("PVtx_Covzx", "PVtx_Covzx");
+  createTitle("PVtx_Covyy", "PVtx_Covyy");
+  createTitle("PVtx_Covzy", "PVtx_Covzy"); 
+  createTitle("PVtx_Covzz", "PVtx_Covzz"); 
+  
+  }
+  
+  createTitle("Bsp_x", "beam spot position x coordinate"); 
+  createTitle("Bsp_y", "beam spot position y coordinate");
+  createTitle("Bsp_z", "beam spot position z coordinate"); 
+  createTitle("Bsp_sigmaz", "beam spot z width");
+  createTitle("Bsp_dxdz", "beam spot x slope"); 
+  createTitle("Bsp_dydz", "beam spot y slope"); 
+  createTitle("Bsp_widthx", "beam spot x width");
+  createTitle("Bsp_widthy", "beam spot y width");
+  
+  }
+  
+  createTitle("nMuon", "(AOD) muons after basic nanoAODplus selection");
+  createTitle("Muon_charge", "electric charge");
+  createTitle("Muon_tightCharge", "Tight charge criterion using pterr/pt of muonBestTrack (0:fail, 2:pass)"); 
+  createTitle("Muon_pt", "pt"); 
+  createTitle("Muon_ptErr", "ptError of the muon track"); 
+  createTitle("Muon_eta", "eta"); 
+  createTitle("Muon_phi", "phi");
+  createTitle("Muon_mass", "mass"); 
+  createTitle("Muon_dxy", "dxy (with sign) wrt first PV, in cm");
+  createTitle("Muon_dxyBest", "dxy (with sign) wrt best PV, in cm");
+  createTitle("Muon_dxyErr", "dxy uncertainty, in cm");
+  createTitle("Muon_dz", "dz (with sign) wrt first PV, in cm"); 
+  createTitle("Muon_dzBest", "dz (with sign) wrt best PV, in cm"); 
+  createTitle("Muon_dzErr", "dz uncertainty, in cm"); 
+  createTitle("Muon_ip3d", "3D impact parameter wrt first PV, in cm");
+  createTitle("Muon_sip3d", "3D impact parameter significance wrt first PV"); 
+  createTitle("Muon_ip3dBest", "3D impact parameter wrt best PV, in cm"); 
+  createTitle("Muon_sip3dBest", "3D impact parameter significance wrt best PV"); 
+  createTitle("Muon_pfRelIso03_all", "PF relative isolation dR=0.3, total (deltaBeta corrections)"); 
+  createTitle("Muon_pfRelIso03_chg", "PF relative isolation dR=0.3, charged component");
+  createTitle("Muon_pfRelIso04_all", "PF relative isolation dR=0.4, total (deltaBeta corrections)"); 
+  createTitle("Muon_pfIsoId", "Muon_pfIsoId");
+  createTitle("Muon_miniPFRelIso_all", "mini PF relative isolation, total (with scaled rho*EA PU corrections)"); 
+  createTitle("Muon_miniPFRelIso_chg", "mini PF relative isolation, charged component"); 
+  createTitle("Muon_jetIdx", "index of the associated jet (-1 if none)");
+  createTitle("Muon_isPFcand", "muon is PF candidate");
+  createTitle("Muon_softId", "soft cut-based ID");
+  createTitle("Muon_mediumId", "cut-based ID, medium WP"); 
+  createTitle("Muon_tightId", "cut-based ID, tight WP"); 
+  createTitle("Muon_highPtId", "high-pT cut-based ID (1 = tracker high pT, 2 = global high pT, which includes tracker high pT)"); 
+  createTitle("Muon_nStations", "number of matched stations with default arbitration (segment & track)");
+  createTitle("Muon_nTrackerLayers", "number of layers in the tracker"); 
+  createTitle("Muon_segmentComp", "muon segment compatibility");
+  createTitle("Muon_cleanmask", "simple cleaning mask with priority to leptons"); 
+  createTitle("Muon_mvaTTH", "TTH MVA lepton ID score"); 
+  createTitle("Muon_pdgId", "PDG code assigned by the event reconstruction (not by MC truth)"); 
+  createTitle("Muon_genPartFlav", "Flavour of genParticle for MC matching to status==1 muons: 1 = prompt muon (including gamma*->mu mu), 15 = muon from prompt tau, 5 = muon from b, 4 = muon from c, 3 = muon from light or unknown, 0 = unmatched"); 
+  createTitle("Muon_genPartIdx", "Index into genParticle list for MC matching to status==1 muons");
+  createTitle("Muon_isGlobal", "muon is global muon"); 
+  createTitle("Muon_isTracker", "muon is tracker muon");
+  
+  if (nanoext) {
+    
+  createTitle("Muon_Id", "Unique identifier of muon, for list-independent cross-referencing"); 
+  createTitle("Muon_x", "x point of closest approach to beam line, in cm"); 
+  createTitle("Muon_y", "y point of closest approach to beam line, in cm"); 
+  createTitle("Muon_z", "z point of closest approach to beam line, in cm"); 
+  createTitle("Muon_gpt", "global muon pt"); 
+  createTitle("Muon_geta", "global muon eta"); 
+  createTitle("Muon_gphi", "global muon phi"); 
+  createTitle("Muon_looseId", "loose cut-based ID"); 
+  createTitle("Muon_softId4", "soft cut-based ID, 2010 version"); 
+  createTitle("Muon_softIdBest", "soft cut-based ID, w.r.t. best PV"); 
+  createTitle("Muon_isNano", "can be found on NanoAOD"); 
+  createTitle("Muon_isMini", "can be found on MiniAOD"); 
+  createTitle("Muon_isGood", "isGood(TMAnyStationTight)"); 
+  createTitle("Muon_isGoodLast", "isGood(TMLastStationTight)"); 
+  createTitle("Muon_isGoodAng", "isGood(TMLastStationAngTight)"); 
+  createTitle("Muon_isArbitrated", "isGood(TrackerMuonArbitrated)"); 
+  createTitle("Muon_isStandAlone", "StandAlone Muon"); 
+  createTitle("Muon_isRPCcand", "RPC Muon"); 
+  createTitle("Muon_nValid", "number of valid tracker hits"); 
+  createTitle("Muon_nPix", "number of valid pixel hits"); 
+  createTitle("Muon_Chi2", "tracker muon chi2/ndof"); 
+  createTitle("Muon_gnValid", "number of valid tracker hits, global muon"); 
+  createTitle("Muon_gnPix", "number of valid pixel hits, global muon"); 
+  createTitle("Muon_gChi2", "global muon chi2/ndof"); 
+  createTitle("Muon_gnValidMu", "Muon_gnValidMu"); 
+  createTitle("Muon_vtxIdx", "index of the associated primary vertex (-1 if none)");
+  createTitle("Muon_vtxFlag", "quality flag for vertex association"); 
+  createTitle("Muon_trkIdx", "index of the associated track (-1 if none)"); 
+  createTitle("Muon_simIdx", "index of the associated gen object (-1 if none)"); 
+  createTitle("Muon_nNano", "number of muons satisfying isNano"); 
+  
+  createTitle("nDimu", "number of dimuons after vertex refit"); 
+  createTitle("Dimu_t1muIdx", "cross reference to unique Id of first muon"); 
+  createTitle("Dimu_t1dxy", "dxy of first muon (needed?)"); 
+  createTitle("Dimu_t1dz", "dz of first muon (needed?)"); 
+  createTitle("Dimu_t2muIdx", "cross reference to unique Id of 2nd muon"); 
+  createTitle("Dimu_t2dxy", "dxy of 2nd muon (needed?)"); 
+  createTitle("Dimu_t2dz", "dz of 2nd muon (needed?)"); 
+  createTitle("Dimu_pt", "dimuon pt after vertex fit"); 
+  createTitle("Dimu_eta", "dimuon eta after vertex fit"); 
+  createTitle("Dimu_phi", "dimuon phi after vertex fit"); 
+  createTitle("Dimu_rap", "dimuon rapidity after vertex fit"); 
+  createTitle("Dimu_mass", "dimuon mass after vertex fit"); 
+  createTitle("Dimu_charge", "dimuon charge"); 
+  createTitle("Dimu_simIdx", "cross reference to parent meson or boson in GenPart"); 
+  createTitle("Dimu_vtxIdx", "cross reference to associated primary vertex"); 
+  createTitle("Dimu_chi2", "dimuon vertex chi2/ndof"); 
+  createTitle("Dimu_dlxy", "dimuon decay length in xy"); 
+  createTitle("Dimu_dlxyErr", "dimuon decay length error in xy"); 
+  createTitle("Dimu_dlxySig", "dimuon decay length significance in xy"); 
+  createTitle("Dimu_cosphixy", "cosine of vertex alignment angle in xy"); 
+  createTitle("Dimu_dl", "dimuon decay length in 3D"); 
+  createTitle("Dimu_dlErr", "dimuon decay length error in 3D"); 
+  createTitle("Dimu_dlSig", "dimuon decay length significance in 3D"); 
+  createTitle("Dimu_cosphi", "cosine of vertex alignment angle in 3D"); 
+  createTitle("Dimu_ptfrac", "transverse momentum fraction w.r.t. total of associated primary vertex"); 
+  createTitle("Dimu_x", "x position of dimuon vertex"); 
+  createTitle("Dimu_y", "y position of dimuon vertex"); 
+  createTitle("Dimu_z", "z position of dimuon vertex"); 
+  
+  if (covout) {    
+      
+  createTitle("Dimu_Covxx", "Dimu_Covxx (covariance matrix of vertex refit)"); 
+  createTitle("Dimu_Covyx", "Dimu_Covyx"); 
+  createTitle("Dimu_Covzx", "Dimu_Covzx"); 
+  createTitle("Dimu_Covyy", "Dimu_Covyy"); 
+  createTitle("Dimu_Covzy", "Dimu_Covzy"); 
+  createTitle("Dimu_Covzz", "Dimu_Covzz"); 
+  
+  }
+  
+  }
+
+  createTitle("nElectron", "number of Electrons"); 
+  createTitle("Electron_x", "x point of closest approach to beam line, in cm"); 
+  createTitle("Electron_y", "y point of closest approach to beam line, in cm"); 
+  createTitle("Electron_z", "z point of closest approach to beam line, in cm"); 
+  createTitle("Electron_pt", "pt");
+  createTitle("Electron_eta", "eta"); 
+  createTitle("Electron_phi", "phi");
+  createTitle("Electron_mass", "mass");
+  createTitle("Electron_charge", "electric charge");
+  createTitle("Electron_tightCharge", "tight charge criteria"); 
+  createTitle("Electron_pfRelIso03_all", "PF relative isolation dR=0.3"); 
+  createTitle("Electron_pfRelIso03_chg", "PF relative isolation dR=0.3, charged component"); 
+  createTitle("Electron_dr03TkSumPtOld", "old: Non-PF track isolation within a delta R cone of 0.3"); 
+  createTitle("Electron_dr03TkSumPt", "Non-PF track isolation within a delta R cone of 0.3 with electron pt > 35 GeV"); 
+  createTitle("Electron_dr03EcalRecHitSumEtOld", "Non-PF Ecal isolation within a delta R cone of 0.3"); 
+  createTitle("Electron_dr03EcalRecHitSumEt", "Non-PF Ecal isolation within a delta R cone of 0.3 with electron pt > 35 GeV"); 
+  createTitle("Electron_dr03HcalTowerSumEt", "NanoAODplus extension"); 
+  createTitle("Electron_dr03HcalDepth1TowerSumEtOld", "Non-PF Hcal isolation within a delta R cone of 0.3"); 
+  createTitle("Electron_dr03HcalDepth1TowerSumEt", "Non-PF Hcal isolation within a delta R cone of 0.3 with electron pt > 35 GeV"); 
+  createTitle("Electron_isEB", "NanoAODplus extension"); 
+  createTitle("Electron_isEE", "NanoAODplus extension"); 
+  createTitle("Electron_lostHits", "NanoAODplus extension"); 
+  createTitle("Electron_isPFcand", "NanoAODplus extension"); 
+  createTitle("Electron_isNano", "NanoAODplus extension"); 
+  createTitle("Electron_convDist", "NanoAODplus extension"); 
+  createTitle("Electron_convDcot", "NanoAODplus extension"); 
+  createTitle("Electron_convVetoOld", "pass conversion veto");
+  createTitle("Electron_convVeto", "pass conversion veto"); 
+  createTitle("Electron_deltaEtaSC", "delta eta (SC,ele) with sign"); 
+  createTitle("Electron_deltaPhiSC", "delta phi (SC,ele) with sign"); 
+  createTitle("Electron_deltaEtaSCtr", "NanoAODplus extension"); 
+  createTitle("Electron_deltaPhiSCtr", "NanoAODplus extension"); 
+  createTitle("Electron_hoe", "H over E");
+  createTitle("Electron_sieie", "sigma_IetaIeta of the supercluster, calculated with full 5x5 region");
+  createTitle("Electron_sieieR1", "NanoAODplus Run1"); 
+  createTitle("Electron_eInvMinusPInvOld", "NanoAODplus Run1"); 
+  createTitle("Electron_eInvMinusPInv", "1/E_SC - 1/p_trk"); 
+  createTitle("Electron_SCeta", "Super Cluster eta");
+  createTitle("Electron_cutBased", "cut-based ID Fall17 V2 (0:fail, 1:veto, 2:loose, 3:medium, 4:tight)"); 
+  createTitle("Electron_dxy", "dxy (with sign) wrt first PV, in cm"); 
+  createTitle("Electron_dxyErr", "dxy uncertainty, in cm"); 
+  createTitle("Electron_dz", "dz (with sign) wrt first PV, in cm"); 
+  createTitle("Electron_dzErr", "dz uncertainty, in cm"); 
+  createTitle("Electron_ip3d", "3D impact parameter wrt first PV, in cm");
+  createTitle("Electron_sip3d", "3D impact parameter significance wrt first PV, in cm");
+  createTitle("Electron_nNano", "electron that follows nanoAOD cut (pT < 5 GeV)"); 
+  createTitle("Electron_vtxIdx", "index of the associated primary vertex (-1 if none)");
+ 
+  createTitle("nTau", "Taus after basic selection (pt > 18 && tauID('decayModeFindingNewDMs') && (tauID('byLooseCombinedIsolationDeltaBetaCorr3Hits') || tauID('byVLooseIsolationMVArun2v1DBoldDMwLT2015') || tauID('byVLooseIsolationMVArun2v1DBnewDMwLT') || tauID('byVLooseIsolationMVArun2v1DBdR03oldDMwLT') || tauID('byVVLooseIsolationMVArun2v1DBoldDMwLT') || tauID('byVVLooseIsolationMVArun2v1DBoldDMwLT2017v2') || tauID('byVVLooseIsolationMVArun2v1DBnewDMwLT2017v2') || tauID('byVVLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2')))"); 
+  createTitle("Tau_pt", "pt"); 
+  createTitle("Tau_eta", "eta"); 
+  createTitle("Tau_phi", "phi"); 
+  createTitle("Tau_mass", "mass"); 
+  createTitle("Tau_charge", "electric charge"); 
+  createTitle("Tau_decayMode", "decayMode()"); 
+  createTitle("Tau_chargedIso", "charged isolation"); 
+  createTitle("Tau_neutralIso", "neutral (photon) isolation"); 
+  
+  createTitle("nPhoton", "Photons after basic selection (pt > 5 )"); 
+  createTitle("Photon_pt", "pt"); 
+  createTitle("Photon_eta", "eta"); 
+  createTitle("Photon_phi", "phi"); 
+  createTitle("Photon_mass", "mass"); 
+  createTitle("Photon_charge", "electric charge"); 
+  createTitle("Photon_pfRelIso03_all", "PF relative isolation dR=0.3, total (with rho*EA PU corrections)"); 
+  
+  createTitle("MET_pt", "pt"); 
+  createTitle("MET_phi", "phi"); 
+  createTitle("MET_sumEt", "scalar sum of Et"); 
+  createTitle("MET_significance", "MET significance"); 
+  createTitle("MET_covXX", "xx element of met covariance matrix"); 
+  createTitle("MET_covXY", "xy element of met covariance matrix"); 
+  createTitle("MET_covYY", "yy element of met covariance matrix"); 
+  
+  createTitle("CaloMET_pt", "pt"); 
+  createTitle("CaloMET_phi", "phi"); 
+  createTitle("CaloMET_sumEt", "scalar sum of Et"); 
+  
+  createTitle("nJet", "PFJets, ak5 for Run 1, ak4 for Run2, after basic selection (pt > 15)"); 
+  createTitle("Jet_pt", "pt with JEC applied"); 
+  createTitle("Jet_ptuncor", "pt before application of JEC"); 
+  createTitle("Jet_eta", "eta"); 
+  createTitle("Jet_phi", "phi"); 
+  createTitle("Jet_mass", "mass"); 
+  createTitle("Jet_area", "jet catchment area, for JECs"); 
+  createTitle("Jet_nConstituents", "number of particles in the jet"); 
+  createTitle("Jet_nElectrons", "number of electrons in the jet"); 
+  createTitle("Jet_nMuons", "number of muons in the jet"); 
+  createTitle("Jet_chEmEF", "charged Electromagnetic Energy Fraction"); 
+  createTitle("Jet_chHEF", "charged Hadron Energy Fraction"); 
+  createTitle("Jet_neEmEF", "neutral Electromagnetic Energy Fraction"); 
+  createTitle("Jet_neHEF", "neutral Hadron Energy Fraction"); 
+  createTitle("Jet_jetId", "Jet ID flags bit1 is loose (does not always exist), bit2 is tight, bit3 is tightLepVeto"); 
+  
+  if (!isData) {
+   
+  createTitle("nGenJet", "GenJets, i.e. ak5 or ak4 Jets made with visible genparticles"); 
+  createTitle("GenJet_pt", "pt"); 
+  createTitle("GenJet_eta", "eta"); 
+  createTitle("GenJet_phi", "phi"); 
+  createTitle("GenJet_mass", "mass"); 
+  
+  }
+  
+  createTitle("nFatJet", "ak7 (Run 1) or ak8 (Run 2) PFjets for wide jet or boosted analysis"); 
+  createTitle("FatJet_pt", "pt"); 
+  createTitle("FatJet_eta", "eta"); 
+  createTitle("FatJet_phi", "phi"); 
+  createTitle("FatJet_mass", "mass"); 
+  createTitle("FatJet_area", "jet catchment area, for JECs"); 
+  createTitle("FatJet_nConstituents", "number of PF constituents"); 
+  createTitle("FatJet_nElectrons", "number of Electrons in jet"); 
+  createTitle("FatJet_nMuons", "number of Muons in jet"); 
+  createTitle("FatJet_chEmEF", "FatJet_chEmEF"); 
+  createTitle("FatJet_chHEF", "FatJet_chHEF"); 
+  createTitle("FatJet_neEmEF", "FatJet_neEmEF"); 
+  createTitle("FatJet_neHEF", "FatJet_neHEF"); 
+  
+  createTitle("nTrackJet", "ak5 (Run 1) or ak4 (Run 2) track jets"); 
+  createTitle("TrackJet_pt", "pt"); 
+  createTitle("TrackJet_eta", "eta"); 
+  createTitle("TrackJet_phi", "phi"); 
+  createTitle("TrackJet_mass", "mass"); 
+  createTitle("TrackJet_area", "area"); 
+  createTitle("TrackJet_nConstituents", "number of track constituents"); 
+  createTitle("TrackJet_nElectrons", "number of Electrons in jet"); 
+  createTitle("TrackJet_nMuons", "number of Muons in jet"); 
+  
+  createTitle("nTrigObj", "trigger objects, only partially filled so far"); 
+  createTitle("TrigObj_id", "ID of the object: 11 = Electron (PixelMatched e/gamma), 22 = Photon (PixelMatch-vetoed e/gamma), 13 = Muon, 15 = Tau, 1 = Jet, 6 = FatJet, 2 = MET, 3 = HT, 4 = MHT"); 
+  createTitle("TrigObj_filterBits", "extra bits of associated information: 1 = CaloIdL_TrackIdL_IsoVL, 2 = 1e (WPTight), 4 = 1e (WPLoose), 8 = OverlapFilter PFTau, 16 = 2e, 32 = 1e-1mu, 64 = 1e-1tau, 128 = 3e, 256 = 2e-1mu, 512 = 1e-2mu for Electron (PixelMatched e/gamma); 1 = TrkIsoVVL, 2 = Iso, 4 = OverlapFilter PFTau, 8 = 1mu, 16 = 2mu, 32 = 1mu-1e, 64 = 1mu-1tau, 128 = 3mu, 256 = 2mu-1e, 512 =1mu-2e for Muon; 1 = LooseChargedIso, 2 = MediumChargedIso, 4 = TightChargedIso, 8 = TightID OOSC photons, 16 = HPS, 32 = single-tau + tau+MET, 64 = di-tau, 128 = e-tau, 256 = mu-tau, 512 = VBF+di-tau for Tau; 1 = VBF cross-cleaned from loose iso PFTau for Jet; "); 
+  createTitle("TrigObj_pt", "pt"); 
+  createTitle("TrigObj_phi", "phi"); 
+  createTitle("TrigObj_eta", "eta"); 
+  
+  createTitle("Trig_goodMinBiasTrigger", "generic flag: event trigger suited for Minimum Bias analysis"); 
+  createTitle("Trig_goodJetTrigger",     "generic flag: event trigger suited for inclusive Jet analysis"); 
+  createTitle("Trig_goodMuTrigger",      "generic flag: event trigger suited for inclusive Muon analysis"); 
+  createTitle("Trig_goodETrigger",       "generic flag: event trigger suited for inclusive Electron analysis"); 
+  createTitle("Trig_ZeroBiasFlag",       "flag for kind of ZeroBias trigger"); 
+  createTitle("Trig_MinBiasFlag",        "flag for kind of MinimumBias irigger"); 
+  createTitle("Trig_MinBiasMult",        "flag for multiplicity in Minimum Bias Multiplicity triggers"); 
+  createTitle("Trig_MuThresh",           "muon trigger pt threshold"); 
+  createTitle("Trig_MuL1Thresh",         "L1 muon trigger pt threshold"); 
+  createTitle("Trig_MuL2Thresh",         "L2 muon trigger pt threshold"); 
+  createTitle("Trig_IsoMuThresh",        "isolated muon trigger pt threshold"); 
+  createTitle("Trig_DoubleMuThresh",     "double muon trigger, lower pt threshold"); 
+  createTitle("Trig_JpsiThresh",         "Jpsi trigger, Jpsi pt threshold"); 
+  createTitle("Trig_MuHadFlag",          "flag for kind of Muon+Hadron trigger"); 
+  createTitle("Trig_MuEGFlag",           "flag for kind of Muon+Electron or Photon trigger"); 
+  createTitle("Trig_ElectronThresh",     "electron trigger pt threshold"); 
+  createTitle("Trig_DoubleElectronThresh","double electron trigger lower pt threshold"); 
+  createTitle("Trig_PhotonThresh",       "photon trigger pt threshold"); 
+  createTitle("Trig_JetThresh",          "jet trigger Et threshold"); 
+  createTitle("Trig_DiJetThresh",        "diJet trigger Et threshold"); 
+  createTitle("Trig_TriJetThresh",       "triJet trigger Et threshold"); 
+  createTitle("Trig_QuadJetThresh",      "four-Jet trigger Et threshold"); 
+  createTitle("Trig_HTThresh",           "HT trigger HT threshold"); 
+  createTitle("Trig_BThresh",            "threshold of B trigger object"); 
+  createTitle("Trig_METThresh",          "MET trigger threshold"); 
+
+}
+
+void NanoAnalyzer::createTitle(const std::string &name, const std::string &title) { 
+ TBranch *branch = t_event->GetBranch(name.c_str()); branch->SetTitle(title.c_str());
+} 
