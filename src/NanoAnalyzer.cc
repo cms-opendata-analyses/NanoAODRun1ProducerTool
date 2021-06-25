@@ -1307,10 +1307,17 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel("ak5TrackJets", trackjets);
   iEvent.getByLabel("ak5GenJets", genjets);//Qun
 
-  // jet correction label, will this work for 2010?
-  mJetCorr = "ak5PFL1FastL2L3Residual";
+  // jet correction label
 //  mJetCorr = "ak5CaloL2L3";
 //  mJetCorr_ak5 = "jetCorr_ak5";
+
+#ifdef CMSSW42X
+  // for 2010
+  mJetCorr = "ak5PFL2L3";
+#else
+  // for 2011/12
+  mJetCorr = "ak5PFL1FastL2L3Residual";
+#endif
 
   // choose primary vertices with/without beam spot
   // see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideOfflinePrimaryVertexProduction
