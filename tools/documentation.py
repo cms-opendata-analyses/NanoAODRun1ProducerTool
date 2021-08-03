@@ -194,12 +194,12 @@ def writeSizeReport(fileData, stream):
     <html>
     <head>
         <title>{title}</title>
-        <link rel="stylesheet" type="text/css" href="http://gpetrucc.web.cern.ch/gpetrucc/micro/patsize.css" />
-        <script type="text/javascript" src="http://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.core.js"></script>
-        <script type="text/javascript" src="http://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.pie.js"></script>
-        <script type="text/javascript" src="http://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.dynamic.js"></script>
-        <script type="text/javascript" src="http://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.tooltips.js"></script>
-        <script type="text/javascript" src="http://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.key.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://gpetrucc.web.cern.ch/gpetrucc/micro/patsize.css" />
+        <script type="text/javascript" src="https://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.core.js"></script>
+        <script type="text/javascript" src="https://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.pie.js"></script>
+        <script type="text/javascript" src="https://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.dynamic.js"></script>
+        <script type="text/javascript" src="https://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.tooltips.js"></script>
+        <script type="text/javascript" src="https://gpetrucc.web.cern.ch/gpetrucc/rgraph/RGraph.common.key.js"></script>
     </head>
     <body>
     <a name="top" id="top"><h1>{title}</h1></a>
@@ -236,7 +236,7 @@ def writeSizeReport(fileData, stream):
     for s in survey:
         stream.write("<th title=\"%s\"><a href='#%s'>%s</a></th><td style='text-align : left;'>%s</td><td>%d</td>" % (s['doc'],s['name'],s['name'],s['kind'].lower(),len(s['subs'])))
         stream.write("<td>%.2f</td><td>%.3f</td><td>%.1f</td>" % (s['entries']/events, s['tot']/events, s['tot']/s['entries']*1024 if s['entries'] else 0))
-        stream.write("<td class=\"img\"><img src='http://gpetrucc.web.cern.ch/gpetrucc/micro/blue-dot.gif' width='%d' height='%d' /></td>" % (s['tot']/grandtotal*200,10))
+        stream.write("<td class=\"img\"><img src='https://gpetrucc.web.cern.ch/gpetrucc/micro/blue-dot.gif' width='%d' height='%d' /></td>" % (s['tot']/grandtotal*200,10))
         stream.write("<td>%.1f%%</td>" % ( s['tot']/grandtotal * 100.0))
         stream.write("<td>%.1f%%</td>" % ( (runningtotal+s['tot'])/grandtotal * 100.0))
         stream.write("<td>%.1f%%</td>" % ( (grandtotal-runningtotal)/grandtotal * 100.0))
@@ -246,14 +246,14 @@ def writeSizeReport(fileData, stream):
     # all known data
     stream.write("<th>All Event data</th>")
     stream.write("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td><b>%.2f</b></td><td>&nbsp;</td>"  % (grandtotal/events))
-    stream.write("<td class=\"img\"><img src=\"http://gpetrucc.web.cern.ch/gpetrucc/micro/green-dot.gif\" width='%d' height='10' />" % ( grandtotal/filesize*100.0))
+    stream.write("<td class=\"img\"><img src=\"https://gpetrucc.web.cern.ch/gpetrucc/micro/green-dot.gif\" width='%d' height='10' />" % ( grandtotal/filesize*100.0))
     stream.write("</td><td>%.1f%%<sup>a</sup></td>" % (grandtotal/filesize*100.0))
     stream.write("</tr>\n")
 
     # other, unknown overhead
     stream.write("<th>Non per-event data or overhead</th>")
     stream.write("<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>%.2f</td><td>&nbsp;</td>" % ( (filesize-grandtotal)/events))
-    stream.write("<td class=\"img\"><img src='http://gpetrucc.web.cern.ch/gpetrucc/micro/red-dot.gif' width='%d' height='%d' /></td>" % ( (filesize-grandtotal)/filesize * 100, 10 ))
+    stream.write("<td class=\"img\"><img src='https://gpetrucc.web.cern.ch/gpetrucc/micro/red-dot.gif' width='%d' height='%d' /></td>" % ( (filesize-grandtotal)/filesize * 100, 10 ))
     stream.write("<td>%.1f%%<sup>a</sup></td>" % ( (filesize-grandtotal)/filesize * 100.0 ))
     stream.write("</tr>\n")
 
@@ -275,7 +275,7 @@ def writeSizeReport(fileData, stream):
         subs = [ fileData.Events['branches'][b] for b in s['subs'] ]
         for b in sorted(subs, key = lambda s : - s['tot']):
             stream.write("<th title=\"%s\">%s</th><td style='text-align : left;'>%s</td><td>%.1f</td><td>%.1f</td>" % (b['doc'],b['name'], b['kind'], b['tot']/events*1024, b['tot']/s['entries']*1024 if s['entries'] else 0))
-            stream.write("<td class=\"img\"><img src='http://gpetrucc.web.cern.ch/gpetrucc/micro/blue-dot.gif' width='%d' height='%d' /></td>" % ( b['tot']/s['tot']*200, 10 ))
+            stream.write("<td class=\"img\"><img src='https://gpetrucc.web.cern.ch/gpetrucc/micro/blue-dot.gif' width='%d' height='%d' /></td>" % ( b['tot']/s['tot']*200, 10 ))
             stream.write("<td>%.1f%%</td>" % (b['tot']/s['tot'] * 100.0))
             stream.write("</tr>\n")
         stream.write("</table>\n")
@@ -288,7 +288,7 @@ def writeDocReport(fileData, stream):
     <html>
     <head>
         <title>Documentation for {filename} </title>
-        <link rel="stylesheet" type="text/css" href="http://gpetrucc.web.cern.ch/gpetrucc/micro/patsize.css" />
+        <link rel="stylesheet" type="text/css" href="https://gpetrucc.web.cern.ch/gpetrucc/micro/patsize.css" />
     </head>
     <body>
     <h1>Content</h1>
