@@ -61,8 +61,8 @@
 // activate this only for data sets for which "plus" part of trigger treatment 
 // is already implemented; checks and aborts in case of inconsistency;
 // should be activated by default if trigger is implemented for dataset
-// (protection against inconsistencies in NanoTrigger implementation)
-//#define trigcheckabort
+// (protection against inconsistencies in NanoTrigger implementation) 
+#define trigcheckabort
 
 #ifdef CMSSW7plus
 // activate this when you read from miniAOD for validation (Run 2/3 only!)
@@ -1500,17 +1500,17 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
               ZeroBiasFlag   = -10;
               MinBiasFlag    = -10;
               MinBiasMult    = -99;
-              MuThresh       = -49;
-              MuL1Thresh     = -49;
-              MuL2Thresh     = -49;
-              IsoMuThresh    = -49;
-              DoubleMuThresh = -49;
-              JpsiThresh     = -49;
+              MuThresh       = -99;
+              MuL1Thresh     = -99;
+              MuL2Thresh     = -99;
+              IsoMuThresh    = -99;
+              DoubleMuThresh = -99;
+              JpsiThresh     = -99;
               MuHadFlag      = -10;
               MuEGFlag       = -10;
-              ElectronThresh = -49;
-              DoubleElectronThresh = -49;
-              PhotonThresh   = -49;
+              ElectronThresh = -99;
+              DoubleElectronThresh = -99;
+              PhotonThresh   = -99;
               JetThresh      = -199;
               DiJetThresh    = -199; 
               TriJetThresh   = -199; 
@@ -1716,40 +1716,40 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //
 //   Commissioning10: (7 TeV and 900 GeV): Zerobias and MinimumBias 
 //
-//      2010A       2010B         2011A (add B*)    2012B/C
+//      2010A       2010B         2011A             2011B              2012B/C
 //      ZeroBias   (Zerobias)
-//      MinimumBias MinimumBias   MinimumBias       MinimumBias*     <-- next
-//   Commissioning* Commissioning                   Commissioning*
-//      Mu          Mu          ( SingleMu        ( SingleMu
-//                              ( DoubleMu        ( DoubleMuParked
-//                              ( MuHad           ( MuHad*
-//                              ( MuEG            ( MuEG*
+//      MinimumBias MinimumBias   MinimumBias       MinimumBias*       MinimumBias*  <-- next    
+//   Commissioning* Commissioning                   next--^            Commissioning*
+//      Mu          Mu          ( SingleMu        ( SingleMu         ( SingleMu
+//                              ( DoubleMu        ( DoubleMu         ( DoubleMuParked
+//                              ( MuHad           ( MuHad*           ( MuHad*
+//                              ( MuEG            ( MuEG             ( MuEG
 //      MuMonitor   MuMonitor
-//      MuOnia      MuOnia        MuOnia* <-- next  MuoniaParked*
-//      EG          Electron    ( SingleElectron* ( SingleElectron*
-//                              ( DoubleElectron  ( DoubleElectron*  
-//		                ( ElectronHad*    ( ElectronHad*
+//      MuOnia      MuOnia        MuOnia* <-- next  MuOnia*            MuoniaParked*
+//      EG          Electron    ( SingleElectron  ( SingleElectron   ( SingleElectron
+//                              ( DoubleElectron  ( DoubleElectron   ( DoubleElectron  
+//		                ( ElectronHad*    ( ElectronHad*     ( ElectronHad*
 //      EGmonitor   EGMonitor
-//          next--> Photon*     ( Photon*        (( SinglePhoton*
-//                                               (( DoublePhoton*
-//                                               (( DoublePhotonHighPt*
-//                              ( PhotonHad*      ( PhotonHad*
+//          next--> Photon*     ( Photon*         ( Photon*         (( SinglePhoton*
+//                                                                  (( DoublePhoton*
+//                                                                  (( DoublePhotonHighPt*
+//                              ( PhotonHad*      ( PhotonHad*       ( PhotonHad*
 //      JeTMETTau*
-//      BTau*       BTau        ( BTag*          (( BTag*
-//                                               (( BJetPlusX*
-//                              ( Tau*            ( TauParked*
-//                              ( TauPlusX*       ( TauPlusX
-//      JetMET*     Jet         ( Jet            (( Jet*
-//      next--^                                  (( JetHT*
-//                                               (( JetMon* 
-//                              ( HT*             ( HTMHTParked*
+//      BTau*       BTau        ( BTag*           ( BTag*           (( BTag*
+//                                                                  (( BJetPlusX*
+//                              ( Tau*            ( Tau*             ( TauParked*
+//                              ( TauPlusX*       ( TauPlusX*        ( TauPlusX*
+//      JetMET*     Jet         ( Jet             ( Jet*            (( Jet*
+//      next--^                                                     (( JetHT*
+//                                                                  (( JetMon* 
+//                              ( HT*             ( HT*              ( HTMHTParked*
 //JetMETTauMonitor* JetMETTauMonitor
-//                  Multijet      MultiJet*
-//                  METFwd*     ( MET*            ( MET*
-//                              ( METBTag* 
-//                                                  HcalNZS*
-//                                                  NoBPTX*
-//                                                  VBF1Parked*
+//                  Multijet      MultiJet*         MultiJet*
+//                  METFwd*     ( MET*              MET*             ( MET*
+//                              ( METBTag*        
+//                                                                     HcalNZS*
+//                                                                     NoBPTX*
+//                                                                     VBF1Parked*
 //
 //     also: 2015E MinimumBias (5 TeV)
 //           2016  ZeroBias (13 TeV)
