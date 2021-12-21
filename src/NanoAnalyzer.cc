@@ -1712,27 +1712,27 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 // datasets from which special trigger variables are being treated are so far
-//   (* = still to be implemented)
+//   (* = still to be implemented,  + = implemented but still to be tested)
 //
 //   Commissioning10: (7 TeV and 900 GeV): Zerobias and MinimumBias 
 //
-//      2010A       2010B         2011A             2011B              2012B/C
+//      2010A       2010B         2011A             2011B              2012B/C             2012A/D
 //      ZeroBias   (Zerobias)
-//      MinimumBias MinimumBias   MinimumBias       MinimumBias*       MinimumBias*  <-- next    
+//      MinimumBias MinimumBias   MinimumBias       MinimumBias*       MinimumBias* <--next    
 //   Commissioning* Commissioning                   next--^            Commissioning*
-//      Mu          Mu          ( SingleMu        ( SingleMu         ( SingleMu
-//                              ( DoubleMu        ( DoubleMu         ( DoubleMuParked
-//                              ( MuHad           ( MuHad*           ( MuHad*
-//                              ( MuEG            ( MuEG             ( MuEG
+//      Mu          Mu          ( SingleMu        ( SingleMu         ( SingleMu           (SingleMu+
+//                              ( DoubleMu        ( DoubleMu         ( DoubleMuParked     (DoubleMuParked+
+//                              ( MuHad           ( MuHad*           ( MuHad*             (
+//                              ( MuEG            ( MuEG             ( MuEG               (
 //      MuMonitor   MuMonitor
-//      MuOnia      MuOnia        MuOnia* <-- next  MuOnia*            MuoniaParked*
+//      MuOnia      MuOnia        MuOnia+           MuOnia+            MuoniaParked+
 //      EG          Electron    ( SingleElectron  ( SingleElectron   ( SingleElectron
 //                              ( DoubleElectron  ( DoubleElectron   ( DoubleElectron  
 //		                ( ElectronHad*    ( ElectronHad*     ( ElectronHad*
 //      EGmonitor   EGMonitor
 //          next--> Photon*     ( Photon*         ( Photon*         (( SinglePhoton*
-//                                                                  (( DoublePhoton*
-//                                                                  (( DoublePhotonHighPt*
+//                              (   ^--next       (                 (( DoublePhoton*
+//                              (                 (                 (( DoublePhotonHighPt*
 //                              ( PhotonHad*      ( PhotonHad*       ( PhotonHad*
 //      JeTMETTau*
 //      BTau*       BTau        ( BTag*           ( BTag*           (( BTag*

@@ -600,7 +600,7 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                 for(unsigned i= 0; i<trigNames.size(); i++) { 
                   if (triggerResultsHandle_->accept(i)==1){
 
-                    // check Mu (2010) or SingleMu (2011) triggers
+                    // check Mu (2010) or SingleMu (2011 and 2012B/C) triggers,  (+ 2012A/D, but with no checks)
                     // can occur exclusively on Mu sample only, but can also occur on other samples if non-exclusive
                     //          --  have all been checked for real occurrence in Mu sample :-)
                     //              the ones which are commented out without comment have been listed but do not occur 
@@ -662,7 +662,7 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     // else if (iEvent.run()<141949 && trigNames.triggerName(i)=="HLT_L1DoubleMuOpen")  DoubleMuThresh=0; // A1 only, on MuMonitor for Run B and Run A2
                     else if (iEvent.run()<141949 && trigNames.triggerName(i)=="HLT_DoubleMu3")  DoubleMuThresh=3; // A only, on MuMonitor for Run B?
  		    
-		    // 2012
+		    // 2012B/C/D
                     else if (trigNames.triggerName(i)=="HLT_L2Mu70_eta2p1_PFMET60_v2") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012C
                     else if (trigNames.triggerName(i)=="HLT_L2Mu70_eta2p1_PFMET60_v1") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012B
                     else if (trigNames.triggerName(i)=="HLT_L2Mu70_eta2p1_PFMET55_v2") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012C
@@ -671,6 +671,19 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_L2Mu70_2Cha_eta2p1_PFMET60_v1") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012B
                     else if (trigNames.triggerName(i)=="HLT_L2Mu70_2Cha_eta2p1_PFMET55_v2") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012C
                     else if (trigNames.triggerName(i)=="HLT_L2Mu70_2Cha_eta2p1_PFMET55_v1") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012B
+		    
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu80_eta2p1_PFMET70_v4") {if (MuL2Thresh<-80) MuL2Thresh=-80;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu80_eta2p1_PFMET70_v3") {if (MuL2Thresh<-80) MuL2Thresh=-80;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu80_eta2p1_PFMET70_v2") {if (MuL2Thresh<-80) MuL2Thresh=-80;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu70_eta2p1_PFMET65_v4") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu70_eta2p1_PFMET65_v3") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu70_eta2p1_PFMET65_v2") {if (MuL2Thresh<-70) MuL2Thresh=-70;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu30_NoVertex_NoBPTX3BX_NoHalo_v1") {if (MuL2Thresh<-30) MuL2Thresh=-30;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu20_eta2p1_NoVertex_v1")           {if (MuL2Thresh<-20) MuL2Thresh=-20;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu20_NoVertex_NoBPTX3BX_NoHalo_v1") {if (MuL2Thresh<-20) MuL2Thresh=-20;}          // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_L2Mu10_NoVertex_NoBPTX3BX_NoHalo_v1") {if (MuL2Thresh<-10) MuL2Thresh=-10;}          // 2012A
+
 
 
                     // not in competition with HLT
@@ -692,6 +705,10 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_L2Mu20_v3")       {if (MuL2Thresh<0 || MuL2Thresh>20) MuL2Thresh=20;} 
 		    else if (trigNames.triggerName(i)=="HLT_L2Mu20_v2")       {if (MuL2Thresh<0 || MuL2Thresh>20) MuL2Thresh=20;}
 		    else if (trigNames.triggerName(i)=="HLT_L2Mu20_v1")       {if (MuL2Thresh<0 || MuL2Thresh>20) MuL2Thresh=20;}
+
+                    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_L1SingleMu12_v1") {if (MuL1Thresh<0 || MuL1Thresh>12) MuL1Thresh=12;}    // 2012A
+
                     // 2011 MC
 		    else if (trigNames.triggerName(i)=="HLT_L1SingleMu10_v5") {if (MuL1Thresh<0 || MuL1Thresh>10) MuL1Thresh=10;}
 
@@ -829,6 +846,9 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu20_v2")  {if (MuThresh<-20) MuThresh=-20;}                //SingleMu 2012C - Murillo  // What is this?
 		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu20_v1")  {if (MuThresh<-20) MuThresh=-20;}                //SingleMu 2012B - Murillo  // What is this?
 
+		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu17_v3")  {if (MuThresh<-17) MuThresh=-17;}                //SingleMu 2012A - Murillo  // What is this?
+		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu17_v2")  {if (MuThresh<-17) MuThresh=-17;}                //SingleMu 2012A - Murillo  // What is this?
+
                     // 2011 MC
 		    else if (trigNames.triggerName(i)=="HLT_Mu15_v14")        {if (MuThresh<0 || MuThresh>15) MuThresh=15;}
 
@@ -895,6 +915,8 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu5_v6")  {if (IsoMuThresh<-5) IsoMuThresh=-5;}                  //SingleMu 2012C - Murillo   // What is this?
 		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu5_v5")  {if (IsoMuThresh<-5) IsoMuThresh=-5;}                  //SingleMu 2012C - Murillo   // What is this?
 		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu5_v4")  {if (IsoMuThresh<-5) IsoMuThresh=-5;}                  //SingleMu 2012B - Murillo   // What is this?
+		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu5_v3")  {if (IsoMuThresh<-5) IsoMuThresh=-5;}                  //SingleMu 2012A - Murillo   // What is this?
+		    else if (trigNames.triggerName(i)=="HLT_RelIso1p0Mu5_v2")  {if (IsoMuThresh<-5) IsoMuThresh=-5;}                  //SingleMu 2012A - Murillo   // What is this?
 
 		    else if (trigNames.triggerName(i)=="HLT_Mu3_v9")          {if (MuThresh<0 || MuThresh>3)  MuThresh=3;}
 		    else if (trigNames.triggerName(i)=="HLT_Mu3_v7")          {if (MuThresh<0 || MuThresh>3)  MuThresh=3;}
@@ -922,12 +944,16 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu40_eta2p1_v10") {if (IsoMuThresh<-40) IsoMuThresh=-40;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu40_eta2p1_v9")  {if (IsoMuThresh<-40) IsoMuThresh=-40;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu40_eta2p1_v8")  {if (IsoMuThresh<-40) IsoMuThresh=-40;}                     //SingleMu 2012B - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu40_eta2p1_v7")  {if (IsoMuThresh<-40) IsoMuThresh=-40;}                     //SingleMu 2012A - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu40_eta2p1_v6")  {if (IsoMuThresh<-40) IsoMuThresh=-40;}                     //SingleMu 2012A - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu40_eta2p1_v2")  {if (IsoMuThresh<-40) IsoMuThresh=-40;}                     //SingleMu 2011B - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu40_eta2p1_v1")  {if (IsoMuThresh<-40) IsoMuThresh=-40;}                     //SingleMu 2011B - Murillo
 
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v13") {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v12") {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v11") {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2012B - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v10") {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2012A - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v9")  {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2012A - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v5")  {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2011B - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v4")  {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2011B - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu34_eta2p1_v1")  {if (IsoMuThresh<-34) IsoMuThresh=-34;}                     //SingleMu 2011B - Murillo
@@ -939,6 +965,8 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v15") {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v14") {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v13") {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2012B - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v12") {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2012A - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v11") {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2012A - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v7")  {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2011B - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v6")  {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2011B - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu30_eta2p1_v3")  {if (IsoMuThresh<-30) IsoMuThresh=-30;}                     //SingleMu 2011B - Murillo
@@ -959,6 +987,8 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v15") {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v14") {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v13") {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2012B - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v12") {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2012A - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v11") {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2012A - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v7")  {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2011B - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v6")  {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2011B - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu24_eta2p1_v3")  {if (IsoMuThresh<-24) IsoMuThresh=-24;}                     //SingleMu 2011B - Murillo
@@ -972,6 +1002,8 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu20_eta2p1_v7")  {if (IsoMuThresh<-20) IsoMuThresh=-20;}                      //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu20_eta2p1_v6")  {if (IsoMuThresh<-20) IsoMuThresh=-20;}                      //SingleMu 2012C - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu20_eta2p1_v5")  {if (IsoMuThresh<-20) IsoMuThresh=-20;}                      //SingleMu 2012B - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu20_eta2p1_v4")  {if (IsoMuThresh<-20) IsoMuThresh=-20;}                      //SingleMu 2012A - Murillo
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu20_eta2p1_v3")  {if (IsoMuThresh<-20) IsoMuThresh=-20;}                      //SingleMu 2012A - Murillo
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu20_eta2p1_v1")  {if (IsoMuThresh<-20) IsoMuThresh=-20;}
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu20_WCandPt80_v4")  {if (IsoMuThresh<-20) IsoMuThresh=-20;
 		    	 if (METThresh<-80) METThresh=-80;}       //SingleMu 2012C - Murillo
@@ -1090,6 +1122,22 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                          if (JetThresh<-80) JetThresh=-80;}  // 2012B
 
 
+	            // 2012D
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu18_CentralPFJet30_CentralPFJet25_PFMET20_v1")   {if (MuHadFlag<0 || MuHadFlag>7) MuHadFlag=7;
+                         if (IsoMuThresh<-18) IsoMuThresh=-18;
+                         if (DiJetThresh<-30) DiJetThresh=-30;
+			 if (METThresh<-20) METThresh=-20;}       // 2012D  // DiJetThresh Convention: higher one
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu18_CentralPFJet30_CentralPFJet25_v1")   {if (MuHadFlag<0 || MuHadFlag>7) MuHadFlag=7;
+                         if (IsoMuThresh<-18) IsoMuThresh=-18;
+                         if (DiJetThresh<-30) DiJetThresh=-30;}   // 2012D  // DiJetThresh Convention: higher one 
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu18_PFJet30_PFJet25_Deta3_v1")  {if (MuHadFlag<0 || MuHadFlag>7) MuHadFlag=7;
+                         if (IsoMuThresh<-18) IsoMuThresh=-18;
+                         if (DiJetThresh<-30) DiJetThresh=-30;}   // 2012D  // DiJetThresh Convention: higher one
+		    else if (trigNames.triggerName(i)=="HLT_IsoMu18_PFJet30_PFJet25_Deta3_CentralPFJet25_v1")  {if (MuHadFlag<0 || MuHadFlag>10) MuHadFlag=10;
+                         if (IsoMuThresh<-18) IsoMuThresh=-18;
+                         if (TriJetThresh<-30) TriJetThresh=-30;} // 2012D  // TriJetThresh Convention: higher one
+
+
 		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_IsoMu17_eta2p1_CentralPFNoPUJet30_BTagIPIter_v4")  {if (MuHadFlag<0 || MuHadFlag>11) MuHadFlag=11;
                          if (IsoMuThresh<-17) IsoMuThresh=-17;
@@ -1193,6 +1241,15 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_Mu24_PFJet30_PFJet25_Deta3_CentralPFJet25_v1")  {if (MuHadFlag<0 || MuHadFlag>8) MuHadFlag=8;
                          if (MuThresh<-24) MuThresh=-24;
                          if (TriJetThresh<-30) TriJetThresh=-30;}  // 2012B  // TriJetThresh Convention: higher one
+
+
+		    // 2012D
+		    else if (trigNames.triggerName(i)=="HLT_Mu18_CentralPFJet30_CentralPFJet25_v1")  {if (MuHadFlag<0 || MuHadFlag>3) MuHadFlag=3;
+                         if (MuThresh<-18) MuThresh=-18;
+                         if (DiJetThresh<-30) DiJetThresh=-30;}    // 2012B   // DiJetThresh Convention: higher one
+		    else if (trigNames.triggerName(i)=="HLT_Mu18_PFJet30_PFJet25_Deta3_CentralPFJet25_v1")  {if (MuHadFlag<0 || MuHadFlag>8) MuHadFlag=8;
+                         if (MuThresh<-18) MuThresh=-18;
+                         if (TriJetThresh<-30) TriJetThresh=-30;}  // 2012D  // TriJetThresh Convention: higher one
 
 
 		    // 2012C
@@ -1906,6 +1963,7 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Acoplanarity03_v3") {if (DoubleMuThresh<-15)  DoubleMuThresh=-15;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Acoplanarity03_v2") {if (DoubleMuThresh<-15)  DoubleMuThresh=-15;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Acoplanarity03_v1") {if (DoubleMuThresh<-15)  DoubleMuThresh=-15;}
+
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Acoplanarity03_v8") {if (DoubleMuThresh<-14)  DoubleMuThresh=-14;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Acoplanarity03_v6") {if (DoubleMuThresh<-14)  DoubleMuThresh=-14;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Acoplanarity03_v5") {if (DoubleMuThresh<-14)  DoubleMuThresh=-14;}
@@ -1930,15 +1988,21 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Mu22_TkMu8_v6")               {if (DoubleMuThresh<0||DoubleMuThresh>22) DoubleMuThresh=22;}
                     else if (trigNames.triggerName(i)=="HLT_Mu22_TkMu8_v7")               {if (DoubleMuThresh<0||DoubleMuThresh>22) DoubleMuThresh=22;}
                     else if (trigNames.triggerName(i)=="HLT_Mu22_TkMu8_v8")               {if (DoubleMuThresh<0||DoubleMuThresh>22) DoubleMuThresh=22;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu22_TkMu8_v9")               {if (DoubleMuThresh<0||DoubleMuThresh>22) DoubleMuThresh=22;}  // 2012D - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu17_TkMu8_v10")              {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}
                     else if (trigNames.triggerName(i)=="HLT_Mu17_TkMu8_v11")              {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}
                     else if (trigNames.triggerName(i)=="HLT_Mu17_TkMu8_v12")              {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}
                     else if (trigNames.triggerName(i)=="HLT_Mu17_TkMu8_v13")              {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu17_TkMu8_v14")              {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}  // 2012D - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Mu8_v17")                {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu17_Mu8_v21")                {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}  // 2012D - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu17_Mu8_v22")                {if (DoubleMuThresh<0||DoubleMuThresh>17) DoubleMuThresh=17;}  // 2012D - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu13_Mu8_v16")                {if (DoubleMuThresh<0||DoubleMuThresh>13) DoubleMuThresh=13;}  // 2012A - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu13_Mu8_v17")                {if (DoubleMuThresh<0||DoubleMuThresh>13) DoubleMuThresh=13;}
                     else if (trigNames.triggerName(i)=="HLT_Mu13_Mu8_v18")                {if (DoubleMuThresh<0||DoubleMuThresh>13) DoubleMuThresh=13;}
                     else if (trigNames.triggerName(i)=="HLT_Mu13_Mu8_v19")                {if (DoubleMuThresh<0||DoubleMuThresh>13) DoubleMuThresh=13;}
                     else if (trigNames.triggerName(i)=="HLT_Mu13_Mu8_v21")                {if (DoubleMuThresh<0||DoubleMuThresh>13) DoubleMuThresh=13;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu13_Mu8_v22")                {if (DoubleMuThresh<0||DoubleMuThresh>13) DoubleMuThresh=13;}  // 2012D - Murillo
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu11_Acoplanarity03_v3") {if (DoubleMuThresh<-21)  DoubleMuThresh=-21;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu11_Acoplanarity03_v4") {if (DoubleMuThresh<-21)  DoubleMuThresh=-21;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu11_Acoplanarity03_v5") {if (DoubleMuThresh<-21)  DoubleMuThresh=-21;}
@@ -2022,7 +2086,7 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
  
 
 
-                    // MuEG triggers for 2011
+                    // MuEG triggers for 2011 (A/B) amd 2012 (B/C)   (+ 2012A/D, but with no checks)
                     // can occur exclusively on MuEG sample only, but can also occur on other samples if non-exclusive
                     //          --  have all been checked for real occurrence in MuEG sample :-)
                     bool MuEGTrigThis = true;
@@ -2031,11 +2095,15 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    // introduce MuEGFlag=1 for Mu+Photon, 2 for Mu+Electron, 3 for DiMu+Electron, 4 for Mu+DiElectron, 
                     //                    5 for Mu+Diphoton, 
                     // inclusive muon+electron triggers 
+		    // 2012A
+                    if      (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v3")           {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v4")           {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v5")           {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012A - Murillo
 		    // 2012B
-                    if      (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v6")           {if (MuEGFlag<1) MuEGFlag=2;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v6")           {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012B - Murillo
 		    // 2012C
-                    else if (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v7")           {if (MuEGFlag<1) MuEGFlag=2;}
-                    else if (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v8")           {if (MuEGFlag<1) MuEGFlag=2;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v7")           {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012C - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu30_Ele30_CaloIdL_v8")           {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012C - Murillo
 		    // 2011A
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdL_v1")           {if (MuEGFlag<1) MuEGFlag=2;}
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdL_v2")           {if (MuEGFlag<1) MuEGFlag=2;}
@@ -2045,6 +2113,7 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdL_v6")           {if (MuEGFlag<1) MuEGFlag=2;}
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdL_v8")           {if (MuEGFlag<1) MuEGFlag=2;}
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdL_v9")           {if (MuEGFlag<1) MuEGFlag=2;}
+		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdL_v12")          {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2011B - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdL_v13")          {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2011B - Murillo
                     // 2011 MC
@@ -2055,6 +2124,10 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v4") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2011B - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v7") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2011B - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_v8") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2011B - Murillo
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4") {if (MuEGFlag<1) MuEGFlag=2;}   // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5") {if (MuEGFlag<1) MuEGFlag=2;}   // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6") {if (MuEGFlag<1) MuEGFlag=2;}   // MuEG 2012A - Murillo
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7") {if (MuEGFlag<1) MuEGFlag=2;}   // MuEG 2012B - Murillo
 		    // 2012C
@@ -2083,12 +2156,19 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v7") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2011B - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_v8") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2011B - Murillo
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012A - Murillo
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v7") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012B - Murillo
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012C - Murillo
                     else if (trigNames.triggerName(i)=="HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9") {if (MuEGFlag<1) MuEGFlag=2;}       // MuEG 2012C - Murillo
 
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Mu7_Ele7_CaloIdT_CaloIsoVL_v3") {if (MuEGFlag<1) MuEGFlag=2;}        // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu7_Ele7_CaloIdT_CaloIsoVL_v4") {if (MuEGFlag<1) MuEGFlag=2;}        // MuEG 2012A - Murillo
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Mu7_Ele7_CaloIdT_CaloIsoVL_v5") {if (MuEGFlag<1) MuEGFlag=2;}        // MuEG 2012B - Murillo
 		    // 2012C
@@ -2102,11 +2182,14 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Mu3_Ele8_CaloIdT_CaloIsoVL_v2")  {if (MuEGFlag<1) MuEGFlag=2;}
 
                     // inclusive muon+photon triggers
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v3")      {if (MuEGFlag<1) MuEGFlag=1;}       // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v4")      {if (MuEGFlag<1) MuEGFlag=1;}       // MuEG 2012A - Murillo
 		    // 2012B
-                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v5")      {if (MuEGFlag<1) MuEGFlag=1;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v5")      {if (MuEGFlag<1) MuEGFlag=1;}       // MuEG 2012B - Murillo
 		    // 2012C
-                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v6")      {if (MuEGFlag<1) MuEGFlag=1;}
-                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v7")      {if (MuEGFlag<1) MuEGFlag=1;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v6")      {if (MuEGFlag<1) MuEGFlag=1;}       // MuEG 2012C - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu22_Photon22_CaloIdL_v7")      {if (MuEGFlag<1) MuEGFlag=1;}       // MuEG 2012C - Murillo
 		    // 2011A
                     else if (trigNames.triggerName(i)=="HLT_Mu15_Photon20_CaloIdL_v2")      {if (MuEGFlag<1) MuEGFlag=1;}
                     else if (trigNames.triggerName(i)=="HLT_Mu15_Photon20_CaloIdL_v3")      {if (MuEGFlag<1) MuEGFlag=1;}
@@ -2145,6 +2228,9 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v7") {if (MuEGFlag<1) MuEGFlag=3;}       // MuEG 2011B - Murillo
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v8") {if (MuEGFlag<1) MuEGFlag=3;}       // MuEG 2011B - Murillo
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v12") {if (MuEGFlag<1) MuEGFlag=3;}      // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v13") {if (MuEGFlag<1) MuEGFlag=3;}      // MuEG 2012A - Murillo
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v14") {if (MuEGFlag<1) MuEGFlag=3;}      // MuEG 2012B - Murillo
 		    // 2012C
@@ -2153,6 +2239,9 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Ele8_CaloIdT_TrkIdT_v3")  {if (MuEGFlag<1) MuEGFlag=3;}       // MuEG 2011B - Murillo
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Ele8_CaloIdT_TrkIdT_v4")  {if (MuEGFlag<1) MuEGFlag=3;}       // MuEG 2011B - Murillo
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v1") {if (MuEGFlag<1) MuEGFlag=3;}       // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v2") {if (MuEGFlag<1) MuEGFlag=3;}       // MuEG 2012A - Murillo
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v3") {if (MuEGFlag<1) MuEGFlag=3;}       // MuEG 2012B - Murillo
 		    // 2012C
@@ -2161,16 +2250,22 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 
 
                     // inclusive muon+dielectron triggers
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v3")                 {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v4")                 {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012A - Murillo
 		    // 2012B
-                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v5")                 {if (MuEGFlag<1) MuEGFlag=4;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v5")                 {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012B - Murillo
 		    // 2012C
-                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v6")                 {if (MuEGFlag<1) MuEGFlag=4;}
-                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v7")                 {if (MuEGFlag<1) MuEGFlag=4;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v6")                 {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012C - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_DoubleEle8_CaloIdT_TrkIdVL_v7")                 {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012C - Murillo
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v3")  {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012A - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v4")  {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012A - Murillo
 		    // 2012B
-                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v5")  {if (MuEGFlag<1) MuEGFlag=4;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v5")  {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012B - Murillo
 		    // 2012C
-                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v6")  {if (MuEGFlag<1) MuEGFlag=4;}
-                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v7")  {if (MuEGFlag<1) MuEGFlag=4;}
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v6")  {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012C - Murillo
+                    else if (trigNames.triggerName(i)=="HLT_Mu8_Ele8_CaloIdT_TrkIdVL_Ele8_CaloIdL_TrkIdVL_v7")  {if (MuEGFlag<1) MuEGFlag=4;}     // MuEG 2012C - Murillo
 
 		    // 2011A
                     else if (trigNames.triggerName(i)=="HLT_Mu5_DoubleEle8_v2")                 {if (MuEGFlag<1) MuEGFlag=4;}
@@ -2258,6 +2353,182 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
                     // the following seem to select events in the mass range 1.5-20 GeV
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu0_Quarkonium_v1")     JpsiThresh=0;      
                     else if (trigNames.triggerName(i)=="HLT_DoubleMu0_Quarkonium_LS_v1")  JpsiThresh=0;
+
+
+		    //2011 Data (RunA and RunB)     (#######################  indicates that the JpsiThresh variable is not appropriate -> use negative value -> to be adjusted)
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon13_Jpsi_Barrel_v5")     {if (JpsiThresh<0 || JpsiThresh>13) JpsiThresh=13;}  //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon13_Jpsi_Barrel_v4")     {if (JpsiThresh<0 || JpsiThresh>13) JpsiThresh=13;}  //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon13_Jpsi_Barrel_v1")     {if (JpsiThresh<0 || JpsiThresh>13) JpsiThresh=13;}  //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon11_PsiPrime_v5")   	  {if (JpsiThresh<-11) JpsiThresh=-11;} 	       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon11_PsiPrime_v4")   	  {if (JpsiThresh<-11) JpsiThresh=-11;} 	       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon11_PsiPrime_v1")   	  {if (JpsiThresh<-11) JpsiThresh=-11;} 	       //2011A/B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon10_Jpsi_Barrel_v10")    {if (JpsiThresh<0 || JpsiThresh>10) JpsiThresh=10;}  //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon10_Jpsi_Barrel_v9")     {if (JpsiThresh<0 || JpsiThresh>10) JpsiThresh=10;}  //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon10_Jpsi_Barrel_v6")     {if (JpsiThresh<0 || JpsiThresh>10) JpsiThresh=10;}  //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon10_Jpsi_Barrel_v5")     {if (JpsiThresh<0 || JpsiThresh>10) JpsiThresh=10;}  //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon10_Jpsi_Barrel_v3")     {if (JpsiThresh<0 || JpsiThresh>10) JpsiThresh=10;}  //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon10_Jpsi_Barrel_v2")     {if (JpsiThresh<0 || JpsiThresh>10) JpsiThresh=10;}  //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon10_Jpsi_Barrel_v1")     {if (JpsiThresh<0 || JpsiThresh>10) JpsiThresh=10;}  //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon9_Upsilon_Barrel_v5")	  {if (JpsiThresh<-9) JpsiThresh=-9;}		       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon9_Upsilon_Barrel_v4")	  {if (JpsiThresh<-9) JpsiThresh=-9;}		       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon9_Upsilon_Barrel_v1")	  {if (JpsiThresh<-9) JpsiThresh=-9;}		       //2011A/B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon9_PsiPrime_v5")         {if (JpsiThresh<-9) JpsiThresh=-9;}		       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon9_PsiPrime_v4")         {if (JpsiThresh<-9) JpsiThresh=-9;}		       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon9_PsiPrime_v1")         {if (JpsiThresh<-9) JpsiThresh=-9;}		       //2011A/B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_PsiPrime_v5")         {if (JpsiThresh<-7) JpsiThresh=-7;}  		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_PsiPrime_v3")         {if (JpsiThresh<-7) JpsiThresh=-7;}  		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_PsiPrime_v2")         {if (JpsiThresh<-7) JpsiThresh=-7;}  		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_PsiPrime_v1")         {if (JpsiThresh<-7) JpsiThresh=-7;}  		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Jpsi_X_Barrel_v5")    {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Jpsi_X_Barrel_v3")    {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Jpsi_X_Barrel_v2")    {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Jpsi_X_Barrel_v1")    {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Jpsi_Displaced_v3")   {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Jpsi_Displaced_v2")   {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Jpsi_Displaced_v1")   {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Upsilon_Barrel_v5")	  {if (JpsiThresh<-7) JpsiThresh=-7;}		       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Upsilon_Barrel_v4")	  {if (JpsiThresh<-7) JpsiThresh=-7;}		       //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_Upsilon_Barrel_v1")	  {if (JpsiThresh<-7) JpsiThresh=-7;}		       //2011A/B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_LowMass_Displaced_v4"){if (JpsiThresh<-7) JpsiThresh=-7;}		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_LowMass_Displaced_v3"){if (JpsiThresh<-7) JpsiThresh=-7;}		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_LowMass_Displaced_v2"){if (JpsiThresh<-7) JpsiThresh=-7;}		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon7_LowMass_Displaced_v1"){if (JpsiThresh<-7) JpsiThresh=-7;}		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6p5_Jpsi_Displaced_v1") {if (JpsiThresh<0 || JpsiThresh>6) JpsiThresh=6;}    //2011A - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6p5_Jpsi_v1")           {if (JpsiThresh<0 || JpsiThresh>6) JpsiThresh=6;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6p5_Barrel_PsiPrime_v1"){if (JpsiThresh<0 || JpsiThresh>6) JpsiThresh=6;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6p5_Barrel_JPsi_v1")    {if (JpsiThresh<0 || JpsiThresh>6) JpsiThresh=6;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6p5_LowMass_v1")        {if (JpsiThresh<-6) JpsiThresh=-6;}		       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6p5_LowMass_Displaced_v1"){if (JpsiThresh<-6) JpsiThresh=-6;}	 	       //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_LowMass_v5") 	  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_LowMass_v4") 	  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_LowMass_v1") 	  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011A/B - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_Bs_v6") 		  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_Bs_v4") 		  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_Bs_v3") 		  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_Bs_v2") 		  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon6_Bs_v1") 		  {if (JpsiThresh<-6) JpsiThresh=-6;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon5_Upsilon_Barrel_v5")   {if (JpsiThresh<-5) JpsiThresh=-5;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon5_Upsilon_Barrel_v3")   {if (JpsiThresh<-5) JpsiThresh=-5;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon5_Upsilon_Barrel_v2")   {if (JpsiThresh<-5) JpsiThresh=-5;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon5_Upsilon_Barrel_v1")   {if (JpsiThresh<-5) JpsiThresh=-5;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon4_Bs_Barrel_v7")        {if (JpsiThresh<-4) JpsiThresh=-4;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon4_Bs_Barrel_v5")        {if (JpsiThresh<-4) JpsiThresh=-4;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon4_Bs_Barrel_v4")        {if (JpsiThresh<-4) JpsiThresh=-4;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon4_Bs_Barrel_v3")        {if (JpsiThresh<-4) JpsiThresh=-4;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon4_Bs_Barrel_v2")        {if (JpsiThresh<-4) JpsiThresh=-4;}                  //2011A - Raphael ################################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Omega_Phi_v4") 	   JpsiThresh = 0;                                     //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Omega_Phi_v3")	   JpsiThresh = 0;                                     //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_NoVertexing_v7")  JpsiThresh = 0;                                     //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_NoVertexing_v6")  JpsiThresh = 0;                                     //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_NoVertexing_v3")  JpsiThresh = 0;                                     //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_NoVertexing_v2")  JpsiThresh = 0;                                     //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v11")        JpsiThresh = 0;				       //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v10")        JpsiThresh = 0;				       //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v7")         JpsiThresh = 0;				       //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v6")         JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v5")         JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v3")         JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v2")         JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_Muon_v1")         JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_v10")             JpsiThresh = 0;				       //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_v9")              JpsiThresh = 0;				       //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_v6")              JpsiThresh = 0;				       //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_v5")              JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_v3")              JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_v2")              JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Jpsi_v1")              JpsiThresh = 0;				       //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Barrel_Upsilon_v1")    JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_v10")  	   JpsiThresh = 0;				       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_v9")   	   JpsiThresh = 0;				       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_v6") 	   JpsiThresh = 0;				       //2011A/B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_v5") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_v3") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_v2") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_v1") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v11") 	   JpsiThresh = 0;				       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v10") 	   JpsiThresh = 0;				       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v7") 	   JpsiThresh = 0;				       //2011A/B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v6") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v4") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v3") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v2") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Dimuon0_Upsilon_Muon_v1") 	   JpsiThresh = 0;				       //2011A - Raphael ##############################
+
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_LowMass_Displaced_v5"){if (JpsiThresh<-5) JpsiThresh=-5;}		       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_LowMass_Displaced_v4"){if (JpsiThresh<-5) JpsiThresh=-5;}		       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_LowMass_Displaced_v1"){if (JpsiThresh<-5) JpsiThresh=-5;}		       //2011A/B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Jpsi_Displaced_v5") {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011B - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Jpsi_Displaced_v4") {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011B - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Jpsi_Displaced_v2") {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011B - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu5_Jpsi_Displaced_v1") {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A/B - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4p5_LowMass_Displaced_v5"){if (JpsiThresh<-4) JpsiThresh=-4;}	       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4p5_LowMass_Displaced_v4"){if (JpsiThresh<-4) JpsiThresh=-4;}	       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4p5_LowMass_Displaced_v1"){if (JpsiThresh<-4) JpsiThresh=-4;}	       //2011A/B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Jpsi_Displaced_v5") {if (JpsiThresh<0 || JpsiThresh>4) JpsiThresh=4;}    //2011B - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Jpsi_Displaced_v4") {if (JpsiThresh<0 || JpsiThresh>4) JpsiThresh=4;}    //2011B - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Jpsi_Displaced_v1") {if (JpsiThresh<0 || JpsiThresh>4) JpsiThresh=4;}    //2011A/B - Raphael // need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_LowMass_Displaced_v2"){if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Dimuon6_Bs_v5")	  {if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Dimuon6_Bs_v4")	  {if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Dimuon6_Bs_v1")	  {if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Dimuon4_Bs_v1")	  {if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Dimuon4_Bs_Barrel_v5"){if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Dimuon4_Bs_Barrel_v4"){if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu4_Dimuon4_Bs_Barrel_v1"){if (JpsiThresh<-4) JpsiThresh=-4;}		       //2011A/B - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3p5_Jpsi_Displaced_v2"){if (JpsiThresh<0 || JpsiThresh>3) JpsiThresh=3;}   //2011A - Raphael// need flag for all displaced
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3_Jpsi_v2")		  {if (JpsiThresh<0 || JpsiThresh>3) JpsiThresh=3;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3_Jpsi_v1")		  {if (JpsiThresh<0 || JpsiThresh>3) JpsiThresh=3;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3_Upsilon_v1")	  {if (JpsiThresh<-3) JpsiThresh=-3;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3_Quarkonium_v2")	  {if (JpsiThresh<-3) JpsiThresh=-3;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3_Quarkonium_v1")	  {if (JpsiThresh<-3) JpsiThresh=-3;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3_LowMass_v1")	  {if (JpsiThresh<-3) JpsiThresh=-3;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu3_Bs_v1")		  {if (JpsiThresh<-3) JpsiThresh=-3;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu2_Bs_v5")		  {if (JpsiThresh<-2) JpsiThresh=-2;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu2_Bs_v4")		  {if (JpsiThresh<-2) JpsiThresh=-2;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu2_Bs_v3")		  {if (JpsiThresh<-2) JpsiThresh=-2;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu2_Bs_v2")		  {if (JpsiThresh<-2) JpsiThresh=-2;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_DoubleMu2_Bs_v1")		  {if (JpsiThresh<-2) JpsiThresh=-2;}		       //2011A - Raphael ##############################
+
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v14")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v13")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v10")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v9")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v7")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v6")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v5")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v3")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v2")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track7_Jpsi_v1")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track5_Jpsi_v2")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu7_Track5_Jpsi_v1")	  {if (JpsiThresh<0 || JpsiThresh>7) JpsiThresh=7;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v13")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v12")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v9")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v8")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v6")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v5")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v4")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v2")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_Track2_Jpsi_v1")	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v13") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v12") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v9") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A/B - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v8") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v6") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v5") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v4") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v3") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v2") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_Jpsi_v1") 	  {if (JpsiThresh<0 || JpsiThresh>5) JpsiThresh=5;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_v2") 		  {if (JpsiThresh<-5) JpsiThresh=-5;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Mu5_L2Mu2_v1") 		  {if (JpsiThresh<-5) JpsiThresh=-5;}		       //2011A - Raphael ##############################
+		    else if (trigNames.triggerName(i)=="HLT_Mu3_Track3_Jpsi_v5") 	  {if (JpsiThresh<0 || JpsiThresh>3) JpsiThresh=3;}    //2011A - Raphael
+		    else if (trigNames.triggerName(i)=="HLT_Mu3_Track3_Jpsi_v4") 	  {if (JpsiThresh<0 || JpsiThresh>3) JpsiThresh=3;}    //2011A - Raphael
+
+	 	    else if (trigNames.triggerName(i)=="HLT_TripleMu0_TauTo3Mu_v1") 	   JpsiThresh=0;		     		       //2011A - Raphael ##############################	    
+		    
+
+
                     else MuOniaTrigThis = false; // none of the above fired
 
                     // check and set whether trigger for MuOnia dataset has fired
@@ -2531,7 +2802,7 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                 for(unsigned i= 0; i<trigNames.size(); i++) { 
                   if (triggerResultsHandle_->accept(i)==1){
 
-                    // single or double electron triggers for 2010B
+                    // Single electron triggers for 2010B, 2011, and 2012B/C (+ 2012A/D, but with no checks)
                     // can occur exclusively on Electron sample only, but can also occur on other samples if non-exclusive
                     //          --  have all been checked for real occurrence in DoubleElectron sample :-)
                     bool ElectronTrigThis = true;
@@ -2568,14 +2839,18 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele10_LW_EleId_L1R") {if (ElectronThresh<0 || ElectronThresh>10) ElectronThresh=10;}
                     else if (run<144200 && trigNames.triggerName(i)=="HLT_Ele10_SW_EleId_L1R"){if (ElectronThresh<0 || ElectronThresh>10) ElectronThresh=10;}
 
-		    // SingleElectron 2011A/B + 2012B/C triggers (-Murillo):
+		    // SingleElectron 2011A/B + 2012B/C triggers (+ 2012A/D, but with no checks) (-Murillo):
 		    // 2011A
 		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVL_CaloIsoVL_TrkIdVL_TrkIsoVL_v3") {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}
 		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVL_CaloIsoVL_TrkIdVL_TrkIsoVL_v2") {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}
 		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVL_CaloIsoVL_TrkIdVL_TrkIsoVL_v1") {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVT_TrkIdT_v10") {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVT_TrkIdT_v9")  {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVT_TrkIdT_v8")  {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}       // 2012A
 		    // 2011B
-		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVT_TrkIdT_v3") {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}       // 2011B
-		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVT_TrkIdT_v2") {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}       // 2011B
+		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVT_TrkIdT_v3")  {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}       // 2011B
+		    else if (trigNames.triggerName(i)=="HLT_Ele100_CaloIdVT_TrkIdT_v2")  {if (ElectronThresh<0 || ElectronThresh>100) ElectronThresh=100;}       // 2011B
 
 		    // 2011A
 		    else if (trigNames.triggerName(i)=="HLT_Ele90_NoSpikeFilter_v3") {if (ElectronThresh<0 || ElectronThresh>90) ElectronThresh=90;}
@@ -2586,14 +2861,22 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Ele90_CaloIdVT_GsfTrkIdT_v2") {if (ElectronThresh<0 || ElectronThresh>90) ElectronThresh=90;}     // 2012C
 
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_TrkIdT_v10") {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_TrkIdT_v8")  {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_TrkIdT_v9")  {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}       // 2012A
 		    // 2011B
-		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_TrkIdT_v3") {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}       // 2011B
-		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_TrkIdT_v2") {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}       // 2011B
+		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_TrkIdT_v3")  {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}       // 2011B
+		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_TrkIdT_v2")  {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}       // 2011B
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_GsfTrkIdT_v1") {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}    // 2012B
 		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Ele80_CaloIdVT_GsfTrkIdT_v2") {if (ElectronThresh<0 || ElectronThresh>80) ElectronThresh=80;}    // 2012C
 
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele65_CaloIdVT_TrkIdT_v13") {if (ElectronThresh<0 || ElectronThresh>65) ElectronThresh=65;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele65_CaloIdVT_TrkIdT_v12") {if (ElectronThresh<0 || ElectronThresh>65) ElectronThresh=65;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele65_CaloIdVT_TrkIdT_v11") {if (ElectronThresh<0 || ElectronThresh>65) ElectronThresh=65;}       // 2012A
 		    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele65_CaloIdVT_TrkIdT_v6") {if (ElectronThresh<0 || ElectronThresh>65) ElectronThresh=65;}       // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele65_CaloIdVT_TrkIdT_v5") {if (ElectronThresh<0 || ElectronThresh>65) ElectronThresh=65;}       // 2011B
@@ -2639,6 +2922,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v11") {if (ElectronThresh<0 || ElectronThresh>32) ElectronThresh=32;}       // 2012C
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v10") {if (ElectronThresh<0 || ElectronThresh>32) ElectronThresh=32;}       // 2012B
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v9")  {if (ElectronThresh<0 || ElectronThresh>32) ElectronThresh=32;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v8")  {if (ElectronThresh<0 || ElectronThresh>32) ElectronThresh=32;}       // 2012A
 		    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v3")  {if (ElectronThresh<0 || ElectronThresh>32) ElectronThresh=32;}       // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v2")  {if (ElectronThresh<0 || ElectronThresh>32) ElectronThresh=32;}       // 2011B
@@ -2647,6 +2933,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_Ele30_CaloIdVT_TrkIdT_v6") {if (ElectronThresh<0 || ElectronThresh>30) ElectronThresh=30;}     // 2012C
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Ele30_CaloIdVT_TrkIdT_v5") {if (ElectronThresh<0 || ElectronThresh>30) ElectronThresh=30;}     // 2012B
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele30_CaloIdVT_TrkIdT_v4") {if (ElectronThresh<0 || ElectronThresh>30) ElectronThresh=30;}     // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele30_CaloIdVT_TrkIdT_v3") {if (ElectronThresh<0 || ElectronThresh>30) ElectronThresh=30;}     // 2012A
 
 		    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMT50_v9") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}       // 2011B
@@ -2669,6 +2958,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_v11") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}   // 2012C
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_v10") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}   // 2012B
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_v9")  {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}   // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_v8")  {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}   // 2012A
 		    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_v3") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_v2") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}    // 2011B
@@ -2681,6 +2973,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v11") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}       // 2012C
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v10") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}       // 2012B
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v9")  {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}       // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v8")  {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}       // 2012A
 		    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v3") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}       // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v2") {if (ElectronThresh<0 || ElectronThresh>27) ElectronThresh=27;}       // 2011B
@@ -2701,6 +2996,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    else if (trigNames.triggerName(i)=="HLT_Ele22_CaloIdL_CaloIsoVL_v6") {if (ElectronThresh<0 || ElectronThresh>22) ElectronThresh=22;}     // 2012C
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Ele22_CaloIdL_CaloIsoVL_v5") {if (ElectronThresh<0 || ElectronThresh>22) ElectronThresh=22;}     // 2012B
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele22_CaloIdL_CaloIsoVL_v4") {if (ElectronThresh<0 || ElectronThresh>22) ElectronThresh=22;}     // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele22_CaloIdL_CaloIsoVL_v3") {if (ElectronThresh<0 || ElectronThresh>22) ElectronThresh=22;}     // 2012A
 
 
                     // partially documented for both EG and EGMonitor simultanously?? (runs 144000-144200)
@@ -2723,14 +3021,17 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Photon10_L1R") {if (PhotonThresh<0 || PhotonThresh>10) PhotonThresh=10;}
                     else if (run<141956 && trigNames.triggerName(i)=="HLT_Photon10_Cleaned_L1R"){if (PhotonThresh<0 || PhotonThresh>10) PhotonThresh=10;}
 
-                    // electron+MET triggers
+                    // electron+MET triggers  *** Add METThresh ?? *** 
                     else if (trigNames.triggerName(i)=="HLT_Ele10_MET45_v1") {if (ElectronThresh<-10) ElectronThresh=-10;}
 		    // 2012C
-                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v7") {if (ElectronThresh<-27) ElectronThresh=-27;}
-                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v6") {if (ElectronThresh<-27) ElectronThresh=-27;}
-                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v5") {if (ElectronThresh<-27) ElectronThresh=-27;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v7") {if (ElectronThresh<-27) ElectronThresh=-27;}     // 2012C  // Add METThresh??
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v6") {if (ElectronThresh<-27) ElectronThresh=-27;}     // 2012C  // Add METThresh??
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v5") {if (ElectronThresh<-27) ElectronThresh=-27;}     // 2012C  // Add METThresh??
 		    // 2012B
-                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v4") {if (ElectronThresh<-27) ElectronThresh=-27;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v4") {if (ElectronThresh<-27) ElectronThresh=-27;}     // 2012B  // Add METThresh??
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v3") {if (ElectronThresh<-27) ElectronThresh=-27;}     // 2012A  // Add METThresh??
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_WP80_PFMET_MT50_v2") {if (ElectronThresh<-27) ElectronThresh=-27;}     // 2012A  // Add METThresh??
 
                     // double electron triggers
                     // 2010 A (including DoublePhoton)
@@ -2768,6 +3069,8 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele10_SW_EleId_HT70U_L1R_v1") {if (ElectronThresh<-10) ElectronThresh=-10;}
                     else if (trigNames.triggerName(i)=="HLT_Ele10_SW_EleId_HT70U_L1R_v2") {if (ElectronThresh<-10) ElectronThresh=-10;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle8_SW_HT70U_L1R_v1") {if (DoubleElectronThresh<-8) ElectronThresh=-8;}
+
+		    // Need to implement flags and thresholds??
 
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele32_WP80_CentralPFJet35_CentralPFJet25_v4")         {if (ElectronThresh<-32) ElectronThresh=-32;}    // 2012C
@@ -2846,6 +3149,11 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele25_CaloIdVL_CaloIsoT_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_30_20_v1")  {if (ElectronThresh<-25) ElectronThresh=-25;}    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele25_CaloIdVL_CaloIsoT_TrkIdVL_TrkIsoT_TriCentralPFNoPUJet30_v1")        {if (ElectronThresh<-25) ElectronThresh=-25;}    // 2012B
 		    
+		    // 2012D
+                    else if (trigNames.triggerName(i)=="HLT_Ele24_WP80_CentralPFJet35_CentralPFJet25_PFMET20_v1") {if (ElectronThresh<-24) ElectronThresh=-24;}    // 2012D
+                    else if (trigNames.triggerName(i)=="HLT_Ele24_WP80_CentralPFJet35_CentralPFJet25_v1")         {if (ElectronThresh<-24) ElectronThresh=-24;}    // 2012D
+                    else if (trigNames.triggerName(i)=="HLT_Ele24_WP80_PFJet30_PFJet25_Deta3_CentralPFJet30_v1")  {if (ElectronThresh<-24) ElectronThresh=-24;}    // 2012D
+                    else if (trigNames.triggerName(i)=="HLT_Ele24_WP80_PFJet30_PFJet25_Deta3_v1")                 {if (ElectronThresh<-24) ElectronThresh=-24;}    // 2012D
 
                     else ElectronTrigThis = false;
 
@@ -2854,7 +3162,7 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     if (ElectronTrigThis) ElectronTrig = true; 
 
 
-                    // DoubleElectron triggers for 2011A/B + 2012B/C
+                    // DoubleElectron triggers for 2011A/B + 2012B/C (+ 2012A/D, but with no checks)
                     // can occur exclusively on DoubleElectron sample only, but can also occur on other samples if non-exclusive
                     //          --  have all been checked for real occurrence in DoubleElectron sample :-)
                     bool DoubleElectronTrigThis = true;
@@ -2875,15 +3183,24 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_v9") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_v10") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2011B
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_v14") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_v15") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012A
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_v16") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012B
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_v17") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012C
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v3") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012A
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012B
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v6") {if (ElectronThresh<0 || ElectronThresh>17) ElectronThresh=17;}   // 2012C
 
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v3") {if (ElectronThresh<-30) ElectronThresh=-30;}   // 2012A  // -17 already taken
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v4") {if (ElectronThresh<-30) ElectronThresh=-30;}   // 2012A  // -17 already taken
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v5") {if (ElectronThresh<-30) ElectronThresh=-30;}   // 2012B  // -17 already taken
 		    // 2012C
@@ -2915,6 +3232,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdL_CaloIsoVL_v10") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}    // 2011B
                     // 2011 MC
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdL_CaloIsoVL_v11") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
+                    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdL_CaloIsoVL_v14") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdL_CaloIsoVL_v15") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdL_CaloIsoVL_v16") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012C
@@ -2942,17 +3262,26 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v8") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}   // 2011B
                     // 2011 MC
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
+                    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v12") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v13") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v14") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
 
+                    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v3") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v4") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v5") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v6") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_v7") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
 
+                    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_TrkIdVL_v2") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_TrkIdVL_v3") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele8_CaloIdT_TrkIdVL_v4") {if (ElectronThresh<0 || ElectronThresh>8) ElectronThresh=8;}
                     // 2012C
@@ -2998,6 +3327,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v8") {if (DoubleElectronThresh<0||DoubleElectronThresh>32) DoubleElectronThresh=32;}  // 2011B
                     // 2011 MC
                     else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v9") {if (DoubleElectronThresh<0||DoubleElectronThresh>32) DoubleElectronThresh=32;}
+                    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>32) DoubleElectronThresh=32;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>32) DoubleElectronThresh=32;}
                     // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_v5") {if (DoubleElectronThresh<0||DoubleElectronThresh>32) DoubleElectronThresh=32;}
                     // 2012C
@@ -3008,25 +3340,43 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_v2") {if (DoubleElectronThresh<0||DoubleElectronThresh>32) DoubleElectronThresh=32;}  // 2011B
                     else if (trigNames.triggerName(i)=="HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>32) DoubleElectronThresh=32;}  // 2011B
 
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele15_CaloIdT_CaloIsoVL_trackless_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele15_CaloIdT_CaloIsoVL_trackless_v5") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;}
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele15_CaloIdT_CaloIsoVL_trackless_v6") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;}
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele15_CaloIdT_CaloIsoVL_trackless_v7") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;}
+		    // 2012D
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele15_CaloIdT_CaloIsoVL_trackless_v7") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;}
 
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT15_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;} // Correct? Should be above?
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT15_v5") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;} // Correct? Should be above?
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT15_v6") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;} // Correct? Should be above?
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT15_v7") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;} // Correct? Should be above?
+		    // 2012D
+                    else if (trigNames.triggerName(i)=="HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT15_v8") {if (DoubleElectronThresh<0||DoubleElectronThresh>27) DoubleElectronThresh=27;} // Correct? Should be above?
 
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele23_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT30_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>23) DoubleElectronThresh=23;} // Correct?
+                    else if (trigNames.triggerName(i)=="HLT_Ele23_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT30_v5") {if (DoubleElectronThresh<0||DoubleElectronThresh>23) DoubleElectronThresh=23;} // Correct?
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele23_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT30_v6") {if (DoubleElectronThresh<0||DoubleElectronThresh>23) DoubleElectronThresh=23;} // Correct? Should be above?
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele23_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT30_v7") {if (DoubleElectronThresh<0||DoubleElectronThresh>23) DoubleElectronThresh=23;} // Correct? Should be above?
+		    // 2012D
+                    else if (trigNames.triggerName(i)=="HLT_Ele23_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_HFT30_v8") {if (DoubleElectronThresh<0||DoubleElectronThresh>23) DoubleElectronThresh=23;} // Correct?
 
                     else if (trigNames.triggerName(i)=="HLT_Ele22_CaloIdL_CaloIsoVL_Ele15_HFT_v1") {if (DoubleElectronThresh<0||DoubleElectronThresh>22) DoubleElectronThresh=22;}
                     else if (trigNames.triggerName(i)=="HLT_Ele22_CaloIdL_CaloIsoVL_Ele15_HFT_v2") {if (DoubleElectronThresh<0||DoubleElectronThresh>22) DoubleElectronThresh=22;}  // 2011B
                     else if (trigNames.triggerName(i)=="HLT_Ele22_CaloIdL_CaloIsoVL_Ele15_HFT_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>22) DoubleElectronThresh=22;}  // 2011B
 
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>20) DoubleElectronThresh=20;}
+                    else if (trigNames.triggerName(i)=="HLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>20) DoubleElectronThresh=20;}
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_v5") {if (DoubleElectronThresh<0||DoubleElectronThresh>20) DoubleElectronThresh=20;}
 		    // 2012C
@@ -3063,10 +3413,15 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v9") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}    // 2011B
 		    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v10") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}    // 2011B
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v15") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}     // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v16") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}     // 2012A
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v17") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}     // 2012B
 		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v18") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}    // 2012C
+		    // 2012D
+		    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v19") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}    // 2012D
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v1") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v2") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdL_CaloIsoVL_Ele15_HFL_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}
@@ -3096,28 +3451,64 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_v8") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}  //2011B
 		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_v9") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}  //2011B
+
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}  //2011A
+                    else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}  //2011A
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_v5") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}  //2011B
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_v6") {if (DoubleElectronThresh<0||DoubleElectronThresh>17) DoubleElectronThresh=17;}  //2011B
 
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Ele5_SC5_Jpsi_Mass2to15_v1") {if (DoubleElectronThresh<0||DoubleElectronThresh>5) DoubleElectronThresh=5;}  //2012A  //Correct?
+		    else if (trigNames.triggerName(i)=="HLT_Ele5_SC5_Jpsi_Mass2to15_v2") {if (DoubleElectronThresh<0||DoubleElectronThresh>5) DoubleElectronThresh=5;}  //2012A  //Correct?
 		    // 2012B
-		    else if (trigNames.triggerName(i)=="HLT_Ele5_SC5_Jpsi_Mass2to15_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>5) DoubleElectronThresh=5;}  //2011B  //Correct?
+		    else if (trigNames.triggerName(i)=="HLT_Ele5_SC5_Jpsi_Mass2to15_v3") {if (DoubleElectronThresh<0||DoubleElectronThresh>5) DoubleElectronThresh=5;}  //2012B  //Correct?
 		    // 2012C
-		    else if (trigNames.triggerName(i)=="HLT_Ele5_SC5_Jpsi_Mass2to15_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>5) DoubleElectronThresh=5;}  //2011B  //Correct?
+		    else if (trigNames.triggerName(i)=="HLT_Ele5_SC5_Jpsi_Mass2to15_v4") {if (DoubleElectronThresh<0||DoubleElectronThresh>5) DoubleElectronThresh=5;}  //2012C  //Correct?
 
+
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_v2") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?  // Chose -40
+		    else if (trigNames.triggerName(i)=="HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_v3") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?  // Chose -40
 		    // 2012B
 		    else if (trigNames.triggerName(i)=="HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?  // Chose -40
-		    else if (trigNames.triggerName(i)=="HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
-		    else if (trigNames.triggerName(i)=="HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
-		    else if (trigNames.triggerName(i)=="HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
-		    else if (trigNames.triggerName(i)=="HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
 		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Photon90_R9Id90_HE10_Iso40_EBOnly_v5") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_v2") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    else if (trigNames.triggerName(i)=="HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_v3") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012B
+		    else if (trigNames.triggerName(i)=="HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Photon75_R9Id90_HE10_Iso40_EBOnly_v5") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v2") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    else if (trigNames.triggerName(i)=="HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v3") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012B
+		    else if (trigNames.triggerName(i)=="HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Photon50_R9Id90_HE10_Iso40_EBOnly_v5") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_v2") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    else if (trigNames.triggerName(i)=="HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_v3") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012B
+		    else if (trigNames.triggerName(i)=="HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Photon36_R9Id90_HE10_Iso40_EBOnly_v5") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+
+		    // 2012A
+		    else if (trigNames.triggerName(i)=="HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_v2") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    else if (trigNames.triggerName(i)=="HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_v3") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012B
+		    else if (trigNames.triggerName(i)=="HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_v4") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+		    // 2012C
 		    else if (trigNames.triggerName(i)=="HLT_Photon22_R9Id90_HE10_Iso40_EBOnly_v5") {if (DoubleElectronThresh<-40) DoubleElectronThresh=-40;}    // Correct?
+
 
                     // inclusive trielectron triggers
 		    // 2011A
@@ -3127,6 +3518,9 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
 		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_TripleEle10_CaloIdL_TrkIdVL_v10") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}     // 2011B
                     else if (trigNames.triggerName(i)=="HLT_TripleEle10_CaloIdL_TrkIdVL_v11") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}     // 2011B
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_TripleEle10_CaloIdL_TrkIdVL_v15") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}     // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_TripleEle10_CaloIdL_TrkIdVL_v16") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}     // 2012A
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_TripleEle10_CaloIdL_TrkIdVL_v17") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}     // 2012B
 		    // 2012C
@@ -3139,13 +3533,20 @@ bool NanoAnalyzer::providesGoodETrigger(const edm::Event& iEvent) {
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_v6") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v1") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v2") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}
+		    // 2011B
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v3") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}   // 2011B
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v4") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}   // 2011B
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v5") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}   // 2011B
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v9")  {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}   // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v10") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}   // 2012A
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v11") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}   // 2012B
 		    // 2012C
                     else if (trigNames.triggerName(i)=="HLT_DoubleEle10_CaloIdL_TrkIdVL_Ele10_CaloIdT_TrkIdVL_v12") {if (DoubleElectronThresh<-10) DoubleElectronThresh=-10;}   // 2012C
+		    // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v3") {if (DoubleElectronThresh<-15) DoubleElectronThresh=-15;}   // 2012A
+                    else if (trigNames.triggerName(i)=="HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v4") {if (DoubleElectronThresh<-15) DoubleElectronThresh=-15;}   // 2012A
 		    // 2012B
                     else if (trigNames.triggerName(i)=="HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL_v5") {if (DoubleElectronThresh<-15) DoubleElectronThresh=-15;}   // 2012B
 		    // 2012C
