@@ -94,10 +94,14 @@
 
 #ifdef CMSSW42X
 #include <boost/unordered_map.hpp>
+#include <boost/array.hpp>
 using boost::unordered_map;
+using boost::array;
 #else
 #include <unordered_map>
+#include <array>
 using std::unordered_map;
+using std::array;
 #endif
 
 //*****************************
@@ -126,12 +130,7 @@ using std::unordered_map;
 #include "DataFormats/Provenance/interface/EventAuxiliary.h"
 // to get release version
 #include "FWCore/Version/interface/GetReleaseVersion.h"
-// header for conversion tools
-#ifndef CMSSW11plus
-#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
-#else
-#include "CommonTools/Egamma/interface/ConversionTools.h"
-#endif
+
 // effective area for rho
 //https://github.com/cms-sw/cmssw/blob/CMSSW_9_4_X/RecoEgamma/EgammaTools/interface/EffectiveAreas.h
 //#include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
@@ -163,6 +162,21 @@ using std::unordered_map;
 // no longer exists in CMSSW_11_2_X, not needed??
 #include "HLTrigger/HLTcore/interface/TriggerSummaryAnalyzerAOD.h"
 #endif
+
+// for L1 trigger (Afiq)
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
+#include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
+#include "CondFormats/L1TObjects/interface/L1GtTriggerMask.h"
+#include "CondFormats/DataRecord/interface/L1GtTriggerMaskAlgoTrigRcd.h"
+
+#include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
+
+#if defined(CMSSW7plus)
+#include "CondFormats/L1TObjects/interface/L1TUtmTriggerMenu.h"
+#include "CondFormats/DataRecord/interface/L1TUtmTriggerMenuRcd.h"
+#include "DataFormats/L1TGlobal/interface/GlobalAlgBlk.h"
+#endif
+
 
 //***************************
 // for tracking information *
@@ -259,8 +273,16 @@ using std::unordered_map;
 #ifdef miniAOD
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #endif
+// header for conversion tools
+#ifndef CMSSW11plus
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#else
+#include "CommonTools/Egamma/interface/ConversionTools.h"
+#endif
 
-// for photon information
+//*************************
+// for photon information *
+//*************************
 #ifndef miniAOD
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
@@ -268,8 +290,14 @@ using std::unordered_map;
 #ifdef miniAOD
 #include "DataFormats/PatCandidates/interface/Photon.h"
 #endif
+#ifndef CMSSW42X
+// for CMSSW 5_3_32
+#include "EgammaAnalysis/ElectronTools/interface/PFIsolationEstimator.h"
+#endif
 
-// for tau information
+//**********************
+// for tau information *
+//**********************
 #ifndef miniAOD
 #include "DataFormats/TauReco/interface/PFTau.h"
 #include "DataFormats/TauReco/interface/PFTauFwd.h"
@@ -277,6 +305,7 @@ using std::unordered_map;
 #ifdef miniAOD
 #include "DataFormats/PatCandidates/interface/Tau.h"
 #endif
+#include "DataFormats/TauReco/interface/PFTauDiscriminator.h"
 
 //**********************
 // for MET information *
@@ -312,6 +341,7 @@ using std::unordered_map;
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 //#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 //#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "DataFormats/BTauReco/interface/JetTag.h"
 #endif
 #ifdef miniAOD
 #include "DataFormats/PatCandidates/interface/Jet.h"
@@ -380,6 +410,7 @@ private:
 
   // as it says on the tin
   void update_HLT_branch();
+  void update_L1_branch(const edm::EventSetup &iStp);
 
   // branch title creation 
   void eventDoc();
@@ -389,6 +420,14 @@ private:
   //HLTConfigProvider hlt_cfg;   // superseded above
   std::string hlt_proc;
   unordered_map<std::string, uint8_t> hlt_bit;
+
+  // L1 bit branches and needed auxiliary objects (Afiq)
+  unordered_map<std::string, array<uint8_t, 2> > l1_bit;
+  std::vector<unsigned int> l1_mask;
+#if defined(CMSSW7plus)
+  edm::ESGetToken<L1TUtmTriggerMenu, L1TUtmTriggerMenuRcd> l1_es_token;
+#endif
+  edm::InputTag l1_input;
   
 #ifdef CMSSW7plus
   // for Run 2, enable access via getByToken
@@ -413,6 +452,7 @@ private:
   EDGetTokenT<reco::PFJetCollection> pfjetTkn;
   EDGetTokenT<reco::PFJetCollection> pffatjetTkn;
   EDGetTokenT<reco::GenJetCollection>  genjetTkn;//Qun
+  EDGetTokenT<reco::GenJetCollection>  genfatjetTkn;//Qun
   EDGetTokenT<reco::TrackJetCollection> trackjetTkn;
   EDGetTokenT<edm::TriggerResults> trigTkn;
   // for Trigger and Flags (Afiq) *** need to sort out duplication ***
@@ -442,6 +482,7 @@ private:
   EDGetTokenT<pat::METCollection> calometTkn;
   EDGetTokenT<pat::JetCollection> pfjetTkn;
   EDGetTokenT<reco::GenJetCollection> genjetTkn;//Qun
+  EDGetTokenT<reco::GenJetCollection> genfatjetTkn;//Qun
   EDGetTokenT<pat::JetCollection> pffatjetTkn;
   // does not exist 
   //EDGetTokenT<pat::TrackJetCollection> trackjetTkn;
@@ -451,6 +492,8 @@ private:
   EDGetTokenT<edm::TriggerResults> custom_tkn;
   EDGetTokenT<trigger::TriggerEvent> trigEvn; //Qun 
 #endif
+  // tokens that are the same for AOD and mini (some still duplicated in AOD/mini above, to be cleaned up)
+  EDGetTokenT<GlobalAlgBlkBxCollection> l1_tkn;
 #endif
 
   std::string   processName_;  //Qun
@@ -504,6 +547,7 @@ private:
   vector<Int_t> GenPart_pdgId;
   vector<Int_t> GenPart_status;
   vector<Int_t> GenPart_statusFlags;
+  vector<Int_t> GenPart_genPartIdMother; 
   vector<Int_t> GenPart_genPartIdxMother; 
 
   /// general nanoAOD extension ///
@@ -522,7 +566,7 @@ private:
   vector<Float_t> GenPart_mvx;     // mother origin vertex
   vector<Float_t> GenPart_mvy;     // (agrees with GenPV of prompt)
   vector<Float_t> GenPart_mvz;
-  vector<Int_t> GenPart_recIdx;    // pointer to rec track list if matched
+  vector<Int_t> GenPart_recId;     // pointer to rec track list if matched
 
   // for decay and mother vertices from GenPart
   float dcyvtxx, dcyvtxy, dcyvtxz;
@@ -686,14 +730,15 @@ private:
   vector<Float_t> Muon_dzErr;     // error in z
   vector<Float_t> Muon_ip3d;      // 3D impact parameter
   vector<Float_t> Muon_sip3d;     // 3D impact parameter significance
+  vector<Float_t> Muon_dxybs;     // dxy w.r.t. beam spot
   // for the following, take the information from ...
   vector<Float_t> Muon_pfRelIso03_all;   // PF isolation in cone 0.3
   vector<Float_t> Muon_pfRelIso03_chg;   // PF track isolation in cone 0.3
   vector<Float_t> Muon_pfRelIso04_all;   // PF isolation in cone 0.4
   vector<Int_t>   Muon_pfIsoId;          // PF isolation flag, (*** not yet ***) pileup corrected
-  vector<Float_t> Muon_miniPFRelIso_all; // *
-  vector<Float_t> Muon_miniPFRelIso_chg; // *
-  vector<Int_t> Muon_jetIdx;   // *
+  vector<Float_t> Muon_miniPFRelIso_all; // scaled from pfReliso
+  vector<Float_t> Muon_miniPFRelIso_chg; // scaled from pfReliso
+  vector<Int_t> Muon_jetIdx;   // index of associated jet in jet list
   // all nanoAOD bool arrays are declared uint8_t (bool will not work)
   vector<uint8_t> Muon_isGlobal; // muon is global muon; 
                                // track parameters are global parameters;
@@ -704,16 +749,17 @@ private:
   vector<uint8_t> Muon_softId;   // muon satisfies soft ID 
   vector<uint8_t> Muon_mediumId; // muon satisfies medium Id 
   vector<uint8_t> Muon_tightId;  // muon satisfies tight Id 
+  vector<uint8_t> Muon_highPurity; // muon satisfies high purity 
   vector<UChar_t> Muon_highPtId; // muon satisfies high pt Id, not bool!
   vector<Int_t> Muon_nStations;      // number of muon stations hit
   vector<Int_t> Muon_nTrackerLayers; // number of tracker layers hit
   vector<Float_t> Muon_segmentComp;  // muon segnent compatibility
-  vector<UChar_t> Muon_cleanmask;    // *
-  vector<Float_t> Muon_mvaTTH;       // *
+  //vector<UChar_t> Muon_cleanmask;    // *
+  //vector<Float_t> Muon_mvaTTH;       // *
   vector<Int_t> Muon_pdgId;          // +-13, depending on (-1)*charge
   vector<UChar_t> Muon_genPartFlav;  // *
-  // clarify overlap with Muon_simIdx
-  vector<Int_t> Muon_genPartIdx;     // *
+  // clarify overlap with Muon_simId, one is id, the other index
+  vector<Int_t> Muon_genPartIdx;     // index of Muon in GenPart
 
   /// nanoAOD extension ///
   // store all muon candidates
@@ -751,9 +797,9 @@ private:
   vector<Int_t> Muon_gnValidMu;// number of valid muon hits in global muon;
   vector<Int_t> Muon_vtxIdx;   // index (PVtx_Id) of vertex in PVtx list,if any
   vector<Int_t> Muon_vtxFlag;  // quality flag for vertex association
-  vector<Int_t> Muon_trkIdx;   // index (Trk_Id) of track in TRK list
-  // clarify overlap with Muon_genPartIdx
-  vector<Int_t> Muon_simIdx;   // index (GenPart_Id) of particle in GenPart
+  vector<Int_t> Muon_trkId;    // Trk_Id of track in TRK list
+  // clarify overlap with Muon_genPartIdx (one is index, the other Id)
+  vector<Int_t> Muon_simId;    // GenPart_Id of particle in GenPart
     
   // for dimuon candidates (nonstandard extension)
 #include "NanoDimu.h" 
@@ -820,6 +866,9 @@ private:
   bool value_el_isPFcand[max_el];   
   bool value_el_isNano[max_el];
 
+  int value_el_simId[max_el];
+  int value_el_genPartIdx[max_el];
+
   UInt_t Electron_nNano; // counter for official nanoAOD electrons
 
 
@@ -833,7 +882,10 @@ private:
   float value_ph_phi[max_ph];
   float value_ph_mass[max_ph];
   int value_ph_charge[max_ph];
+  float value_ph_pfreliso03chg[max_ph];
   float value_ph_pfreliso03all[max_ph];
+  float value_ph_phIso[max_ph];
+  int value_ph_cutBased[max_ph];
 
 // Taus
   const static int max_tau = 100;
@@ -844,8 +896,18 @@ private:
   float value_tau_mass[max_tau];
   int value_tau_charge[max_tau];
   int value_tau_decaymode[max_tau];
+  // reconsider tau_reliso_all
   float value_tau_chargediso[max_tau];
   float value_tau_neutraliso[max_tau];
+  // reconsider float in the future
+  float value_tau_iddecaymode[max_tau];
+  float value_tau_idisoraw[max_tau];
+  float value_tau_idisovloose[max_tau];
+  float value_tau_idisoloose[max_tau];
+  float value_tau_idisomedium[max_tau];
+  float value_tau_idisotight[max_tau];
+  float value_tau_idantieletight[max_tau];
+  float value_tau_idantimutight[max_tau];
 
 // MET
   float value_met_pt;
@@ -882,6 +944,7 @@ private:
   float value_jet_MUF[max_jet];
   float value_jet_NumConst[max_jet]; 
   float value_jet_CHM[max_jet];
+  float value_jet_btag[max_jet];
   int value_jet_id[max_jet];
 
   // jet correction label, can/should this be moved elsewhere?
@@ -895,6 +958,14 @@ private:
   float value_gjet_eta[max_gjet];
   float value_gjet_phi[max_gjet];
   float value_gjet_mass[max_gjet];
+
+//GenJetsAK8 (or 7)
+  const static int max_gfjet = 300;
+  UInt_t value_gfjet_n;
+  float value_gfjet_pt[max_gfjet];
+  float value_gfjet_eta[max_gfjet];
+  float value_gfjet_phi[max_gfjet];
+  float value_gfjet_mass[max_gfjet];
 
 // FatJets
   const static int max_fatjet = 300;
@@ -963,6 +1034,7 @@ const unsigned nReserve_D0 = 4096;
 //const unsigned nReserve_Dstar = 8192;
 const unsigned nReserve_Dstar = 16384;
 const int maxnmusim = 128;
+const int maxnelsim = 128;
 const int maxnD0sim = 128;
 const int maxnDplussim = 128;
 const int maxnDstarsim = 128;
@@ -1014,6 +1086,8 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   // use hlt_proc above
   //processName_ = iConfig.getParameter<std::string>("processName"); //Qun
   triggerName_ = iConfig.getParameter<std::string>("triggerName"); //Qun
+
+  l1_input = iConfig.getParameter<edm::InputTag>("L1Input"); // Afiq
 
   // https://github.com/cms-sw/cmssw/blob/CMSSW_9_4_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L100
   // https://github.com/cms-sw/cmssw/blob/CMSSW_9_4_X/PhysicsTools/NanoAOD/plugins/IsoValueMapProducer.cc#L49
@@ -1108,6 +1182,7 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   // should use ak4PFJetsCHS in miniAOD/nanoAOD Compatibility mode
   pfjetTkn = consumes<reco::PFJetCollection>(edm::InputTag("ak4PFJets"));
   genjetTkn = consumes<reco::GenJetCollection>(edm::InputTag("ak4GenJets"));//Qun
+  genfatjetTkn = consumes<reco::GenJetCollection>(edm::InputTag("ak8GenJets"));//Qun
   // jet correction label, will this work? doesn't so far ...
   mJetCorr = "ak4PFL1FastL2L3Residual";
 
@@ -1164,6 +1239,7 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   genTkn = consumes<reco::GenParticleCollection>(edm::InputTag("prunedGenParticles"));
   pfjetTkn = consumes<pat::JetCollection>(edm::InputTag("slimmedJets"));
   genjetTkn = consumes<reco::GenJetCollection>(edm::InputTag("slimmedGenJets"));//Qun
+  genfatjetTkn = consumes<reco::GenJetCollection>(edm::InputTag("slimmedGenJetsAK8"));//Qun
   // actually, the slimmedJets refer to AOD   
   pffatjetTkn = consumes<pat::JetCollection>(edm::InputTag("slimmedJetsAK8"));
 
@@ -1185,10 +1261,12 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   if (!custom_flag.empty())
     custom_tkn = consumes<edm::TriggerResults>(custom_tag);
 
+  l1_tkn = consumes<GlobalAlgBlkBxCollection>(l1_input); // Afiq
+
   // CMSSWplus 
 #endif
 
-  //cout << "init" << endl;
+  // cout << "init" << endl;
 
 } // end of constructor
 
@@ -1233,6 +1311,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<reco::CaloMETCollection> calomet;
   Handle<reco::PFMETCollection> met;
   Handle<reco::PFJetCollection> jets;
+  Handle<reco::JetTagCollection> btags;
   Handle<reco::PFJetCollection> fatjets;
   // track jets are available for 4_2, 5_3 and 10_6, but not for others
 #ifndef CMSSW11plus
@@ -1257,6 +1336,10 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //const DeDxDataValueMap eloss  = *energyLossHandle;
   // nuha
   Handle<reco::ConversionCollection> hConversions;
+  Handle<reco::PFCandidateCollection> pfCands;
+  Handle<double> rhoHandle;
+  Handle<reco::PFTauDiscriminator> tausLooseIso, tausVLooseIso, tausMediumIso, tausTightIso, 
+    tausTightEleRej, tausTightMuonRej, tausDecayMode, tausRawIso;
 #endif
 
 #ifdef miniAOD
@@ -1275,6 +1358,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<pat::METCollection> calomet;
   Handle<pat::METCollection> met;
   Handle<pat::JetCollection> jets;  
+  Handle<pat::JetTagCollection> btags;  
   Handle<pat::JetCollection> fatjets;  
   //Handle<pat::TrackJetCollection> trackjets;  
 #endif
@@ -1284,9 +1368,16 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::BeamSpot> beamSpotHandle;
   edm::Handle<reco::VertexCollection> Primvertex;
   edm::Handle<reco::GenJetCollection> genjets;//Qun
+  edm::Handle<reco::GenJetCollection> genfatjets;//Qun
   // for trigger and flags
   edm::Handle<edm::TriggerResults> trigger_handle;
   edm::Handle<edm::TriggerResults> custom_handle;
+
+#if defined(CMSSW42X) || defined(CMSSW53X)
+  edm::Handle<L1GlobalTriggerReadoutRecord> l1_handle;
+#elif defined(CMSSW7plus)
+  edm::Handle<GlobalAlgBlkBxCollection> l1_handle;
+#endif
 
   // cout << "hello get event" << endl; 
 
@@ -1303,9 +1394,27 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //iEvent.getByLabel("caloMet", calomet);
   iEvent.getByLabel("met", calomet);
   iEvent.getByLabel("ak5PFJets", jets);
+  // how do we know to which jet collection this belongs?
+  iEvent.getByLabel(InputTag("combinedSecondaryVertexBJetTags"), btags);
+  //iEvent.getByLabel("combinedSecondaryVertexBJetTags", btags);
   iEvent.getByLabel("ak7PFJets", fatjets);
   iEvent.getByLabel("ak5TrackJets", trackjets);
   iEvent.getByLabel("ak5GenJets", genjets);//Qun
+  iEvent.getByLabel("ak7GenJets", genfatjets);//Qun
+  // for electrons (POET)
+  iEvent.getByLabel("allConversions", hConversions);
+  // for photons (POET)
+  iEvent.getByLabel("particleFlow", pfCands);
+  iEvent.getByLabel(InputTag("fixedGridRhoAll"), rhoHandle);
+  // for taus (POET)
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByDecayModeFinding"),tausDecayMode);
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByRawCombinedIsolationDBSumPtCorr"), tausRawIso);
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByVLooseCombinedIsolationDBSumPtCorr"), tausVLooseIso);
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByLooseCombinedIsolationDBSumPtCorr"), tausLooseIso);
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByMediumCombinedIsolationDBSumPtCorr"), tausMediumIso);
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByTightCombinedIsolationDBSumPtCorr"), tausTightIso);
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByTightElectronRejection"), tausTightEleRej);
+  iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByTightMuonRejection"), tausTightMuonRej);  
 
   // jet correction label
 //  mJetCorr = "ak5CaloL2L3";
@@ -1337,8 +1446,10 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   ////if (!iEvent.getByLabel("dedxPixelHarmonic2", energyLossHandle)) dedxexist=0;
 
   // trigger and flags (Afiq)
-  if (!skiptrigger)
+  if (!skiptrigger) {
     iEvent.getByLabel(edm::InputTag("TriggerResults", "", hlt_proc), trigger_handle);
+    iEvent.getByLabel(l1_input, l1_handle);
+  }
   if (!custom_flag.empty())
     iEvent.getByLabel(custom_tag, custom_handle);
   // not CMSSW7plus
@@ -1362,6 +1473,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // iEvent.getByToken(muCorrmetTkn, muCorrmets);
   iEvent.getByToken(pfjetTkn, jets);
   iEvent.getByToken(genjetTkn, genjets);//Qun
+  iEvent.getByToken(genfatjetTkn, genfatjets);//Qun
   iEvent.getByToken(pffatjetTkn, fatjets);
 #ifndef CMSSW11plus
 #ifdef CMSSW106plus
@@ -1401,6 +1513,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // iEvent.getByToken(muCorrmetTkn, muCorrmets);
   iEvent.getByToken(pfjetTkn, jets);
   iEvent.getByToken(genjetTkn, genjets);//Qun
+  iEvent.getByToken(genfatjetTkn, genfatjets);//Qun
   // need to insert something here for fatjets and trackjets
   iEvent.getByToken(pffatjetTkn, fatjets);
   // iEvent.getByToken(trackjetTkn, trackjets);
@@ -1414,6 +1527,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     iEvent.getByToken(trig_tkn, trigger_handle);
   if (!custom_flag.empty())
     iEvent.getByToken(custom_tkn, custom_handle);
+
+  iEvent.getByToken(l1_tkn, l1_handle);
 
   // CMSSW7plus
 #endif
@@ -1445,44 +1560,67 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 #endif
 
 #ifdef CMSSW42X
-              // skip trigger for 2010 MC  (not available)
-              if (run == 1) {
-                if (!skiptrigger)    // on first event only 
-		  std::cout << "Trigger information will be skipped" << std::endl;
-                skiptrigger = true;
-              }
+  // skip trigger for 2010 MC  (not available)
+  if (run == 1) {
+    if (!skiptrigger)    // on first event only 
+      std::cout << "Trigger information will be skipped" << std::endl;
+    skiptrigger = true;
+  }
 #endif
-	      // cout << "hello skip trigger " << run << " " << skiptrigger << endl; 
-	      if (!skiptrigger) {
+  // cout << "hello skip trigger " << run << " " << skiptrigger << endl; 
+  if (!skiptrigger) {
 // *************************************************************
 //------------------ get and check trigger info ----------------
 // *************************************************************
 //      sets hlt_bit.at pointers, i.e. whether trigger has fired or not
 
-  //cout << "hello get trigger" << endl; 
+  // cout << "hello get trigger" << endl; 
 
-  if (!hlt_proc.empty()) {
-    //cout << "hello hlt_proc.empty" << endl; 
-    for (unsigned iP = 0; iP < trigger_handle->size(); ++iP) {
-      // get path name with version stripped off
-      const std::string path = remove_version( iEvent.triggerNames(*trigger_handle).triggerName(iP) );
-      // check whether path occurs in container (0 or 1)
-      if (hlt_bit.count(path)) {
-        // for debug 
-        //cout << "hello accepted trigger path " << iP << " " << path << endl;
-        // trigger_handle->accept returns 0 or 1,
-        // .at refers to the value of the second element of the pair 
-        hlt_bit.at(path) = trigger_handle->accept(iP);
+    if (!hlt_proc.empty()) {
+      //cout << "hello hlt_proc.empty" << endl; 
+      for (unsigned iP = 0; iP < trigger_handle->size(); ++iP) {
+        // get path name with version stripped off
+        const std::string path = remove_version( iEvent.triggerNames(*trigger_handle).triggerName(iP) );
+        // check whether path occurs in container (0 or 1)
+        if (hlt_bit.count(path)) {
+          // for debug 
+          //cout << "hello accepted trigger path " << iP << " " << path << endl;
+          // trigger_handle->accept returns 0 or 1,
+          // .at refers to the value of the second element of the pair 
+          hlt_bit.at(path) = trigger_handle->accept(iP);
+        }
+        else if (path.substr(0, 3) == "HLT")
+          std::cout << "WARNING: HLT path " << path << " is not present in the bitmap, when it should be!! Check if the logic is "
+            "properly implemented!" << std::endl;
+        // for debug
+        //else 
+        //  cout << "hello *rejected* trigger path " << iP << " " << path << endl;
       }
-      else if (path.substr(0, 3) == "HLT")
-        std::cout << "WARNING: HLT path " << path << " is not present in the bitmap, when it should be!! Check if the logic is "
-          "properly implemented!" << std::endl;
-      // for debug
-      //else 
-      //  cout << "hello *rejected* trigger path " << iP << " " << path << endl;
+    } // hlt_proc_empty
+
+    // for L1 trigger (Afiq)
+    const std::vector<bool> *wordp = nullptr;
+#if defined(CMSSW42X) || defined(CMSSW53X)
+    wordp = &l1_handle->decisionWord();
+#elif defined(CMSSW7plus)
+    wordp = &l1_handle->at(0, 0).getAlgoDecisionFinal();
+#endif
+
+    const std::vector<bool> &word = *wordp;
+    for (unordered_map<std::string, array<uint8_t, 2> >::iterator it = l1_bit.begin(); it != l1_bit.end(); ++it) {
+      it->second[1] = word[it->second[0]];
+      // FIXME not yet understood how to handle L1 masking appropriately; in 2011 MC mask = 0 for all seeds but not data 
+      //if (not l1_mask.empty())
+      //  it->second[1] &= l1_mask[it->second[0]] & (1 << 0);
+      // currently none is chosen as both lead to all seeds always failing in 2011 MC and data (CMSSW 53X default config in gitlab)
+
+      // L1 mask application
+      // impl 1 from PhysicsTools/NanoAOD/plugins/L1TriggerResultsConverter.cc
+      // impl 1: it->second[1] &= (l1_mask[it->second[0]] != 0);
+      // impl 2 from CaloOnlineTools/EcalTools/plugins/EcalTPGAnalyzer.cc, EventFilter/L1GlobalTriggerRawToDigi/src/L1GlobaTriggerRecordProducer.cc
+      // impl 2: it->second[1] &= l1_mask[it->second[0]] & (1 << 0);
     }
-  } // hlt_proc_empty
-	      } // skiptrigger
+  } // skiptrigger
 
               // initialize all dataset trigger flags to true
               // (for 2010 MC)
@@ -1955,6 +2093,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   GenPart_pdgId.clear();
   GenPart_status.clear();
   GenPart_statusFlags.clear();
+  GenPart_genPartIdMother.clear();
   GenPart_genPartIdxMother.clear();
 
   GenPart_Id.clear();
@@ -1971,7 +2110,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   GenPart_mvx.clear();
   GenPart_mvy.clear();
   GenPart_mvz.clear();
-  GenPart_recIdx.clear();
+  GenPart_recId.clear();
 
   TLorentzVector p4Kt, p4pit, p4D0t;
   p4Kt.SetPtEtaPhiE(0., 0., 0., 0.);
@@ -1985,6 +2124,13 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   float etamusim[maxnmusim];
   float phimusim[maxnmusim];
 
+  int nelsim =0;
+  int idelsim[maxnelsim];
+  float chgelsim[maxnelsim];
+  float ptelsim[maxnelsim];
+  float etaelsim[maxnelsim];
+  float phielsim[maxnelsim];
+
   // clear GenPV variables for each event; somehow needed for GenPV_chmult?
   GenPV_x = -999.;
   GenPV_y = -999.;
@@ -1993,6 +2139,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   GenPV_chmult = 0;
 
   if (!isData) {
+
+    //cout << "hello gen" << endl;
 
 #ifndef CMSSW7plus   
     iEvent.getByLabel("genParticles", genParticles);
@@ -2218,10 +2366,24 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           etamusim[nmusim]=genp.eta();
           phimusim[nmusim]=genp.phi();
 	  ++nmusim;
+          //cout << ee << " " << genp.charge() << " " << genp.pt() << " " << genp.eta() << " " << genp.phi() << endl;
         }
         if (nmusim >= maxnmusim) std::cout << "!!! maxnmusim exceeded !!!" << std::endl;
 
-        // cout << "hello muons" << endl;
+        // cout << "hello musim" << endl;
+
+        // electrons (not yet used)
+        if (abs(genp.pdgId())==11 && genp.status()==1 && genp.pt()>1 && nelsim < maxnelsim) {
+          idelsim[nelsim]=ee; 
+          chgelsim[nelsim]=genp.charge();
+          ptelsim[nelsim]=genp.pt();
+          etaelsim[nelsim]=genp.eta();
+          phielsim[nelsim]=genp.phi();
+          // if (genp.pt()>5) cout << "true electron " << idelsim[nelsim] << " with pt = " << ptelsim[nelsim] 
+	  //   << " " << chgelsim[nelsim] << " " << etaelsim[nelsim] << " " << phielsim[nelsim] << endl;
+	  ++nelsim;
+        }
+        if (nelsim >= maxnelsim) std::cout << "!!! maxnelsim exceeded !!!" << std::endl;
 
 	if (GenPart_pt.size() < nReserve_GenPart) {
 	  GenPart_pt.push_back(genp.pt());
@@ -2260,13 +2422,19 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           // does not yet exist
           uint statusflags = 0;
 #endif
-          //cout << "hello status" << endl;  
+          // cout << "hello status" << endl;  
           GenPart_statusFlags.push_back(statusflags);
-          // The following does not work, do something else
-	  //          GenPart_genPartIdxMother.push_back(genp.mother());
-          // Rather loop over previous entries in *this* list, find parent
-          // (if stored), and store index of that! 
-	  GenPart_genPartIdxMother.push_back(genpmid);
+          // the follwing is an Id, not an index !!!
+	  GenPart_genPartIdMother.push_back(genpmid);
+          // and now the index from the Id (loop over previous)
+          int genpmidx = -1;
+          for (int igen = 0; igen < int(GenPart_Id.size()); ++igen) {
+            if (GenPart_Id[igen] == genpmid) {
+              genpmidx = igen;
+              break;
+            }
+          }
+	  GenPart_genPartIdxMother.push_back(genpmidx);
           GenPart_Id.push_back(ee);
 	  GenPart_isNano.push_back(isNano);
 	  GenPart_parpdgId.push_back(parpdgId);
@@ -2280,7 +2448,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           GenPart_mvx.push_back(motx);
           GenPart_mvy.push_back(moty);
           GenPart_mvz.push_back(motz);
-          GenPart_recIdx.push_back(-1);
+          GenPart_recId.push_back(-1);
 	}
 	else{std::cout << "WARNING!!!!! NO. OF GENPART IS MORE THAN YOUR RESERVED NO.!!!!!!" << std::endl;}
       }
@@ -2292,13 +2460,16 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 /////////////////////////////// Gen Particle End /////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-   // cout << "hello beam spot" << endl;
+  // cout << "hello beam spot" << endl;
 
 /////////////////////////////////////////////////////////////////////////////
 ///////////////////////////// Beam spot /////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
   reco::BeamSpot vertexBeamSpot= *beamSpotHandle;  
+  // needed for POET
+  reco::BeamSpot beamspot= *beamSpotHandle.product();  
+  const reco::BeamSpot &beamspot1= *beamSpotHandle.product();  
 
   // store beam spot info 
   Bsp_x = vertexBeamSpot.x0();
@@ -2404,6 +2575,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   reco::VertexCollection::const_iterator PV_ite;
 
+  // all primary vertices are stored, so Id and Idx are the same 
+  // (except if size is exceeded)
   for (reco::VertexCollection::const_iterator vite = Primvertex->begin(); 
        vite != Primvertex->end(); ++vite) {
     if (PVtx_z.size() < nReserve_PVtx) {
@@ -2431,7 +2604,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	PVtx_isMain.push_back(null);
       }
       // fill extended vertex structure
-      // just in case not all vertices are stored (otherwise redundant)
+      // just in case not all vertices are stored (otherwise, as now, redundant)
       PVtx_Id.push_back(vtxid);
       //    will be refilled in NanoDmeson later (when activated)
       PVtx_ntrk.push_back(-1);
@@ -2537,7 +2710,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  if (abs(itElec->gsfTrack()->pt()-trackRef->pt())/itElec->gsfTrack()->pt()<0.5) {
 	    if (abs(itElec->gsfTrack()->eta()-trackRef->eta())<0.1) {
               float eledphi = abs(itElec->gsfTrack()->phi()-trackRef->phi());
-              if (eledphi > 3.1415) eledphi = eledphi - 2.*3.1415;
+              if (eledphi > pi) eledphi = eledphi - 2.*pi;
 	      if (abs(eledphi) <0.1) { 
                 if (itElec->gsfTrack()->charge() == trackRef->charge()) {
 		  if (abs(itElec->gsfTrack()->vx()-vite->x())<1. && abs(itElec->gsfTrack()->vy()-vite->y())<1. && abs(itElec->gsfTrack()->vz()-vite->z())<1.) {
@@ -2707,6 +2880,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   Muon_dzErr.clear();
   Muon_ip3d.clear();
   Muon_sip3d.clear();
+  Muon_dxybs.clear();
   Muon_pfRelIso03_all.clear();
   Muon_pfRelIso03_chg.clear();
   Muon_pfRelIso04_all.clear();
@@ -2720,12 +2894,13 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   Muon_softId.clear();
   Muon_mediumId.clear(); 
   Muon_tightId.clear(); 
+  Muon_highPurity.clear(); 
   Muon_highPtId.clear(); 
   Muon_nStations.clear();
   Muon_nTrackerLayers.clear(); 
   Muon_segmentComp.clear(); 
-  Muon_cleanmask.clear(); 
-  Muon_mvaTTH.clear(); 
+  //Muon_cleanmask.clear(); 
+  //Muon_mvaTTH.clear(); 
   Muon_pdgId.clear(); 
   Muon_genPartFlav.clear(); 
   Muon_genPartIdx.clear(); 
@@ -2761,8 +2936,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   Muon_gnValidMu.clear(); 
   Muon_vtxIdx.clear(); 
   Muon_vtxFlag.clear(); 
-  Muon_trkIdx.clear();
-  Muon_simIdx.clear(); 
+  Muon_trkId.clear();
+  Muon_simId.clear(); 
   
   b4_nMuon = muons->size();
   Muon_nNano = 0;
@@ -2834,6 +3009,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     float mu_dz = 0.;
     float mu_dzBest = 0.;
     float mu_dzError = -1.;
+    float mu_dxybs = 0.;
     int mu_vtxId = -1.;
 
     // set quality variables
@@ -2878,12 +3054,16 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       mu_dz = recoMuon->innerTrack()->dz(pv);
       // neither is good, but global track is somewhat better??
       mu_dzError = recoMuon->innerTrack()->dzError();
+      // w.r.t beam spot
+      mu_dxybs = recoMuon->innerTrack()->dxy(vertexBeamSpot);
 #else
       // use bestTrack when available in CMSSW
       mu_dxy = recoMuon->bestTrack()->dxy(pv);
       mu_dxyError = recoMuon->bestTrack()->d0Error();
       mu_dz = recoMuon->bestTrack()->dz(pv);
       mu_dzError = recoMuon->bestTrack()->dzError();
+      // w.r.t beam spot
+      mu_dxybs = recoMuon->bestTrack()->dxy(vertexBeamSpot);
 #endif
       // } // else
 
@@ -3046,10 +3226,13 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     // use main vertex vertex
     //bool mu_highPtId = muon::isHighPtMuon(*recoMuon,*PV_ite, reco::TunePType = muon::improvedTuneP);
 #ifdef CMSSW7plus
-    UChar_t mu_highPtId = muon::isHighPtMuon(*recoMuon,*PV_ite);
+    UChar_t mu_highPtId = 2*muon::isHighPtMuon(*recoMuon,*PV_ite);
+    mu_highPtId = mu_highPtId + muon::isTrackerHighPtMuon(*recoMuon,*PV_ite);
 #endif
 #ifdef CMSSW53X
-    UChar_t mu_highPtId = muon::isHighPtMuon(*recoMuon,*PV_ite, improvedTuneP);
+    UChar_t mu_highPtId = 2*muon::isHighPtMuon(*recoMuon,*PV_ite, improvedTuneP);
+    //mu_highPtId = mu_highPtId + muon::isTrackerHighPtMuon(*recoMuon,*PV_ite);
+    //mu_highPtId = mu_highPtId + muon::isTrackerHighPtMuon(*recoMuon,*PV_ite, improvedTuneP);
     //bool mu_highPtId = muon::isHighPtMuon(*recoMuon,*PV_ite, muon::improvedTuneP);
 #endif
 #ifdef CMSSW42X
@@ -3147,6 +3330,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	Muon_sip3d.push_back(mu_sip3d);
 	Muon_ip3dBest.push_back(mu_ip3dBest);
 	Muon_sip3dBest.push_back(mu_sip3dBest);
+	Muon_dxybs.push_back(mu_dxybs);
 
         // isolation
         if (mu_relPFIsoR04 != -9999.) {
@@ -3157,7 +3341,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         } // if
 	else { // for CMSSW 4-2-8
 	  Muon_pfRelIso03_all.push_back(mu_relIsoR03);
-	  Muon_pfRelIso04_all.push_back(mu_relIsoR05);
+          // multiply 03 by 16/9? better: interpolate between 03 and 05?
+	  Muon_pfRelIso04_all.push_back(sqrt(mu_relIsoR03*mu_relIsoR05));
           mu_pfIso = int(mu_relIsoR03<0.3)+int(mu_relIsoR03<0.25)+int(mu_relIsoR03<0.2)+int(mu_relIsoR03<0.15)+int(mu_relIsoR03<0.1)+int(mu_relIsoR03<0.05);
         } // else
 #ifndef CMSSW42X     
@@ -3169,10 +3354,20 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	Muon_pfRelIso03_chg.push_back((recoMuon->isolationR03()).sumPt / recoMuon->pt());
 #endif
         Muon_pfIsoId.push_back(mu_pfIso);
-	Muon_miniPFRelIso_all.push_back(999.); // *
-	Muon_miniPFRelIso_chg.push_back(999.); // *
+        
+        if (mu_relPFIsoR03 != -9999.) { 
+          // approximate by 2/3 of Muon_pfRelIso (from study on official nanoAOD)
+	  Muon_miniPFRelIso_all.push_back(mu_relPFIsoR03 *2./3.);
+#ifndef CMSSW42X
+	  Muon_miniPFRelIso_chg.push_back((recoMuon->pfIsolationR03()).sumChargedHadronPt / recoMuon->pt() *2./3.);
+#endif
+        }
+        else {
+          Muon_miniPFRelIso_all.push_back(mu_relIsoR03 *2./3.);
+	  Muon_miniPFRelIso_chg.push_back((recoMuon->isolationR03()).sumPt / recoMuon->pt() *2./3.);
+        }
 
-	Muon_jetIdx.push_back(999);
+	Muon_jetIdx.push_back(-1);
 
         Muon_isGlobal.push_back(mu_isGlobal); 
         Muon_isTracker.push_back(mu_isTracker); 
@@ -3186,6 +3381,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	Muon_softId.push_back(mu_softId);
 	Muon_mediumId.push_back(mu_mediumId); 
 	Muon_tightId.push_back(mu_tightId);
+	Muon_highPurity.push_back(mu_highPurity);
 	Muon_highPtId.push_back(mu_highPtId);
 
 	Muon_nStations.push_back(mu_nStations);
@@ -3193,10 +3389,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	// unsigned should be int & can't be (-)
 	// Fill these variables with something nonsense atm
         // not yet being sorted!
-	Muon_cleanmask.push_back('9'); // *
+	//Muon_cleanmask.push_back('9'); // was this supposed to mean something?
 	Muon_genPartFlav.push_back('9'); // *
-	Muon_genPartIdx.push_back(999); // *
-	Muon_mvaTTH.push_back(999.); // *
+	//Muon_mvaTTH.push_back(999.); // *
 	Muon_nTrackerLayers.push_back(mu_nTrackerLayers);
 	// this needs to be changed to id after truth matching 
 	Muon_pdgId.push_back(-13*recoMuon->charge());
@@ -3249,7 +3444,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 #ifndef miniAOD
 	// find muon in generaltracks list
         int itcount = -1;
-        int mu_trkIdx = -1;
+        int mu_trkId = -1;
         if ((recoMuon->innerTrack()).isNonnull()) {
           for (reco::TrackCollection::const_iterator itrack = tracks->begin(); itrack != tracks->end(); ++itrack) {
             ++itcount;
@@ -3268,29 +3463,44 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             // capitulate: (is this safe?)
 	    if (itrack->pt() == recoMuon->innerTrack()->pt()) {
               // muon found
-              mu_trkIdx = itcount;
+              mu_trkId = itcount;
               break; 
 	    } // if
           } // for
         } // nonnull
-        Muon_trkIdx.push_back(mu_trkIdx);
+        Muon_trkId.push_back(mu_trkId);
 #endif 
 #ifdef miniAOD
         // not yet treated
-        Muon_trkIdx.push_back(-1); // *
+        Muon_trkId.push_back(-1); // *
 #endif
 
         // check for associated simulated muon from prestored list
         bool musimfound = false;
         for (int im=0; im<nmusim; ++im) {
-          if (recoMuon->charge()==chgmusim[im] && abs(recoMuon->pt()-ptmusim[im])/ptmusim[im] < 0.1 && abs(recoMuon->eta()-etamusim[im])<0.1 && fmod(abs(recoMuon->phi()-phimusim[im]),2.*pi)<0.1) {
+          if (recoMuon->charge()==chgmusim[im] && abs(recoMuon->pt()-ptmusim[im])/ptmusim[im] < 0.2 && abs(recoMuon->eta()-etamusim[im])<0.1 && fmod(abs(recoMuon->phi()-phimusim[im]),2.*pi)<0.1) {
             musimfound = true;
-            Muon_simIdx.push_back(idmusim[im]);
+            // store GenPart_Id
+            Muon_simId.push_back(idmusim[im]);
+            bool mugenfound = false;
+            for (int igen=0; igen<int(nGenPart); ++igen) {
+              if (idmusim[im]==GenPart_Id[igen]) {
+                // found in genparticle list
+                mugenfound = true;
+                // store GenPart index
+                Muon_genPartIdx.push_back(igen);
+                break;
+              }
+            }
+            if (!mugenfound) {
+              cout << "Alarm: muon " << idmusim[im] << " not found in GenPart" << endl; 
+            }
             break;
           } // if
 	} // im
         if (!musimfound) {
-          Muon_simIdx.push_back(-1);
+          Muon_simId.push_back(-1);
+          Muon_genPartIdx.push_back(-1);
         } // !musimfound    
 
        } // nanoext
@@ -3363,6 +3573,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         temp = Muon_sip3dBest[i1];
         Muon_sip3dBest[i1] = Muon_sip3dBest[i2];
         Muon_sip3dBest[i2] = temp;    
+        temp = Muon_dxybs[i1];
+        Muon_dxybs[i1] = Muon_dxybs[i2];
+        Muon_dxybs[i2] = temp;    
 
         temp = Muon_pfRelIso03_all[i1];
         Muon_pfRelIso03_all[i1] = Muon_pfRelIso03_all[i2];
@@ -3406,6 +3619,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         tempi8 = Muon_tightId[i1];
         Muon_tightId[i1] = Muon_tightId[i2];
         Muon_tightId[i2] = tempi8;    
+        tempi8 = Muon_highPurity[i1];
+        Muon_highPurity[i1] = Muon_highPurity[i2];
+        Muon_highPurity[i2] = tempi8;    
         UChar_t tempU = Muon_highPtId[i1];
         Muon_highPtId[i1] = Muon_highPtId[i2];
         Muon_highPtId[i2] = tempU;    
@@ -3424,12 +3640,12 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         Muon_pdgId[i1] = Muon_pdgId[i2];
         Muon_pdgId[i2] = tempi;    
 
-        tempU = Muon_cleanmask[i1];
-        Muon_cleanmask[i1] = Muon_cleanmask[i2];
-        Muon_cleanmask[i2] = tempU;    
-        temp = Muon_mvaTTH[i1];
-        Muon_mvaTTH[i1] = Muon_mvaTTH[i2];
-        Muon_mvaTTH[i2] = temp;    
+        //tempU = Muon_cleanmask[i1];
+        //Muon_cleanmask[i1] = Muon_cleanmask[i2];
+        //Muon_cleanmask[i2] = tempU;    
+        //temp = Muon_mvaTTH[i1];
+        //Muon_mvaTTH[i1] = Muon_mvaTTH[i2];
+        //Muon_mvaTTH[i2] = temp;    
         tempU = Muon_genPartFlav[i1];
         Muon_genPartFlav[i1] = Muon_genPartFlav[i2];
         Muon_genPartFlav[i2] = tempU;    
@@ -3522,12 +3738,12 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         tempi = Muon_vtxFlag[i1];
         Muon_vtxFlag[i1] = Muon_vtxFlag[i2];
         Muon_vtxFlag[i2] = tempi;    
-        tempi = Muon_trkIdx[i1];
-        Muon_trkIdx[i1] = Muon_trkIdx[i2];
-        Muon_trkIdx[i2] = tempi;    
-        tempi = Muon_simIdx[i1];
-        Muon_simIdx[i1] = Muon_simIdx[i2];
-        Muon_simIdx[i2] = tempi;    
+        tempi = Muon_trkId[i1];
+        Muon_trkId[i1] = Muon_trkId[i2];
+        Muon_trkId[i2] = tempi;    
+        tempi = Muon_simId[i1];
+        Muon_simId[i1] = Muon_simId[i2];
+        Muon_simId[i2] = tempi;    
       } // isNano
     } // i2
   } // i1
@@ -3618,6 +3834,35 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       value_el_mass[value_el_n] = it->mass();
       //value_el_mass[value_el_n] = emass;
 
+        // check for associated simulated electron from prestored list
+        bool elsimfound = false;
+        for (int ie=0; ie<nelsim; ++ie) {
+          if (it->charge()==chgelsim[ie] && abs(it->pt()-ptelsim[ie])/ptelsim[ie] < 0.28 && abs(it->eta()-etaelsim[ie])<0.1 && fmod(abs(it->phi()-phielsim[ie]),2.*pi)<0.1) {
+            elsimfound = true;
+            // store GenPart_Id
+            value_el_simId[value_el_n] = idelsim[ie];
+            bool elgenfound = false;
+            for (int igen=0; igen<int(nGenPart); ++igen) {
+              if (idelsim[ie]==GenPart_Id[igen]) {
+                // found in genparticle list
+                elgenfound = true;
+                // store GenPart index
+                value_el_genPartIdx[value_el_n] = igen;
+                break;
+              }
+            }
+            if (!elgenfound) {
+              cout << "Alarm: electron " << idelsim[ie] << " not found in GenPart" << endl; 
+            }
+            break;
+          } // if
+	} // ie
+        if (!elsimfound) {
+          value_el_simId[value_el_n] = -1;
+          value_el_genPartIdx[value_el_n] = -1;
+        } // !elsimfound    
+
+
       // need to define this for other CMSSW versions
 #ifdef CMSSW42X
       // non pf based approximation, from 
@@ -3641,14 +3886,19 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // see https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPFBasedIsolation
       // verify whether the isPFcand condition is needed here (in Run 2 it is not)
       if (it->passingPflowPreselection()) {
+        // will be superseded by corrected version below
         auto iso03 = it->pfIsolationVariables();
         value_el_pfreliso03all[value_el_n] =
             (iso03.chargedHadronIso + iso03.neutralHadronIso + iso03.photonIso)/it->pt();
         value_el_pfreliso03chg[value_el_n] = iso03.chargedHadronIso/it->pt();
       } 
       else {
-        value_el_pfreliso03all[value_el_n] = -999.;
-        value_el_pfreliso03chg[value_el_n] = -999.;
+        // should this rather be +999?
+        //value_el_pfreliso03all[value_el_n] = -999.;
+        //value_el_pfreliso03chg[value_el_n] = -999.;
+        // use "old" non-PF variant:
+        value_el_pfreliso03all[value_el_n] = (it->dr03TkSumPt()+it->dr03EcalRecHitSumEt()+it->dr03HcalTowerSumEt())/it->p4().Pt();
+        value_el_pfreliso03chg[value_el_n] = it->dr03TkSumPt()/it->p4().Pt();
       }
 #endif
 
@@ -3690,12 +3940,15 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 #endif    
       // *** need to fix for Run 2 ***
 #ifndef CMSSW7plus
+      // for 2010 (also 2011?)
+      // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaPublicData
       // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification
       value_el_lostHits[value_el_n] = ((it->gsfTrack())->trackerExpectedHitsInner()).numberOfHits();
       // nuha  (seems to yield same result, although not documented)
       //value_el_lostHits[value_el_n] = ((it->gsfTrack())->trackerExpectedHitsInner()).numberOfLostHits();
 #endif
 #ifdef CMSSW7plus
+      // Run 2
       value_el_lostHits[value_el_n] = ((it->gsfTrack())->hitPattern()).numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
 #endif
 #ifdef CMSSW7plus
@@ -3704,8 +3957,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // only available from 94X onwards (do we need further ifdef?)
       // https://github.com/cms-sw/cmssw/blob/CMSSW_9_4_X/RecoEgamma/ElectronIdentification/plugins/cuts/GsfEleMissingHitsCut.cc
-      value_el_lostHits[value_el_n] = ((it->gsfTrack())->hitPattern()).numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
-      // for 80X, they use this:
+      // this is the same as above:
+      // value_el_lostHits[value_el_n] = ((it->gsfTrack())->hitPattern()).numberOfLostHits(reco::HitPattern::MISSING_INNER_HITS);
+      // for 80X, they use this instead:
       // value_el_lostHits[value_el_n] = ((it->gsfTrack())->hitPattern()).numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
       // https://github.com/cms-sw/cmssw/blob/CMSSW_8_0_X/RecoEgamma/ElectronIdentification/plugins/cuts/GsfEleMissingHitsCut.cc
       // not sure which one to use, need to discuss/check, see also 
@@ -3713,7 +3967,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/RecoEgamma/ElectronIdentification/plugins/cuts/GsfEleMissingHitsCut.cc
 #endif
 
-      // are the next two redundant with convVeto?
+      // are the next two redundant with convVetoOld?
       value_el_convDist[value_el_n] = it->convDist();
       value_el_convDcot[value_el_n] = it->convDcot();
       // flag to *pass* veto (i.e. accept if 1)
@@ -3750,8 +4004,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // see https://github.com/cms-sw/cmssw/blob/82e3ed4ea0b8756c412d1f56758b7698d717104e/PhysicsTools/NanoAOD/python/electrons_cff.py
       value_el_deltaEtaSC[value_el_n] = (it->superCluster()->eta()) - it->eta();
       value_el_deltaPhiSC[value_el_n] = (it->superCluster()->phi()) - it->phi();
-      if (value_el_deltaPhiSC[value_el_n] > 3.1415) value_el_deltaPhiSC[value_el_n] = value_el_deltaPhiSC[value_el_n]-2.*3.1415;  
-      if (value_el_deltaPhiSC[value_el_n] < -3.1415) value_el_deltaPhiSC[value_el_n] = value_el_deltaPhiSC[value_el_n]+2.*3.1415;  
+      if (value_el_deltaPhiSC[value_el_n] > pi) value_el_deltaPhiSC[value_el_n] = value_el_deltaPhiSC[value_el_n]-2.*pi;  
+      if (value_el_deltaPhiSC[value_el_n] < -pi) value_el_deltaPhiSC[value_el_n] = value_el_deltaPhiSC[value_el_n]+2.*pi;  
       // nanoAODplus variables for Run 1
       value_el_deltaEtaSCtr[value_el_n] = it->deltaEtaSuperClusterTrackAtVtx();
       value_el_deltaPhiSCtr[value_el_n] = it->deltaPhiSuperClusterTrackAtVtx();
@@ -3763,16 +4017,16 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       value_el_sieie[value_el_n] = it->full5x5_sigmaIetaIeta();
 #endif
 #ifndef CMSSW7plus
-      value_el_sieie[value_el_n] = -9999.;
+      // use Run 1 value, since Run 2 algorithm is not defined 
+      value_el_sieie[value_el_n] = it->sigmaIetaIeta();
 #endif
       // nanoAODplus variable for Run 1 (exists also for Run 2)
       value_el_sieieR1[value_el_n] = it->sigmaIetaIeta();
       // what about it->ecalEnergy()  and it->trackMomentumAtVtx().p() ? see
       // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification
-      // what about it->ecalEnergy()  and it->trackMomentumAtVtx().p() ? see
-      // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification
       // nuha
       value_el_eInvMinusPInvOld[value_el_n] = 1/it->p4().E() - 1/it->p4().P();
+      // should use Gsftrack instead? 
       value_el_eInvMinusPInv[value_el_n] = (1-(it->eSuperClusterOverP()) ) / it->ecalEnergy();
 
       // auto trk = it->gsfTrack();
@@ -3797,13 +4051,52 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       value_el_dxy[value_el_n] = it->gsfTrack()->dxy(pv);
       // value_el_dxy[value_el_n] = trk->dxy(pv) * it->charge();
       // if (it->phi()<0) value_el_dxy[value_el_n] = -value_el_dxy[value_el_n];
-      if (it->phi()<0) value_el_dxy[value_el_n] = -value_el_dxy[value_el_n];
       value_el_dz[value_el_n] = it->gsfTrack()->dz(pv);
       value_el_dxyErr[value_el_n] = it->gsfTrack()->d0Error();
       value_el_dzErr[value_el_n] = it->gsfTrack()->dzError();
   
       value_el_ip3d[value_el_n] = IP3d_e;
       value_el_sip3d[value_el_n] = SIP3d_e;
+
+
+      // cout << "hello before POET" << endl;
+
+      // and now using the POET code
+      reco::GsfElectronCollection::const_iterator itElec = it;
+      // *** this is mostly negative!? fix! ***
+      int missing_hits = itElec->gsfTrack()->trackerExpectedHitsInner().numberOfHits()-itElec->gsfTrack()->hitPattern().numberOfHits();
+
+      // cout << "hello after missing hits" << endl;
+
+      bool passelectronveto = !ConversionTools::hasMatchedConversion(*itElec, hConversions, beamspot1.position());
+
+      // cout << "hello after veto" << endl;
+      
+      float el_pfIso = 999;
+#ifndef CMSSW42X
+      if (itElec->passingPflowPreselection()) {
+        // cout << "passing preselection" << endl;
+	double rho = 0;
+	if(rhoHandle.isValid()) rho = *(rhoHandle.product());
+	//double Aeff = effectiveArea0p3cone(itElec->eta());
+        float eta = itElec->eta();   // *** should rather be SCeta! ***
+        double Aeff = 0.;
+        if(fabs(eta) < 1.0)  Aeff = 0.13;
+        else if(fabs(eta) < 1.479) Aeff = 0.14;
+        else if(fabs(eta) < 2.0) Aeff = 0.07;
+        else if(fabs(eta) < 2.2) Aeff = 0.09;
+        else if(fabs(eta) < 2.3) Aeff = 0.11;
+        else if(fabs(eta) < 2.4) Aeff = 0.11;
+        else Aeff = 0.14; 
+	auto iso03 = itElec->pfIsolationVariables();
+	el_pfIso = (iso03.chargedHadronIso + std::max(0.0,iso03.neutralHadronIso + iso03.photonIso - rho*Aeff))/itElec->pt();
+      } 
+#endif
+      // supersede isolation with this pileup corrected version if defined
+      if (el_pfIso < 999) value_el_pfreliso03all[value_el_n] = el_pfIso;
+
+      // cout << "hello after iso " << el_pfIso << endl; 
+
       
       // for cut based selection cuts (2011 data and higher), see
       // https://twiki.cern.ch/twiki/bin/view/CMS/EgammaCutBasedIdentification
@@ -3813,30 +4106,52 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       bool eisLoose = true;
       bool eisMedium = true;
       bool eisTight = true;
+
+      /*
+      cout <<  "SCeta: " << value_el_SCeta[value_el_n]
+           << " deta: " << value_el_deltaEtaSC[value_el_n]
+           << " detatr: " << value_el_deltaEtaSCtr[value_el_n]
+           << " dphi: " << value_el_deltaPhiSC[value_el_n]
+           << " dphitr: " << value_el_deltaPhiSCtr[value_el_n]
+           << " sieie: " << value_el_sieie[value_el_n]
+           << " sieieR1: " << value_el_sieieR1[value_el_n]
+           << " hoe: "  << value_el_hoe[value_el_n]       
+           << " dxy: "  << value_el_dxy[value_el_n]
+           << " dz: "   << value_el_dz[value_el_n]      
+	   << " 1oPold: "  << value_el_eInvMinusPInvOld[value_el_n]
+           << " 1oP: " << value_el_eInvMinusPInv[value_el_n]
+           << " iso: "  << value_el_pfreliso03all[value_el_n]
+           << " vetoold: " << value_el_convVetoOld[value_el_n]
+           << " veto: " << value_el_convVeto[value_el_n] << endl;
+      cout << " hits: " << int(value_el_lostHits[value_el_n]) << endl;
+      */
+
       if (fabs(value_el_SCeta[value_el_n])<=1.479) {
       // barrel (are SCeta and isEB/isEE redundant?)
       // verify which of the two variable variants (with or without tr) 
       // should be used!
         // dEtaIn   *** recheck whether EtaSc or EtaSCtr! ***
-        if (fabs(value_el_deltaEtaSC[value_el_n])>0.004) {
+        //              (also for 2010 and Run 2) 
+        if (fabs(value_el_deltaEtaSCtr[value_el_n])>0.004) {
 	  eisMedium = false;  
 	  eisTight = false;  
         }
-        if (fabs(value_el_deltaEtaSC[value_el_n])>0.007) {
+        if (fabs(value_el_deltaEtaSCtr[value_el_n])>0.007) {
 	  eisVeto = false;  
 	  eisLoose = false;  
         }
         // dPhiIn  *** recheck whether PhiSc or PhiSCtr! ***
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.03) {
+        //              (also for 2010 and Run 2) 
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.03) {
 	  eisTight = false;
         } 
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.06) {
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.06) {
 	  eisMedium = false;
         } 
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.15) {
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.15) {
 	eisLoose = false;
         } 
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.8) {
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.8) {
 	  eisVeto = false;
         } 
         // sigmaIEtaIEta  *** recheck whether sieie or sieieR1! ***
@@ -3873,8 +4188,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  eisLoose = false;
 	  eisVeto = false;
         }
-        // 1/E-1/p
-        if (fabs(value_el_eInvMinusPInvOld[value_el_n])>0.05) { // nuha
+        // 1/E-1/p,    recheck whether Old or not 
+        if (fabs(value_el_eInvMinusPInv[value_el_n])>0.05) { // nuha
 	  eisTight = false;
 	  eisMedium = false;
 	  eisLoose = false;
@@ -3889,8 +4204,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  eisVeto = false;
         }
         // conversion rejection
-        // implement properly!
-        if (!value_el_convVetoOld[value_el_n]) {
+        // implement properly!  (check old for 2010?)
+        if (!value_el_convVeto[value_el_n]) {
 	  eisTight = false;
 	  eisMedium = false;
 	  eisLoose = false;
@@ -3907,29 +4222,29 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       else if (fabs(value_el_SCeta[value_el_n])<=2.5) {
       // end cap (are SCeta and isEB/isEE redundant?)
         // dEtaIn
-        if (fabs(value_el_deltaEtaSC[value_el_n])>0.005) {
+        if (fabs(value_el_deltaEtaSCtr[value_el_n])>0.005) {
 	  eisTight = false;  
         }
-        if (fabs(value_el_deltaEtaSC[value_el_n])>0.007) {
+        if (fabs(value_el_deltaEtaSCtr[value_el_n])>0.007) {
 	  eisMedium = false;  
         }
-        if (fabs(value_el_deltaEtaSC[value_el_n])>0.009) {
+        if (fabs(value_el_deltaEtaSCtr[value_el_n])>0.009) {
 	  eisLoose = false;  
         }
-        if (fabs(value_el_deltaEtaSC[value_el_n])>0.010) {
+        if (fabs(value_el_deltaEtaSCtr[value_el_n])>0.010) {
 	  eisVeto = false;  
         }
         // dPhiIn
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.02) {
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.02) {
 	  eisTight = false;
         } 
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.03) {
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.03) {
 	  eisMedium = false;
         } 
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.10) {
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.10) {
 	eisLoose = false;
         } 
-        if (fabs(value_el_deltaPhiSC[value_el_n])>0.7) {
+        if (fabs(value_el_deltaPhiSCtr[value_el_n])>0.7) {
 	  eisVeto = false;
         } 
         // sigmaIEtaIEta
@@ -3964,7 +4279,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  eisVeto = false;
         }
         // 1/E-1/p
-        if (fabs(value_el_eInvMinusPInvOld[value_el_n])>0.05) { // nuha
+        if (fabs(value_el_eInvMinusPInv[value_el_n])>0.05) { // nuha
 	  eisTight = false;
 	  eisMedium = false;
 	  eisLoose = false;
@@ -3993,8 +4308,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           }
         }
         // conversion rejection
-        // implement properly!
-        if (value_el_convVetoOld[value_el_n]) {
+        // implement properly! (check old for 2010?)
+        if (!value_el_convVeto[value_el_n]) {
 	  eisTight = false;
 	  eisMedium = false;
 	  eisLoose = false;
@@ -4016,6 +4331,80 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	eisLoose = false;
 	eisVeto = false;
       }
+
+      // does not work for CMSSW_4_2_8, use itElec->gsfTrack() directly
+      //auto trk = itElec->gsfTrack();
+   
+      bool isLoose = false, isMedium = false, isTight = false;
+
+      /*
+      cout   <<  "eta: " << itElec->eta()
+             << " deta: " << itElec->deltaEtaSuperClusterTrackAtVtx()
+             << " dphi: " << itElec->deltaPhiSuperClusterTrackAtVtx()
+             << " SIeIe: " << itElec->sigmaIetaIeta()
+             << " hOe: " << itElec->hadronicOverEm()
+             //<< " dxy: " << abs(trk->dxy(pv))   // pv not defined?
+             //<< " dz: " << abs(trk->dz(pv))   // pv not defined?
+             << " dxy: " << abs(itElec->gsfTrack()->dxy(pv))   // pv not defined?
+             << " dz: " << abs(itElec->gsfTrack()->dz(pv))   // pv not defined?
+             << " veto: " << passelectronveto 
+             << " 1overP: " << abs(1/itElec->ecalEnergy()-1/(itElec->ecalEnergy()/itElec->eSuperClusterOverP()))
+             << " el_pfIso: " << el_pfIso << endl;
+      cout   << " hits: " << missing_hits << endl;
+      */
+
+      if ( abs(itElec->eta()) <= 1.479 ) {
+	if ( abs(itElec->deltaEtaSuperClusterTrackAtVtx())<.007 && abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.15 && 
+	     itElec->sigmaIetaIeta()<.01 && itElec->hadronicOverEm()<.12 && 
+	     //abs(trk->dxy(pv))<.02 && abs(trk->dz(pv))<.2 && 
+	     abs(itElec->gsfTrack()->dxy(pv))<.02 && abs(itElec->gsfTrack()->dz(pv))<.2 && 
+	     missing_hits<=1 && passelectronveto==true &&
+	     abs(1/itElec->ecalEnergy()-1/(itElec->ecalEnergy()/itElec->eSuperClusterOverP()))<.05 && 
+	     el_pfIso<.15){
+	  
+	  isLoose = true;
+	  
+	  //if ( abs(itElec->deltaEtaSuperClusterTrackAtVtx())<.004 && abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.06 && abs(trk->dz(pv))<.1 ){
+	  if ( abs(itElec->deltaEtaSuperClusterTrackAtVtx())<.004 && abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.06 && abs(itElec->gsfTrack()->dz(pv))<.1 ){
+	    isMedium = true;
+	    
+	    if (abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.03 && missing_hits<=0 && el_pfIso<.10 ){
+	      isTight = true;
+	    }
+	  }
+	}
+      }
+      else if ( abs(itElec->eta()) > 1.479 && abs(itElec->eta()) < 2.5 ) {
+	if ( abs(itElec->deltaEtaSuperClusterTrackAtVtx())<.009 && abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.1 && 
+	     itElec->sigmaIetaIeta()<.03 && itElec->hadronicOverEm()<.1 && 
+	     //abs(trk->dxy(pv))<.02 && abs(trk->dz(pv))<.2 && 
+	     abs(itElec->gsfTrack()->dxy(pv))<.02 && abs(itElec->gsfTrack()->dz(pv))<.2 && 
+	     missing_hits<=1 && el_pfIso<.15 && passelectronveto==true &&
+	     abs(1/itElec->ecalEnergy()-1/(itElec->ecalEnergy()/itElec->eSuperClusterOverP()))<.05) {
+	  
+	  isLoose = true;
+	  
+	  //if ( abs(itElec->deltaEtaSuperClusterTrackAtVtx())<.007 && abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.03 && abs(trk->dz(pv))<.1 ){
+	  if ( abs(itElec->deltaEtaSuperClusterTrackAtVtx())<.007 && abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.03 && abs(itElec->gsfTrack()->dz(pv))<.1 ){
+	    isMedium = true;
+	    
+	    if ( abs(itElec->deltaEtaSuperClusterTrackAtVtx())<.005 && abs(itElec->deltaPhiSuperClusterTrackAtVtx())<.02 && missing_hits<=0 && el_pfIso<.10 ){
+	      isTight = true;
+	    }
+	  }
+	}
+      }
+
+      // allow tight only for PF candidates
+      if (el_pfIso == 999.) eisTight = false;
+      
+      // use variables to satisfy compiler
+      if (isLoose != eisLoose && isMedium != eisMedium && isTight != eisTight) {
+	cout << "electron cutBased disagreement" << endl;
+        // for debug
+        cout << "electron pt = " << it->pt() << ", eta = " << it->eta() << ", loose: " << eisLoose << " " << isLoose <<  ", medium: " << eisMedium << " " << isMedium << ", tight: " << eisTight << " " << isTight << ", true: " << value_el_simId[value_el_n] << endl;
+      }
+
       // set variable
       if (eisTight) value_el_cutBased[value_el_n] = 4;
       else if (eisMedium) value_el_cutBased[value_el_n] = 3;
@@ -4195,6 +4584,12 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         tempi = value_el_vtxIdx[i1];
         value_el_vtxIdx[i1] = value_el_vtxIdx[i2];
         value_el_vtxIdx[i2] = tempi;    
+        tempi = value_el_simId[i1];
+        value_el_simId[i1] = value_el_simId[i2];
+        value_el_simId[i2] = tempi;    
+        tempi = value_el_genPartIdx[i1];
+        value_el_genPartIdx[i1] = value_el_genPartIdx[i2];
+        value_el_genPartIdx[i2] = tempi;    
 
         temp = value_el_dxy[i1];
         value_el_dxy[i1] = value_el_dxy[i2];
@@ -4247,6 +4642,36 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       value_tau_chargediso[value_tau_n] = it->isolationPFChargedHadrCandsPtSum();
       value_tau_neutraliso[value_tau_n] = it->isolationPFGammaCandsEtSum();
 #endif
+      // need to adjust to correct type for 2010
+      // nice "feature" how to calcuate the index!
+#ifdef CMSSW42X
+      // even this gave error 
+      //reco::PFTauCollection::const_iterator idx = it - taus->begin();
+      // the following code has been skipped 
+      // (either flags or "operator" do not work on CMSSW_4_2_8)
+      // replace by equivalent evaluations?
+      value_tau_iddecaymode[value_tau_n] = 0;
+      value_tau_idisoraw[value_tau_n] = 0;
+      value_tau_idisovloose[value_tau_n] = 0;
+      value_tau_idisoloose[value_tau_n] = 0;
+      value_tau_idisomedium[value_tau_n] = 0;
+      value_tau_idisotight[value_tau_n] = 0;
+      value_tau_idantieletight[value_tau_n] = 0;
+      value_tau_idantimutight[value_tau_n] = 0;
+#else
+      // this should work both for AOD and miniAOD
+      const auto idx = it - taus->begin();
+      value_tau_iddecaymode[value_tau_n] = tausDecayMode->operator[](idx).second;
+      value_tau_idisoraw[value_tau_n] = tausRawIso->operator[](idx).second;
+      value_tau_idisovloose[value_tau_n] = tausVLooseIso->operator[](idx).second;
+      value_tau_idisoloose[value_tau_n] = tausLooseIso->operator[](idx).second;
+      value_tau_idisomedium[value_tau_n] = tausMediumIso->operator[](idx).second;
+      value_tau_idisotight[value_tau_n] = tausTightIso->operator[](idx).second;
+      value_tau_idantieletight[value_tau_n] = tausTightEleRej->operator[](idx).second;
+      value_tau_idantimutight[value_tau_n] = tausTightMuonRej->operator[](idx).second;
+#endif
+      
+
       ++value_tau_n;
       if (int(value_tau_n) >= max_tau) {
 	std::cout << "NanoAnalyzer: max_tau exceeded" << std::endl;
@@ -4263,18 +4688,118 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   const float ph_min_pt = 5;
   // for (auto it = photons->begin(); it != photons->end(); ++it) {
 #ifndef miniAOD
-  for (reco::PhotonCollection::const_iterator it = photons->begin(); it != photons->end(); ++it) {
+  for (reco::PhotonCollection::const_iterator itphoton = photons->begin(); itphoton != photons->end(); ++itphoton) {
 #endif
 #ifdef miniAOD
-  for (pat::PhotonCollection::const_iterator it = photons->begin(); it != photons->end(); ++it) {
+  for (pat::PhotonCollection::const_iterator itphoton = photons->begin(); itphoton != photons->end(); ++itphoton) {
 #endif
-    if (it->pt() > ph_min_pt) {
-      value_ph_pt[value_ph_n] = it->pt();
-      value_ph_eta[value_ph_n] = it->eta();
-      value_ph_phi[value_ph_n] = it->phi();
-      value_ph_charge[value_ph_n] = it->charge();
-      value_ph_mass[value_ph_n] = it->mass();
-      value_ph_pfreliso03all[value_ph_n] = it->ecalRecHitSumEtConeDR03();
+    if (itphoton->pt() > ph_min_pt) {
+      value_ph_pt[value_ph_n] = itphoton->pt();
+      value_ph_eta[value_ph_n] = itphoton->eta();
+      value_ph_phi[value_ph_n] = itphoton->phi();
+      value_ph_charge[value_ph_n] = itphoton->charge();
+      value_ph_mass[value_ph_n] = itphoton->mass();
+      // to be implemented
+      value_ph_pfreliso03chg[value_ph_n] = -999.;
+      value_ph_pfreliso03all[value_ph_n] = itphoton->ecalRecHitSumEtConeDR03();
+      value_ph_phIso[value_ph_n] = -999.;
+      value_ph_cutBased[value_ph_n] = -1;
+#ifdef CMSSW53X
+      // from POET:  (cross-checked against POET, not against nanoAOD or physics)
+      bool passelectronveto = !ConversionTools::hasMatchedPromptElectron(itphoton->superCluster(), electrons, hConversions, beamspot.position());
+      double eta = (itphoton)->superCluster()->eta();
+      //struct PhotonAnalyzer::AEff aEff = effectiveArea0p3cone(scEta);
+      // calculate effective area
+      float CH_AEff = 0;
+      float NH_AEff = 0;
+      float Ph_AEff = 0;
+      if(fabs(eta) >2.4) {
+         CH_AEff = 0.012;
+         NH_AEff = 0.072;
+         Ph_AEff = 0.266;
+      }
+      else if(fabs(eta) >2.3) {
+         CH_AEff = 0.020;
+         NH_AEff = 0.039;
+         Ph_AEff = 0.260;
+      }
+      else if(fabs(eta) >2.2) {
+         CH_AEff = 0.016;
+         NH_AEff = 0.024;
+         Ph_AEff = 0.262;
+      }
+      else if(fabs(eta) >2.0) {
+         CH_AEff = 0.012;
+         NH_AEff = 0.015;
+         Ph_AEff = 0.216;
+      }
+      else if(fabs(eta) >1.479) {
+         CH_AEff = 0.014;
+         NH_AEff = 0.039;
+         Ph_AEff = 0.112;
+      }
+      else if(fabs(eta) >0.1) {
+         CH_AEff = 0.010;
+         NH_AEff = 0.057;
+         Ph_AEff = 0.130;
+      }
+      else {
+         CH_AEff = 0.012;
+         NH_AEff = 0.030;
+         Ph_AEff = 0.148;
+      }     
+      double ph_hOverEm = itphoton->hadTowOverEm();
+      double ph_sigIetaIeta = itphoton->sigmaIetaIeta();
+      // had to extend Buildfile.xml :-)
+      PFIsolationEstimator isolator;
+      isolator.initializePhotonIsolation(kTRUE);
+      isolator.setConeSize(0.3);
+      const reco::VertexRef vertex(Primvertex, 0);
+      const reco::Photon &thephoton = *itphoton;
+      isolator.fGetIsolation(&thephoton, pfCands.product(), vertex, Primvertex);
+      double rhoIso = 0;
+      if(rhoHandle.isValid()) rhoIso = std::max(*(rhoHandle.product()), 0.0);
+      double corrPFCHIso = std::max(isolator.getIsolationCharged() - rhoIso * CH_AEff, 0.)/itphoton->pt();
+      double corrPFNHIso = std::max(isolator.getIsolationNeutral() - rhoIso * NH_AEff, 0.)/itphoton->pt();
+      double corrPFPhIso = std::max(isolator.getIsolationPhoton() - rhoIso * Ph_AEff, 0.)/itphoton->pt();      
+      value_ph_pfreliso03chg[value_ph_n] = corrPFCHIso;
+      value_ph_pfreliso03all[value_ph_n] = corrPFNHIso;
+      value_ph_phIso[value_ph_n] = corrPFPhIso;
+      bool isLoose = false, isMedium = false, isTight = false;
+      if ( itphoton->eta() <= 1.479 ){
+	if ( ph_hOverEm<.05 && ph_sigIetaIeta<.012 && 
+             corrPFCHIso<2.6 && corrPFNHIso<(3.5+.04*itphoton->pt()) && 
+	     corrPFPhIso<(1.3+.005*itphoton->pt()) && passelectronveto==true) {
+          isLoose = true;
+
+	  if ( ph_sigIetaIeta<.011 && corrPFCHIso<1.5 && corrPFNHIso<(1.0+.04*itphoton->pt()) && corrPFPhIso<(.7+.005*itphoton->pt())){
+            isMedium = true;
+
+	    if ( corrPFCHIso<.7 && corrPFNHIso<(.4+.04*itphoton->pt()) && corrPFPhIso<(.5+0.005*itphoton->pt()) ){
+	      isTight = true;
+            }
+          }
+        }
+      }
+      else if ( itphoton->eta() > 1.479 && itphoton->eta() < 2.5 ) {
+	if ( ph_hOverEm<.05 && ph_sigIetaIeta<.034 && corrPFCHIso<2.3 && corrPFNHIso<(2.9+.04*itphoton->pt()) && passelectronveto==true ){
+	  isLoose = true;
+	           
+	  if ( ph_sigIetaIeta<.033 && corrPFCHIso<1.2 && corrPFNHIso<(1.5+.04*itphoton->pt()) && corrPFPhIso<(1.0+.005*itphoton->pt())) {
+	    isMedium = true;
+
+	    if ( ph_sigIetaIeta<0.031 && corrPFCHIso<0.5){
+	      isTight = true;
+            }
+          }
+        }
+      }
+      if (isTight) value_ph_cutBased[value_ph_n]=3;
+      else if (isMedium) value_ph_cutBased[value_ph_n]=2;
+      else if (isLoose) value_ph_cutBased[value_ph_n]=1;
+      else value_ph_cutBased[value_ph_n]=0;
+#endif
+
       ++value_ph_n;
       if (int(value_ph_n) >= max_ph) {
 	std::cout << "NanoAnalyzer: max_ph exceeded" << std::endl;
@@ -4437,6 +4962,11 @@ cout<<"---------------------------------"<<endl;*/
       value_jet_id[value_jet_n] = jetid;   
       //cout<<looseJetID<<endl;
       //float NHF = it->neutralHadronEnergyFraction();
+      value_jet_btag[value_jet_n] = -1.;
+      // from POET: (can this work??)
+      if (btags.isValid() && (it - jets->begin()) < btags->size()) {
+	value_jet_btag[value_jet_n] = btags->operator[](it - jets->begin()).second;
+      }
 
       /*
       float NEMF = it->neutralEmEnergyFraction();
@@ -4460,6 +4990,33 @@ cout<<"---------------------------------"<<endl;*/
       }
     }
   }
+  
+  // get muon-jet cross pointers
+  // (should be replaced by direct result of jet algorithm)
+  float deltaRmin = 999.;
+  int ijmin = -1;
+  for (int imu=0; imu<int(nMuon); ++imu) {
+    // find closest jet for each muon (no quality cuts!)
+    deltaRmin = 999.; 
+    for (int ijet =0; ijet<int(value_jet_n); ++ijet) {
+      float deltaeta = abs(value_jet_eta[ijet] - Muon_eta[imu]);
+      float deltaphi = abs(value_jet_phi[ijet] - Muon_phi[imu]);
+      if (deltaphi > pi) deltaphi = deltaphi-pi;
+      float deltaR = sqrt(deltaeta*deltaeta+deltaphi*deltaphi);
+      if (deltaR < deltaRmin) {
+        deltaRmin = deltaR;
+        ijmin = ijet;
+      }  
+    }
+#ifndef CMSSW7plus
+    // Run 1: ak5 jets
+    if (deltaRmin < 0.5) Muon_jetIdx[imu] = ijmin;
+#else
+    // Run 2: ak4 jets
+    if (deltaRmin < 0.4) Muon_jetIdx[imu] = ijmin;
+#endif
+  }
+      
 
   // cout << "hello FatJet" << endl; 
 
@@ -4559,7 +5116,9 @@ cout<<"---------------------------------"<<endl;*/
   // GenJets  //Qun
 
   const float gjet_min_pt = 10;
+  const float gfjet_min_pt = 10;
   value_gjet_n = 0;
+  value_gfjet_n = 0;
 
   if (!isData) {
 
@@ -4582,6 +5141,32 @@ cout<<"---------------------------------"<<endl;*/
       }
     }
    }
+  } // isData
+
+/////GenJetAK8
+
+  if (!isData) {
+
+#ifndef miniAOD
+  for (reco::GenJetCollection::const_iterator it = genfatjets->begin(); it != genfatjets->end(); ++it) {
+#endif
+#ifdef miniAOD
+  for (reco::GenJetCollection::const_iterator it = genfatjets->begin(); it != genfatjets->end(); ++it) {
+#endif 
+    if (it->pt() > gfjet_min_pt) {
+      value_gfjet_pt[value_gfjet_n] = it->pt();
+      value_gfjet_eta[value_gfjet_n] = it->eta();
+      value_gfjet_phi[value_gfjet_n] = it->phi();
+      value_gfjet_mass[value_gfjet_n] = it->mass();
+      // cout << "genJet:" << value_gfjet_n << " pt:" << value_gfjet_pt[value_gfjet_n] << " eta: "<< value_gfjet_eta[value_gfjet_n] << endl;
+      ++value_gfjet_n;
+      if (int(value_gfjet_n) >= max_gfjet) {
+        std::cout << "NanoAnalyzer: max_gfjet exceeded" << std::endl;
+        continue;
+      }
+    }
+   }
+
   } // isData
 
     // cout << "hello after GenJets" << endl; 
@@ -4718,6 +5303,7 @@ NanoAnalyzer::beginJob()
   GenPart_pdgId.reserve(nReserve_GenPart);
   GenPart_status.reserve(nReserve_GenPart);
   GenPart_statusFlags.reserve(nReserve_GenPart);
+  GenPart_genPartIdMother.reserve(nReserve_GenPart);
   GenPart_genPartIdxMother.reserve(nReserve_GenPart);
 
   GenPart_Id.reserve(nReserve_GenPart);
@@ -4734,7 +5320,7 @@ NanoAnalyzer::beginJob()
   GenPart_mvx.reserve(nReserve_GenPart);
   GenPart_mvy.reserve(nReserve_GenPart);
   GenPart_mvz.reserve(nReserve_GenPart);
-  GenPart_recIdx.reserve(nReserve_GenPart);
+  GenPart_recId.reserve(nReserve_GenPart);
 
   //--------------------------------- IsoTrack reserve -----------------------------//
   
@@ -4801,6 +5387,7 @@ NanoAnalyzer::beginJob()
   Muon_sip3d.reserve(nReserve_Muon);
   Muon_ip3dBest.reserve(nReserve_Muon);
   Muon_sip3dBest.reserve(nReserve_Muon);
+  Muon_dxybs.reserve(nReserve_Muon);
   Muon_pfRelIso03_all.reserve(nReserve_Muon);
   Muon_pfRelIso03_chg.reserve(nReserve_Muon);
   Muon_pfRelIso04_all.reserve(nReserve_Muon);
@@ -4814,12 +5401,13 @@ NanoAnalyzer::beginJob()
   Muon_softId.reserve(nReserve_Muon);
   Muon_mediumId.reserve(nReserve_Muon); 
   Muon_tightId.reserve(nReserve_Muon);
+  Muon_highPurity.reserve(nReserve_Muon);
   Muon_highPtId.reserve(nReserve_Muon); 
   Muon_nStations.reserve(nReserve_Muon);
   Muon_nTrackerLayers.reserve(nReserve_Muon); 
   Muon_segmentComp.reserve(nReserve_Muon); 
-  Muon_cleanmask.reserve(nReserve_Muon); 
-  Muon_mvaTTH.reserve(nReserve_Muon); 
+  //Muon_cleanmask.reserve(nReserve_Muon); 
+  //Muon_mvaTTH.reserve(nReserve_Muon); 
   Muon_pdgId.reserve(nReserve_Muon); 
   Muon_genPartFlav.reserve(nReserve_Muon); 
   Muon_genPartIdx.reserve(nReserve_Muon); 
@@ -4851,8 +5439,8 @@ NanoAnalyzer::beginJob()
   Muon_gnValidMu.reserve(nReserve_Muon); 
   Muon_vtxIdx.reserve(nReserve_Muon); 
   Muon_vtxFlag.reserve(nReserve_Muon); 
-  Muon_trkIdx.reserve(nReserve_Muon); 
-  Muon_simIdx.reserve(nReserve_Muon); 
+  Muon_trkId.reserve(nReserve_Muon); 
+  Muon_simId.reserve(nReserve_Muon); 
 
   //------------------------------- Dimuon reserve --------------------------//
 
@@ -4868,7 +5456,8 @@ NanoAnalyzer::beginJob()
   Dimu_rap.reserve(nReserve_Dimu);
   Dimu_mass.reserve(nReserve_Dimu);
   Dimu_charge.reserve(nReserve_Dimu);
-  Dimu_simIdx.reserve(nReserve_Dimu);
+  Dimu_simId.reserve(nReserve_Dimu);
+  Dimu_genPartIdx.reserve(nReserve_Dimu);
   Dimu_vtxIdx.reserve(nReserve_Dimu);
   Dimu_chi2.reserve(nReserve_Dimu);
   Dimu_dlxy.reserve(nReserve_Dimu);
@@ -4970,6 +5559,7 @@ NanoAnalyzer::beginJob()
     t_event->Branch("GenPart_pdgId", GenPart_pdgId.data(), "GenPart_pdgId[nGenPart]/I");
     t_event->Branch("GenPart_status", GenPart_status.data(), "GenPart_status[nGenPart]/I");
     t_event->Branch("GenPart_statusFlags", GenPart_statusFlags.data(), "GenPart_statusFlags[nGenPart]/I");
+    t_event->Branch("GenPart_genPartIdMother", GenPart_genPartIdMother.data(), "GenPart_genPartIdMother[nGenPart]/I");
     t_event->Branch("GenPart_genPartIdxMother", GenPart_genPartIdxMother.data(), "GenPart_genPartIdxMother[nGenPart]/I");
 
     if (nanoext) {
@@ -4987,7 +5577,7 @@ NanoAnalyzer::beginJob()
       t_event->Branch("GenPart_mvx", GenPart_mvx.data(), "GenPart_mvx[nGenPart]/F");
       t_event->Branch("GenPart_mvy", GenPart_mvy.data(), "GenPart_mvy[nGenPart]/F");
       t_event->Branch("GenPart_mvz", GenPart_mvz.data(), "GenPart_mvz[nGenPart]/F");
-      t_event->Branch("GenPart_recIdx", GenPart_recIdx.data(), "GenPart_recIdx[nGenPart]/I");
+      t_event->Branch("GenPart_recId", GenPart_recId.data(), "GenPart_recId[nGenPart]/I");
 
       // GenPV extension
       t_event->Branch("GenPV_x", &GenPV_x, "GenPV_x/F");
@@ -5082,6 +5672,7 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Muon_sip3d", Muon_sip3d.data(), "Muon_sip3d[nMuon]/F");
   t_event->Branch("Muon_ip3dBest", Muon_ip3dBest.data(), "Muon_ip3dBest[nMuon]/F");
   t_event->Branch("Muon_sip3dBest", Muon_sip3dBest.data(), "Muon_sip3dBest[nMuon]/F");
+  t_event->Branch("Muon_dxybs", Muon_dxybs.data(), "Muon_dxybs[nMuon]/F");
   t_event->Branch("Muon_pfRelIso03_all", Muon_pfRelIso03_all.data(), "Muon_pfRelIso03_all[nMuon]/F");
   t_event->Branch("Muon_pfRelIso03_chg", Muon_pfRelIso03_chg.data(), "Muon_pfRelIso03_chg[nMuon]/F");  
   t_event->Branch("Muon_pfRelIso04_all", Muon_pfRelIso04_all.data(), "Muon_pfRelIso04_all[nMuon]/F");
@@ -5093,12 +5684,13 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Muon_softId", Muon_softId.data(), "Muon_softId[nMuon]/O");
   t_event->Branch("Muon_mediumId", Muon_mediumId.data(), "Muon_mediumId[nMuon]/O");
   t_event->Branch("Muon_tightId", Muon_tightId.data(), "Muon_tightId[nMuon]/O");
+  t_event->Branch("Muon_highPurity", Muon_highPurity.data(), "Muon_highPurity[nMuon]/O");
   t_event->Branch("Muon_highPtId", Muon_highPtId.data(), "Muon_highPtId[nMuon]/b");
   t_event->Branch("Muon_nStations", Muon_nStations.data(), "Muon_nStations[nMuon]/I");
   t_event->Branch("Muon_nTrackerLayers", Muon_nTrackerLayers.data(), "Muon_nTrackerLayers[nMuon]/I");
   t_event->Branch("Muon_segmentComp", Muon_segmentComp.data(), "Muon_segmentComp[nMuon]/F");
-  t_event->Branch("Muon_cleanmask", Muon_cleanmask.data(), "Muon_cleanmask[nMuon]/b");
-  t_event->Branch("Muon_mvaTTH", Muon_mvaTTH.data(), "Muon_mvaTTH[nMuon]/F");
+  //t_event->Branch("Muon_cleanmask", Muon_cleanmask.data(), "Muon_cleanmask[nMuon]/b");
+  //t_event->Branch("Muon_mvaTTH", Muon_mvaTTH.data(), "Muon_mvaTTH[nMuon]/F");
   t_event->Branch("Muon_pdgId", Muon_pdgId.data(), "Muon_pdgId[nMuon]/I");
   t_event->Branch("Muon_genPartFlav", Muon_genPartFlav.data(), "Muon_genPartFlav[nMuon]/b");
   t_event->Branch("Muon_genPartIdx", Muon_genPartIdx.data(), "Muon_genPartIdx[nMuon]/I");
@@ -5134,8 +5726,8 @@ NanoAnalyzer::beginJob()
     t_event->Branch("Muon_gnValidMu", Muon_gnValidMu.data(), "Muon_gnValidMu[nMuon]/I");
     t_event->Branch("Muon_vtxIdx", Muon_vtxIdx.data(), "Muon_vtxIdx[nMuon]/I");
     t_event->Branch("Muon_vtxFlag", Muon_vtxFlag.data(), "Muon_vtxFlag[nMuon]/I");
-    t_event->Branch("Muon_trkIdx", Muon_trkIdx.data(), "Muon_trkIdx[nMuon]/I");
-    t_event->Branch("Muon_simIdx", Muon_simIdx.data(), "Muon_simIdx[nMuon]/I");
+    t_event->Branch("Muon_trkId", Muon_trkId.data(), "Muon_trkId[nMuon]/I");
+    t_event->Branch("Muon_simId", Muon_simId.data(), "Muon_simId[nMuon]/I");
     // temporary
     //t_event->Branch("b4_nMuon", &b4_nMuon, "b4_nMuon/i");  
     t_event->Branch("Muon_nNano", &Muon_nNano, "Muon_nNano/i");  
@@ -5157,7 +5749,8 @@ NanoAnalyzer::beginJob()
     t_event->Branch("Dimu_rap", Dimu_rap.data(), "Dimu_rap[nDimu]/F");
     t_event->Branch("Dimu_mass", Dimu_mass.data(), "Dimu_mass[nDimu]/F");
     t_event->Branch("Dimu_charge", Dimu_charge.data(), "Dimu_charge[nDimu]/I");
-    t_event->Branch("Dimu_simIdx", Dimu_simIdx.data(), "Dimu_simIdx[nDimu]/I");
+    t_event->Branch("Dimu_simId", Dimu_simId.data(), "Dimu_simId[nDimu]/I");
+    t_event->Branch("Dimu_genPartIdx", Dimu_genPartIdx.data(), "Dimu_genPartIdx[nDimu]/I");
     t_event->Branch("Dimu_vtxIdx", Dimu_vtxIdx.data(), "Dimu_vtxIdx[nDimu]/I");
     t_event->Branch("Dimu_chi2", Dimu_chi2.data(), "Dimu_chi2[nDimu]/F");
     t_event->Branch("Dimu_dlxy", Dimu_dlxy.data(), "Dimu_dlxy[nDimu]/F");
@@ -5250,6 +5843,8 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Electron_dzErr", value_el_dzErr, "Electron_dzErr[nElectron]/F");
   t_event->Branch("Electron_ip3d", value_el_ip3d, "Electron_ip3d[nElectron]/F");
   t_event->Branch("Electron_sip3d", value_el_sip3d, "Electron_sip3d[nElectron]/F");
+  t_event->Branch("Electron_simId", value_el_simId, "Electron_simId[nElectron]/I");
+  t_event->Branch("Electron_genPartIdx", value_el_genPartIdx, "Electron_genPartIdx[nElectron]/I");
   t_event->Branch("Electron_nNano", &Electron_nNano, "Electron_nNano/i");  
 
   // Taus
@@ -5262,6 +5857,14 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Tau_decayMode", value_tau_decaymode, "Tau_decayMode[nTau]/I");
   t_event->Branch("Tau_chargedIso", value_tau_chargediso, "Tau_chargedIso[nTau]/F");
   t_event->Branch("Tau_neutralIso", value_tau_neutraliso, "Tau_neutralIso[nTau]/F");
+  t_event->Branch("Tau_idDecaymode", value_tau_iddecaymode, "Tau_idDecaymode[nTau]/F");
+  t_event->Branch("Tau_idIsoraw", value_tau_idisoraw, "Tau_idIsoraw[nTau]/F");
+  t_event->Branch("Tau_idIsovloose", value_tau_idisovloose, "Tau_idIsovlosse[nTau]/F");
+  t_event->Branch("Tau_idIsoloose", value_tau_idisoloose, "Tau_idIsoloose[nTau]/F");
+  t_event->Branch("Tau_idIsomedium", value_tau_idisomedium, "Tau_idIsomedium[nTau]/F");
+  t_event->Branch("Tau_idIsotight", value_tau_idisotight, "Tau_idIsotight[nTau]/F");
+  t_event->Branch("Tau_idAntieletight", value_tau_idantieletight, "Tau_idantieletight[nTau]/F");
+  t_event->Branch("Tau_idAntimutight", value_tau_idantimutight, "Tau_idantimutight[nTau]/F");
 
   // Photons
   t_event->Branch("nPhoton", &value_ph_n, "nPhoton/i");
@@ -5270,7 +5873,10 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Photon_phi", value_ph_phi, "Photon_phi[nPhoton]/F");
   t_event->Branch("Photon_mass", value_ph_mass, "Photon_mass[nPhoton]/F");
   t_event->Branch("Photon_charge", value_ph_charge, "Photon_charge[nPhoton]/I");
+  t_event->Branch("Photon_pfRelIso03_chg", value_ph_pfreliso03chg, "Photon_pfRelIso03_chg[nPhoton]/F");
   t_event->Branch("Photon_pfRelIso03_all", value_ph_pfreliso03all, "Photon_pfRelIso03_all[nPhoton]/F");
+  t_event->Branch("Photon_phIso", value_ph_phIso, "Photon_phIso[nPhoton]/F");
+  t_event->Branch("Photon_cutBased", value_ph_cutBased, "Photon_cutBased[nPhoton]/I");
 
   // MET
   t_event->Branch("MET_pt", &value_met_pt, "MET_pt/F");
@@ -5304,6 +5910,7 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Jet_neHEF", value_jet_neHEF, "Jet_neHEF[nJet]/F");
   // input values to jetId not stored (for the time being)
   t_event->Branch("Jet_jetId",value_jet_id, "Jet_jetId[nJet]/i");
+  t_event->Branch("Jet_btag", value_jet_btag, "Jet_btag[nJet]/F");
 
  if (!isData) {
   // GenJets //Qun
@@ -5312,6 +5919,12 @@ NanoAnalyzer::beginJob()
   t_event->Branch("GenJet_eta", value_gjet_eta, "GenJet_eta[nGenJet]/F");
   t_event->Branch("GenJet_phi", value_gjet_phi, "GenJet_phi[nGenJet]/F");
   t_event->Branch("GenJet_mass", value_gjet_mass, "GenJet_mass[nGenJet]/F");
+  // GenFatJets //Qun
+  t_event->Branch("nGenJetAK8", &value_gfjet_n, "nGenJetAK8/i");
+  t_event->Branch("GenJetAK8_pt", value_gfjet_pt, "GenJetAK8_pt[nGenJetAK8]/F");
+  t_event->Branch("GenJetAK8_eta", value_gfjet_eta, "GenJetAK8_eta[nGenJetAK8]/F");
+  t_event->Branch("GenJetAK8_phi", value_gfjet_phi, "GenJetAK8_phi[nGenJetAK8]/F");
+  t_event->Branch("GenJetAK8_mass", value_gfjet_mass, "GenJetAK8_mass[nGenJetAK8]/F");
  }
 
   // FatJets
@@ -5414,6 +6027,9 @@ void NanoAnalyzer::beginRun(const edm::Run &iRun, const edm::EventSetup &iStp)
   if (!hltConfig_.init(iRun, iStp, hlt_proc, changed)) {
     std::cout << "Initialization of HLTConfigProvider failed!!" << std::endl;
     std::cout << "This is normal on 2010 MC only" << std::endl;
+    // the following might not be needed?
+    //update_L1_branch(iStp); // FIXME not sure if 2010 MC has L1 when it has no HLT?
+    std::cout << "L1 also skipped" << endl; 
     return;
   }
   if (changed) {
@@ -5429,19 +6045,22 @@ void NanoAnalyzer::beginRun(const edm::Run &iRun, const edm::EventSetup &iStp)
     update_HLT_branch();
   }
 
-// for trigger objects
-	if (triggerName_!="@") { // "@" means: analyze all triggers in config
-	  const unsigned int n(hltConfig_.size());
-	  const unsigned int triggerIndex(hltConfig_.triggerIndex(triggerName_));
-	  if (triggerIndex>=n) {
-            std::cout << "HLTEventAnalyzerAOD::analyze:"
-               << " TriggerName " << triggerName_
-	       << " not available in (new) config!" << std::endl;
-            std::cout << "Available TriggerNames are: " << std::endl;
-            hltConfig_.dump("Triggers");
-          }
-	  std::cout << "Available TriggerNames are:QQQQQQ " << std::endl;
-	}
+  // for l1 triggers   
+  update_L1_branch(iStp);
+
+  // for trigger objects
+  if (triggerName_!="@") { // "@" means: analyze all triggers in config
+    const unsigned int n(hltConfig_.size());
+    const unsigned int triggerIndex(hltConfig_.triggerIndex(triggerName_));
+    if (triggerIndex>=n) {
+      std::cout << "HLTEventAnalyzerAOD::analyze:"
+                << " TriggerName " << triggerName_
+	        << " not available in (new) config!" << std::endl;
+      std::cout << "Available TriggerNames are: " << std::endl;
+      hltConfig_.dump("Triggers");
+    }
+  std::cout << "Available TriggerNames are:QQQQQQ " << std::endl;
+  }
 
   //cout << "hello beginRun end" << endl; 
 }
@@ -5471,6 +6090,51 @@ void NanoAnalyzer::update_HLT_branch()
   }
 }
 
+// ------------ method for creating and updating L1 branches as necessary run by run ------------
+void NanoAnalyzer::update_L1_branch(const edm::EventSetup &iStp)
+{
+  // zero out all existing bits between runs, so that the seeds that stop existing is set to 0
+  // instead of whatever value it has in the last event
+  for (unordered_map<std::string, array<uint8_t, 2> >::iterator it = l1_bit.begin(); it != l1_bit.end(); ++it)
+    it->second[1] = 0;
+  l1_mask.clear();
+
+#if defined(CMSSW42X) || defined(CMSSW53X)
+  edm::ESHandle<L1GtTriggerMenu> l1_rcd;
+  iStp.get<L1GtTriggerMenuRcd>().get(l1_rcd);
+  const AlgorithmMap &l1_map = l1_rcd.product()->gtAlgorithmAliasMap();
+
+  edm::ESHandle<L1GtTriggerMask> l1_mrcd;
+  iStp.get<L1GtTriggerMaskAlgoTrigRcd>().get(l1_mrcd);
+  l1_mask = l1_mrcd->gtTriggerMask();
+#elif defined(CMSSW7plus)
+  const auto &l1_map = iStp.getHandle(l1_es_token)->getAlgorithmMap();
+#endif
+
+  for (CItAlgo it = l1_map.begin(); it != l1_map.end(); ++it) {
+    const std::string &seed = it->first;
+
+    // check if the seed already exists
+    // if not, create a new branch and pad it with 0 for previous events
+    if (!l1_bit.count(seed)) {
+
+      array<uint8_t, 2> default_bitmask = {{0, 0}};
+      l1_bit.insert( std::make_pair(seed, default_bitmask) );
+
+#if defined(CMSSW42X) || defined(CMSSW53X)
+      l1_bit.at(seed)[0] = it->second.algoBitNumber();
+#elif defined(CMSSW7plus)
+      l1_bit.at(seed)[0] = it->second.getIndex();
+#endif
+
+      TBranch *l1_seed = t_event->Branch(seed.c_str(), &l1_bit.at(seed)[1], (seed + "/O").c_str());  
+      for (uint iE = 0; iE < t_event->GetEntries(); ++iE)
+        l1_seed->Fill(); 
+    }
+  }
+}
+
+
 void NanoAnalyzer::fillDescriptions(edm::ConfigurationDescriptions & descriptions) 
 { // set defaults for parameters which can be overruled by configuration
   edm::ParameterSetDescription desc;
@@ -5488,6 +6152,13 @@ void NanoAnalyzer::fillDescriptions(edm::ConfigurationDescriptions & description
   desc.add<edm::InputTag>("customTag", edm::InputTag());
   desc.add<std::string>("triggerName_", "@");
   desc.add<std::string>("triggerName", "@");
+  // L1 triggers (Afiq)
+#if defined(CMSSW42X) || defined(CMSSW53X)
+  desc.add<edm::InputTag>("L1Input", edm::InputTag("gtDigis"));
+#elif defined(CMSSW7plus)
+  desc.add<edm::InputTag>("L1Input", edm::InputTag("gtStage2Digis"));
+#endif
+
   descriptions.add("nanoAnalyzer", desc);
 }
 
@@ -5567,6 +6238,7 @@ void NanoAnalyzer::eventDoc() {
   createTitle("GenPart_pdgId", "PDG id"); 
   createTitle("GenPart_status", "Particle status. 1=stable"); 
   createTitle("GenPart_statusFlags", "gen status flags stored bitwise, bits are: 0 : isPrompt, 1 : isDecayedLeptonHadron, 2 : isTauDecayProduct, 3 : isPromptTauDecayProduct, 4 : isDirectTauDecayProduct, 5 : isDirectPromptTauDecayProduct, 6 : isDirectHadronDecayProduct, 7 : isHardProcess, 8 : fromHardProcess, 9 : isHardProcessTauDecayProduct, 10 : isDirectHardProcessTauDecayProduct, 11 : fromHardProcessBeforeFSR, 12 : isFirstCopy, 13 : isLastCopy, 14 : isLastCopyBeforeFSR, "); 
+  createTitle("GenPart_genPartIdMother",  "GenPart Id of the mother particle");
   createTitle("GenPart_genPartIdxMother", "index of the mother particle");
   
   if (nanoext) {
@@ -5584,12 +6256,12 @@ void NanoAnalyzer::eventDoc() {
   createTitle("GenPart_mvx", "x position of mother origin vertex");
   createTitle("GenPart_mvy", "y position of mother origin vertex");
   createTitle("GenPart_mvz", "z position of mother origin vertex");
-  createTitle("GenPart_recIdx", "identifier of associated reconstructed track (-1 if none)"); 
+  createTitle("GenPart_recId", "identifier of associated reconstructed track (-1 if none)"); 
   
   createTitle("GenPV_x", "x position of generated main vertex"); 
   createTitle("GenPV_y", "y position of generated main vertex");
   createTitle("GenPV_z", "z position of generated main vertex"); 
-  createTitle("GenPV_recIdx", "identifyer of corresponding reconstructed vertex");
+  createTitle("GenPV_recIdx", "identifyer and index of corresponding reconstructed vertex");
   createTitle("GenPV_chmult", "charged multiplicity at this vertex"); 
   
   }
@@ -5673,7 +6345,9 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Muon_ip3d", "3D impact parameter wrt first PV, in cm");
   createTitle("Muon_sip3d", "3D impact parameter significance wrt first PV"); 
   createTitle("Muon_ip3dBest", "3D impact parameter wrt best PV, in cm"); 
-  createTitle("Muon_sip3dBest", "3D impact parameter significance wrt best PV"); 
+  createTitle("Muon_sip3dBest", "3D impact parameter significance wrt best PV");
+  createTitle("Muon_dxybs", "dxy (with sign) wrt beam spot, in cm");
+ 
   createTitle("Muon_pfRelIso03_all", "PF relative isolation dR=0.3, total (deltaBeta corrections)"); 
   createTitle("Muon_pfRelIso03_chg", "PF relative isolation dR=0.3, charged component");
   createTitle("Muon_pfRelIso04_all", "PF relative isolation dR=0.4, total (deltaBeta corrections)"); 
@@ -5685,15 +6359,16 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Muon_softId", "soft cut-based ID");
   createTitle("Muon_mediumId", "cut-based ID, medium WP"); 
   createTitle("Muon_tightId", "cut-based ID, tight WP"); 
+  createTitle("Muon_highPurity", "satisfies high purity criteria"); 
   createTitle("Muon_highPtId", "high-pT cut-based ID (1 = tracker high pT, 2 = global high pT, which includes tracker high pT)"); 
   createTitle("Muon_nStations", "number of matched stations with default arbitration (segment & track)");
   createTitle("Muon_nTrackerLayers", "number of layers in the tracker"); 
   createTitle("Muon_segmentComp", "muon segment compatibility");
-  createTitle("Muon_cleanmask", "simple cleaning mask with priority to leptons"); 
-  createTitle("Muon_mvaTTH", "TTH MVA lepton ID score"); 
+  //createTitle("Muon_cleanmask", "simple cleaning mask with priority to leptons"); 
+  //createTitle("Muon_mvaTTH", "TTH MVA lepton ID score"); 
   createTitle("Muon_pdgId", "PDG code assigned by the event reconstruction (not by MC truth)"); 
   createTitle("Muon_genPartFlav", "Flavour of genParticle for MC matching to status==1 muons: 1 = prompt muon (including gamma*->mu mu), 15 = muon from prompt tau, 5 = muon from b, 4 = muon from c, 3 = muon from light or unknown, 0 = unmatched"); 
-  createTitle("Muon_genPartIdx", "Index into genParticle list for MC matching to status==1 muons");
+  createTitle("Muon_genPartIdx", "index into GenPart list for MC matching to status==1 muons");
   createTitle("Muon_isGlobal", "muon is global muon"); 
   createTitle("Muon_isTracker", "muon is tracker muon");
   
@@ -5726,15 +6401,16 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Muon_gnValidMu", "Muon_gnValidMu"); 
   createTitle("Muon_vtxIdx", "index of the associated primary vertex (-1 if none)");
   createTitle("Muon_vtxFlag", "quality flag for vertex association"); 
-  createTitle("Muon_trkIdx", "index of the associated track (-1 if none)"); 
-  createTitle("Muon_simIdx", "index of the associated gen object (-1 if none)"); 
+  createTitle("Muon_trkId", "Id of the associated track in track list (-1 if none)"); 
+  createTitle("Muon_simId", "GenPart Id of the associated gen object (-1 if none)"); 
+  createTitle("Muon_genPartIdx", "GenPart index of the associated gen object (-1 if none)"); 
   createTitle("Muon_nNano", "number of muons satisfying isNano"); 
   
   createTitle("nDimu", "number of dimuons after vertex refit"); 
-  createTitle("Dimu_t1muIdx", "cross reference to unique Id of first muon"); 
+  createTitle("Dimu_t1muIdx", "index of first muon in Muon"); 
   createTitle("Dimu_t1dxy", "dxy of first muon (needed?)"); 
   createTitle("Dimu_t1dz", "dz of first muon (needed?)"); 
-  createTitle("Dimu_t2muIdx", "cross reference to unique Id of 2nd muon"); 
+  createTitle("Dimu_t2muIdx", "index of 2nd muon in Muon"); 
   createTitle("Dimu_t2dxy", "dxy of 2nd muon (needed?)"); 
   createTitle("Dimu_t2dz", "dz of 2nd muon (needed?)"); 
   createTitle("Dimu_pt", "dimuon pt after vertex fit"); 
@@ -5743,7 +6419,8 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Dimu_rap", "dimuon rapidity after vertex fit"); 
   createTitle("Dimu_mass", "dimuon mass after vertex fit"); 
   createTitle("Dimu_charge", "dimuon charge"); 
-  createTitle("Dimu_simIdx", "cross reference to parent meson or boson in GenPart"); 
+  createTitle("Dimu_simId", "cross reference to parent meson or boson in GenPart"); 
+  createTitle("Dimu_genPartIdx", "cross reference to parent meson or boson in GenPart"); 
   createTitle("Dimu_vtxIdx", "cross reference to associated primary vertex"); 
   createTitle("Dimu_chi2", "dimuon vertex chi2/ndof"); 
   createTitle("Dimu_dlxy", "dimuon decay length in xy"); 
@@ -5819,6 +6496,8 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Electron_sip3d", "3D impact parameter significance wrt first PV, in cm");
   createTitle("Electron_nNano", "electron that follows nanoAOD cut (pT < 5 GeV)"); 
   createTitle("Electron_vtxIdx", "index of the associated primary vertex (-1 if none)");
+  createTitle("Electron_simId", "GenPart Id of the associated true electron (-1 if none)");
+  createTitle("Electron_genPartIdx", "GenPart index of the associated true electron (-1 if none)");
  
   createTitle("nTau", "Taus after basic selection (pt > 18 && tauID('decayModeFindingNewDMs') && (tauID('byLooseCombinedIsolationDeltaBetaCorr3Hits') || tauID('byVLooseIsolationMVArun2v1DBoldDMwLT2015') || tauID('byVLooseIsolationMVArun2v1DBnewDMwLT') || tauID('byVLooseIsolationMVArun2v1DBdR03oldDMwLT') || tauID('byVVLooseIsolationMVArun2v1DBoldDMwLT') || tauID('byVVLooseIsolationMVArun2v1DBoldDMwLT2017v2') || tauID('byVVLooseIsolationMVArun2v1DBnewDMwLT2017v2') || tauID('byVVLooseIsolationMVArun2v1DBdR03oldDMwLT2017v2')))"); 
   createTitle("Tau_pt", "pt"); 
@@ -5836,7 +6515,10 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Photon_phi", "phi"); 
   createTitle("Photon_mass", "mass"); 
   createTitle("Photon_charge", "electric charge"); 
+  createTitle("Photon_pfRelIso03_chg", "PF relative isolation dR=0.3, charged (with rho*EA PU corrections)"); 
   createTitle("Photon_pfRelIso03_all", "PF relative isolation dR=0.3, total (with rho*EA PU corrections)"); 
+  createTitle("Photon_phIso", "PF relative isolation dR=0.3, ph (with rho*EA PU corrections)"); 
+  createTitle("Photon_cutBased", "Quality flag: 1=Loose, 2=Medium, 3=Tight"); 
   
   createTitle("MET_pt", "pt"); 
   createTitle("MET_phi", "phi"); 
@@ -5865,6 +6547,7 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Jet_neEmEF", "neutral Electromagnetic Energy Fraction"); 
   createTitle("Jet_neHEF", "neutral Hadron Energy Fraction"); 
   createTitle("Jet_jetId", "Jet ID flags bit1 is loose (does not always exist), bit2 is tight, bit3 is tightLepVeto"); 
+  createTitle("Jet_btag", "jet b tagging flag, combinedSecondaryVertex algorithm"); 
   
   if (!isData) {
    
@@ -5874,6 +6557,11 @@ void NanoAnalyzer::eventDoc() {
   createTitle("GenJet_phi", "phi"); 
   createTitle("GenJet_mass", "mass"); 
   
+  createTitle("nGenJetAK8", "GenJetAK8 (Run 2) or AK7 (Run 1) Jets made with visible genparticles"); 
+  createTitle("GenJetAK8_pt", "pt"); 
+  createTitle("GenJetAK8_eta", "eta"); 
+  createTitle("GenJetAK8_phi", "phi"); 
+  createTitle("GenJetAK8_mass", "mass");
   }
   
   createTitle("nFatJet", "ak7 (Run 1) or ak8 (Run 2) PFjets for wide jet or boosted analysis"); 

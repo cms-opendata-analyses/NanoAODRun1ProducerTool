@@ -2731,7 +2731,7 @@ bool NanoAnalyzer::providesGoodMuTrigger(const edm::Event& iEvent) {
 		  GoodMuTrig = true; 
                   return true;
                 }
-                else if ((Mudataset || MuHaddataset || DoubleMudataset || MuEGdataset || MuOniadataset || MuMonitordataset || BParkingdataset) &&  
+                else if (!MCdataset && (Mudataset || MuHaddataset || DoubleMudataset || MuEGdataset || MuOniadataset || MuMonitordataset || BParkingdataset) &&  
                          MuThresh == -99 && IsoMuThresh == -99 && MuHadFlag == -10 && DoubleMuThresh == -99 && MuEGFlag == -10 && JpsiThresh == -99) {
 // activate this for debug
                   std::cout<<" ****** no muon Trigger recognized ****** "<<std::endl;

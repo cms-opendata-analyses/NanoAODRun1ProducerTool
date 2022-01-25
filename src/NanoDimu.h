@@ -2,12 +2,12 @@
   //------------------------------ For Dimu branches ------------------------//
   UInt_t nDimu;  
   // mu 1 from Dimu
-  vector<Int_t> Dimu_t1muIdx;    // pointer to first muon
+  vector<Int_t> Dimu_t1muIdx;    // pointer to index of first muon
   vector<Float_t> Dimu_t1dxy;    // dxy of first muon w.r.t. allocated vertex
   vector<Float_t> Dimu_t1dz;     // dz of first muon w.r.t. allocated vertex
 
   // mu 2 from Dimu
-  vector<Int_t> Dimu_t2muIdx;    // pointer to second muon
+  vector<Int_t> Dimu_t2muIdx;    // pointer to index of second muon
   vector<Float_t> Dimu_t2dxy;    // dxy of second muon w.r.t. allocated vertex
   vector<Float_t> Dimu_t2dz;     // dz of second muon w.r.t. allocated vertex
 
@@ -18,7 +18,8 @@
   vector<Float_t> Dimu_rap;      // Dimuon rapidity after refit
   vector<Float_t> Dimu_mass;     // Dimuon mass
   vector<Int_t>   Dimu_charge;   // Dimuon charge
-  vector<Int_t>   Dimu_simIdx;   // matched true gamma/Z/meson in genparticle
+  vector<Int_t>   Dimu_simId;    // Id of matched true gamma/Z/meson in genparticle
+  vector<Int_t>   Dimu_genPartIdx; // index of matched true gamma/Z/meson in GenPart
   vector<Int_t>   Dimu_vtxIdx;   // associated prim. vtx (can differ from 1,2)
   vector<Float_t> Dimu_chi2;     // chi2 of Dimuon vertex
   vector<Float_t> Dimu_dlxy;     // Dimuon decay length in xy

@@ -20,7 +20,8 @@ if (nanoext) {
   Dimu_rap.clear();
   Dimu_mass.clear();
   Dimu_charge.clear();
-  Dimu_simIdx.clear();
+  Dimu_simId.clear();
+  Dimu_genPartIdx.clear();
   Dimu_vtxIdx.clear();
   Dimu_chi2.clear();
   Dimu_dlxy.clear();
@@ -49,6 +50,7 @@ if (nanoext) {
   float vcdimuvtx[3] = {0.};
 
   int simidDimu = -1; 
+  int genpartidxDimu = -1; 
   int vtxidDimu = -1; 
  
   float sumptdimu = 0;
@@ -139,6 +141,24 @@ if (nanoext) {
     if (muindex1 < 0) continue;
     float mu1dxy = 0;
     float mu1dz = 0;
+    // allow for a depth of up to 7 for Z->mumu (soft photon radiation?)
+    int mupsimindex1 = -1;
+    int mugpsimindex1 = -1;
+    int muggpsimindex1 = -1;
+    int mugggpsimindex1 = -1;
+    int muggggpsimindex1 = -1;
+    int mugggggpsimindex1 = -1;
+    int muggggggpsimindex1 = -1;
+    int mugggggggpsimindex1 = -1;
+    if (Muon_genPartIdx[muindex1] >-1)
+      mupsimindex1 = GenPart_genPartIdxMother[Muon_genPartIdx[muindex1]];
+    if (mupsimindex1 > -1) mugpsimindex1 = GenPart_genPartIdxMother[mupsimindex1];
+    if (mugpsimindex1 > -1) muggpsimindex1 = GenPart_genPartIdxMother[mugpsimindex1];
+    if (muggpsimindex1 > -1) mugggpsimindex1 = GenPart_genPartIdxMother[muggpsimindex1];
+    if (mugggpsimindex1 > -1) muggggpsimindex1 = GenPart_genPartIdxMother[mugggpsimindex1];
+    if (muggggpsimindex1 > -1) mugggggpsimindex1 = GenPart_genPartIdxMother[muggggpsimindex1];
+    if (mugggggpsimindex1 > -1) muggggggpsimindex1 = GenPart_genPartIdxMother[mugggggpsimindex1];
+    if (muggggggpsimindex1 > -1) mugggggggpsimindex1 = GenPart_genPartIdxMother[muggggggpsimindex1];
 
     // put cuts on first muon here (none for the time being)
 
@@ -160,7 +180,27 @@ if (nanoext) {
       if (muindex2 < 0) continue;
       float mu2dxy = 0;
       float mu2dz = 0;
-          
+      int mupsimindex2 = -2; // must be different from musimindex1
+      int mugpsimindex2 = -2;
+      int muggpsimindex2 = -2;
+      int mugggpsimindex2 = -2;
+      int muggggpsimindex2 = -2;
+      int mugggggpsimindex2 = -2;
+      int muggggggpsimindex2 = -2;
+      int mugggggggpsimindex2 = -2;
+      genpartidxDimu = -1;
+      simidDimu = -1;
+
+      if (Muon_genPartIdx[muindex2] >-1)
+        mupsimindex2 = GenPart_genPartIdxMother[Muon_genPartIdx[muindex2]];
+      if (mupsimindex2 > -1) mugpsimindex2 = GenPart_genPartIdxMother[mupsimindex2];
+      if (mugpsimindex2 > -1) muggpsimindex2 = GenPart_genPartIdxMother[mugpsimindex2];
+      if (muggpsimindex2 > -1) mugggpsimindex2 = GenPart_genPartIdxMother[muggpsimindex2];
+      if (mugggpsimindex2 > -1) muggggpsimindex2 = GenPart_genPartIdxMother[mugggpsimindex2];
+      if (muggggpsimindex2 > -1) mugggggpsimindex2 = GenPart_genPartIdxMother[muggggpsimindex2];
+      if (mugggggpsimindex2 > -1) muggggggpsimindex2 = GenPart_genPartIdxMother[mugggggpsimindex2];
+      if (muggggggpsimindex2 > -1) mugggggggpsimindex2 = GenPart_genPartIdxMother[muggggggpsimindex2];
+
       // apply cuts
       //cout << "check FW " << muonid2 << endl; 
       // don't accept extreme forward backward pairs
@@ -445,6 +485,80 @@ if (nanoext) {
       //zDimu = (recoMuon1->innerTrack()->pt() + recoMuon2->innerTrack()->pt()) / sumptdimu;
       zDimu = (recoMuon1->bestTrack()->pt() + recoMuon2->bestTrack()->pt()) / sumptdimu;
 
+      // treat gen info
+      if (mupsimindex2 > -1 && mupsimindex1 == mupsimindex2) {
+        // if both mus have same parent (e.g. J/psi->mumu), store index and Id
+        genpartidxDimu = mupsimindex2;
+        simidDimu = GenPart_Id[mupsimindex2];
+      }    
+      else if (mugpsimindex2 > -1 && (mupsimindex1 == mugpsimindex2 || mugpsimindex1 == mugpsimindex2)) {
+        // if both mus have same grandparent (e.g. Z->mu->mu, b->cmu->mumu), store index and Id
+        genpartidxDimu = mugpsimindex2;
+        simidDimu = GenPart_Id[mugpsimindex2];
+      }    
+      else if (muggpsimindex2 > -1 && (mupsimindex1 == muggpsimindex2 || mugpsimindex1 == muggpsimindex2 || muggpsimindex1 == muggpsimindex2)) {
+        // if both mus have same grandgrandparent (e.g. Z->mu->mu->mu), store index and Id
+        genpartidxDimu = muggpsimindex2;
+        simidDimu = GenPart_Id[muggpsimindex2];
+      }    
+      else if (mugggpsimindex2 > -1 && (mupsimindex1 == mugggpsimindex2 || mugpsimindex1 == mugggpsimindex2 || muggpsimindex1 == mugggpsimindex2 || mugggpsimindex1 == mugggpsimindex2)) {
+        // if both mus have same grandgrandgrandparent (e.g. Z->mu->mu->mu->mu), store index and Id
+        genpartidxDimu = mugggpsimindex2;
+        simidDimu = GenPart_Id[mugggpsimindex2];
+      }    
+      else if (muggggpsimindex2 > -1 && (mupsimindex1 == muggggpsimindex2 || mugpsimindex1 == muggggpsimindex2 || muggpsimindex1 == muggggpsimindex2 || mugggpsimindex1 == muggggpsimindex2 || muggggpsimindex1 == muggggpsimindex2)) {
+        // if both mus have same grandgrandgrandgrandparent (e.g. Z->mu->mu->mu->mu->mu), store index and Id
+        genpartidxDimu = muggggpsimindex2;
+        simidDimu = GenPart_Id[muggggpsimindex2];
+      }    
+      // only same depth from here on
+      else if (mugggggpsimindex2 > -1 && mugggggpsimindex1 == mugggggpsimindex2) {
+        genpartidxDimu = mugggggpsimindex2;
+        simidDimu = GenPart_Id[mugggggpsimindex2];
+      }    
+      else if (muggggggpsimindex2 > -1 && muggggggpsimindex1 == muggggggpsimindex2) {
+        genpartidxDimu = muggggggpsimindex2;
+        simidDimu = GenPart_Id[muggggggpsimindex2];
+      }    
+      else if (mugggggggpsimindex2 > -1 && mugggggggpsimindex1 == mugggggggpsimindex2) {
+        genpartidxDimu = mugggggggpsimindex2;
+        simidDimu = GenPart_Id[mugggggggpsimindex2];
+      }
+      else if (mupsimindex1 > -1 && mupsimindex2 >-1) {
+        // both muons true but no common parent identified
+        genpartidxDimu = -10;
+        simidDimu = -10;
+      }
+    
+      if (Muon_genPartIdx[muindex2] == Muon_genPartIdx[muindex1]) {
+        // reset in case the two reconstructed muons point to the same simulated muon
+        genpartidxDimu = -19;
+        simidDimu = -19;
+      }         
+
+/* debug print - deactivated
+     if (Muon_genPartIdx[muindex1] > -1 && Muon_genPartIdx[muindex2] > -1 && (simidDimu <0 || (genpartidxDimu > -1 && GenPart_pdgId[genpartidxDimu]!=23))) { 
+      //cout << "pt: " << Muon_pt[muindex1] << " " << Muon_pt[muindex2] << endl; 
+      //cout << "id: " << Muon_simId[muindex1] << " " << Muon_simId[muindex2] << endl; 
+      // print gen info on pair
+      //cout << muindex1 << " 1 " << Muon_genPartIdx[muindex1] << " " << mupsimindex1 << endl;
+      if (mugggggpsimindex1 >-1) cout << "1 " << GenPart_pdgId[mupsimindex1] << " " << GenPart_pdgId[mugpsimindex1] << " " << GenPart_pdgId[muggpsimindex1] << " " << GenPart_pdgId[mugggpsimindex1] << " " << GenPart_pdgId[muggggpsimindex1] << " " << GenPart_pdgId[mugggggpsimindex1] << endl;
+      else if (muggggpsimindex1 >-1) cout << "1 " << GenPart_pdgId[mupsimindex1] << " " << GenPart_pdgId[mugpsimindex1] << " " << GenPart_pdgId[muggpsimindex1] << " " << GenPart_pdgId[mugggpsimindex1] << " " << GenPart_pdgId[muggggpsimindex1] << endl;
+      else if (mugggpsimindex1 >-1) cout << "1 " << GenPart_pdgId[mupsimindex1] << " " << GenPart_pdgId[mugpsimindex1] << " " << GenPart_pdgId[muggpsimindex1] << " " << GenPart_pdgId[mugggpsimindex1] << endl;
+      else if (muggpsimindex1 >-1) cout << "1 " << GenPart_pdgId[mupsimindex1] << " " << GenPart_pdgId[mugpsimindex1] << " " << GenPart_pdgId[muggpsimindex1] << endl;
+      else if (mugpsimindex1 >-1) cout << "1 " << GenPart_pdgId[mupsimindex1] << " " << GenPart_pdgId[mugpsimindex1] << endl;
+      else if (mupsimindex1 >-1) cout << "1 " << GenPart_pdgId[mupsimindex1] << endl;
+      //cout << muindex2 << " 2 " << Muon_genPartIdx[muindex2] << " " << mupsimindex2 << endl;
+      if (mugggggpsimindex2 >-1) cout << "2 " << GenPart_pdgId[mupsimindex2] << " " << GenPart_pdgId[mugpsimindex2] << " " << GenPart_pdgId[muggpsimindex2] << " " << GenPart_pdgId[mugggpsimindex2] << " " << GenPart_pdgId[muggggpsimindex2] << " " << GenPart_pdgId[mugggggpsimindex2] << endl;
+      else if (muggggpsimindex2 >-1) cout << "2 " << GenPart_pdgId[mupsimindex2] << " " << GenPart_pdgId[mugpsimindex2] << " " << GenPart_pdgId[muggpsimindex2] << " " << GenPart_pdgId[mugggpsimindex2] << " " << GenPart_pdgId[muggggpsimindex2] << endl;
+      else if (mugggpsimindex2 >-1) cout << "2 " << GenPart_pdgId[mupsimindex2] << " " << GenPart_pdgId[mugpsimindex2] << " " << GenPart_pdgId[muggpsimindex2] << " " << GenPart_pdgId[mugggpsimindex2] << endl;
+      else if (muggpsimindex2 >-1) cout << "2 " << GenPart_pdgId[mupsimindex2] << " " << GenPart_pdgId[mugpsimindex2] << " " << GenPart_pdgId[muggpsimindex2] << endl;
+      else if (mugpsimindex2 >-1) cout << "2 " << GenPart_pdgId[mupsimindex2] << " " << GenPart_pdgId[mugpsimindex2] << endl;
+      else if (mupsimindex2 >-1) cout << "2 " << GenPart_pdgId[mupsimindex2] << endl;
+      cout << "mass " << mDimu << " " << chargeDimu << " " << endl;
+      if (simidDimu > -1) cout << genpartidxDimu << " " << simidDimu << " found " << GenPart_pdgId[genpartidxDimu] << endl;
+     }
+*/
 
       // fill ntuple variables
       if (Dimu_pt.size() < nReserve_Dimu) {
@@ -463,7 +577,8 @@ if (nanoext) {
         Dimu_rap.push_back(rapDimu);
         Dimu_mass.push_back(mDimu);
         Dimu_charge.push_back(chargeDimu);
-        Dimu_simIdx.push_back(simidDimu);
+        Dimu_simId.push_back(simidDimu);
+        Dimu_genPartIdx.push_back(genpartidxDimu);
         Dimu_vtxIdx.push_back(vtxidDimu);
         Dimu_chi2.push_back(chi2Dimu);
         Dimu_dlxy.push_back(dlxyDimu);
