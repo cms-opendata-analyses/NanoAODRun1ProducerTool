@@ -80,7 +80,12 @@
 //  (e.g. in case of problems with the configuration, and only if jets are
 //   *not* used in the analysis)
 //  default should be flag off!
+#ifdef CMSSW7XX
+// jet correction not yet set up for 2015 
+#define noJetCor
+#else
 //#define noJetCor 
+#endif
 
 // system include files
 #include <memory>
@@ -164,14 +169,16 @@ using std::array;
 #endif
 
 // for L1 trigger (Afiq)
+#ifndef CMSSW106plus
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMenuRcd.h"
 #include "CondFormats/L1TObjects/interface/L1GtTriggerMask.h"
 #include "CondFormats/DataRecord/interface/L1GtTriggerMaskAlgoTrigRcd.h"
+#endif
 
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 
-#if defined(CMSSW7plus)
+#if defined(CMSSW106plus)
 #include "CondFormats/L1TObjects/interface/L1TUtmTriggerMenu.h"
 #include "CondFormats/DataRecord/interface/L1TUtmTriggerMenuRcd.h"
 #include "DataFormats/L1TGlobal/interface/GlobalAlgBlk.h"
@@ -424,8 +431,10 @@ private:
   // L1 bit branches and needed auxiliary objects (Afiq)
   unordered_map<std::string, array<uint8_t, 2> > l1_bit;
   std::vector<unsigned int> l1_mask;
-#if defined(CMSSW7plus)
+#if defined(CMSSW10plus)
   edm::ESGetToken<L1TUtmTriggerMenu, L1TUtmTriggerMenuRcd> l1_es_token;
+#elseif CMSSW7plus
+  edm::ESGetToken<L1GtTriggerMenu, L1GtTriggerMenuRcd> l1_es_token; 
 #endif
   edm::InputTag l1_input;
   
@@ -493,7 +502,11 @@ private:
   EDGetTokenT<trigger::TriggerEvent> trigEvn; //Qun 
 #endif
   // tokens that are the same for AOD and mini (some still duplicated in AOD/mini above, to be cleaned up)
+#ifdef CMSSW10plus
   EDGetTokenT<GlobalAlgBlkBxCollection> l1_tkn;
+#else
+  EDGetTokenT<L1GlobalTriggerReadoutRecord> l1_tkn; 
+#endif
 #endif
 
   std::string   processName_;  //Qun
@@ -1260,9 +1273,11 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
     trig_tkn = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", hlt_proc));
   if (!custom_flag.empty())
     custom_tkn = consumes<edm::TriggerResults>(custom_tag);
-
+#ifdef CMSSW10plus
   l1_tkn = consumes<GlobalAlgBlkBxCollection>(l1_input); // Afiq
-
+#else
+  l1_tkn = consumes<L1GlobalTriggerReadoutRecord>(l1_input); 
+#endif
   // CMSSWplus 
 #endif
 
@@ -1373,9 +1388,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<edm::TriggerResults> trigger_handle;
   edm::Handle<edm::TriggerResults> custom_handle;
 
-#if defined(CMSSW42X) || defined(CMSSW53X)
+#ifndef CMSSW10plus
   edm::Handle<L1GlobalTriggerReadoutRecord> l1_handle;
-#elif defined(CMSSW7plus)
+#else
   edm::Handle<GlobalAlgBlkBxCollection> l1_handle;
 #endif
 
@@ -1600,9 +1615,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     // for L1 trigger (Afiq)
     const std::vector<bool> *wordp = nullptr;
-#if defined(CMSSW42X) || defined(CMSSW53X)
+#ifndef CMSSW10plus
     wordp = &l1_handle->decisionWord();
-#elif defined(CMSSW7plus)
+#else
     wordp = &l1_handle->at(0, 0).getAlgoDecisionFinal();
 #endif
 
@@ -2468,8 +2483,11 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   reco::BeamSpot vertexBeamSpot= *beamSpotHandle;  
   // needed for POET
+#ifdef CMSSW53X
   reco::BeamSpot beamspot= *beamSpotHandle.product();  
+#endif
   const reco::BeamSpot &beamspot1= *beamSpotHandle.product();  
+
 
   // store beam spot info 
   Bsp_x = vertexBeamSpot.x0();
@@ -3225,9 +3243,11 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonID
     // use main vertex vertex
     //bool mu_highPtId = muon::isHighPtMuon(*recoMuon,*PV_ite, reco::TunePType = muon::improvedTuneP);
-#ifdef CMSSW7plus
+#ifdef CMSSW10plus
     UChar_t mu_highPtId = 2*muon::isHighPtMuon(*recoMuon,*PV_ite);
     mu_highPtId = mu_highPtId + muon::isTrackerHighPtMuon(*recoMuon,*PV_ite);
+#elif defined CMSSW7plus
+    UChar_t mu_highPtId = 2*muon::isHighPtMuon(*recoMuon,*PV_ite);
 #endif
 #ifdef CMSSW53X
     UChar_t mu_highPtId = 2*muon::isHighPtMuon(*recoMuon,*PV_ite, improvedTuneP);
@@ -4063,8 +4083,12 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // and now using the POET code
       reco::GsfElectronCollection::const_iterator itElec = it;
+#ifndef CMSSW7plus
       // *** this is mostly negative!? fix! ***
       int missing_hits = itElec->gsfTrack()->trackerExpectedHitsInner().numberOfHits()-itElec->gsfTrack()->hitPattern().numberOfHits();
+#else
+      int missing_hits = value_el_lostHits[value_el_n];
+#endif
 
       // cout << "hello after missing hits" << endl;
 
@@ -4073,7 +4097,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // cout << "hello after veto" << endl;
       
       float el_pfIso = 999;
-#ifndef CMSSW42X
+      // the following does not work for 42X (keep old), and not yet for 7plus 
+#ifdef CMSSW53X
       if (itElec->passingPflowPreselection()) {
         // cout << "passing preselection" << endl;
 	double rho = 0;
@@ -5859,7 +5884,7 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Tau_neutralIso", value_tau_neutraliso, "Tau_neutralIso[nTau]/F");
   t_event->Branch("Tau_idDecaymode", value_tau_iddecaymode, "Tau_idDecaymode[nTau]/F");
   t_event->Branch("Tau_idIsoraw", value_tau_idisoraw, "Tau_idIsoraw[nTau]/F");
-  t_event->Branch("Tau_idIsovloose", value_tau_idisovloose, "Tau_idIsovlosse[nTau]/F");
+  t_event->Branch("Tau_idIsovloose", value_tau_idisovloose, "Tau_idIsovloose[nTau]/F");
   t_event->Branch("Tau_idIsoloose", value_tau_idisoloose, "Tau_idIsoloose[nTau]/F");
   t_event->Branch("Tau_idIsomedium", value_tau_idisomedium, "Tau_idIsomedium[nTau]/F");
   t_event->Branch("Tau_idIsotight", value_tau_idisotight, "Tau_idIsotight[nTau]/F");
@@ -6099,7 +6124,7 @@ void NanoAnalyzer::update_L1_branch(const edm::EventSetup &iStp)
     it->second[1] = 0;
   l1_mask.clear();
 
-#if defined(CMSSW42X) || defined(CMSSW53X)
+#ifndef CMSSW10plus
   edm::ESHandle<L1GtTriggerMenu> l1_rcd;
   iStp.get<L1GtTriggerMenuRcd>().get(l1_rcd);
   const AlgorithmMap &l1_map = l1_rcd.product()->gtAlgorithmAliasMap();
@@ -6107,7 +6132,7 @@ void NanoAnalyzer::update_L1_branch(const edm::EventSetup &iStp)
   edm::ESHandle<L1GtTriggerMask> l1_mrcd;
   iStp.get<L1GtTriggerMaskAlgoTrigRcd>().get(l1_mrcd);
   l1_mask = l1_mrcd->gtTriggerMask();
-#elif defined(CMSSW7plus)
+#else
   const auto &l1_map = iStp.getHandle(l1_es_token)->getAlgorithmMap();
 #endif
 
@@ -6121,9 +6146,9 @@ void NanoAnalyzer::update_L1_branch(const edm::EventSetup &iStp)
       array<uint8_t, 2> default_bitmask = {{0, 0}};
       l1_bit.insert( std::make_pair(seed, default_bitmask) );
 
-#if defined(CMSSW42X) || defined(CMSSW53X)
+#ifndef CMSSW10plus
       l1_bit.at(seed)[0] = it->second.algoBitNumber();
-#elif defined(CMSSW7plus)
+#else
       l1_bit.at(seed)[0] = it->second.getIndex();
 #endif
 
@@ -6153,9 +6178,9 @@ void NanoAnalyzer::fillDescriptions(edm::ConfigurationDescriptions & description
   desc.add<std::string>("triggerName_", "@");
   desc.add<std::string>("triggerName", "@");
   // L1 triggers (Afiq)
-#if defined(CMSSW42X) || defined(CMSSW53X)
+#ifndef CMMSSW10plus
   desc.add<edm::InputTag>("L1Input", edm::InputTag("gtDigis"));
-#elif defined(CMSSW7plus)
+#else
   desc.add<edm::InputTag>("L1Input", edm::InputTag("gtStage2Digis"));
 #endif
 
@@ -6508,6 +6533,14 @@ void NanoAnalyzer::eventDoc() {
   createTitle("Tau_decayMode", "decayMode()"); 
   createTitle("Tau_chargedIso", "charged isolation"); 
   createTitle("Tau_neutralIso", "neutral (photon) isolation"); 
+  createTitle("Tau_idDecaymode", "decay mode id (POET)");
+  createTitle("Tau_idIsoraw", "Isoraw id (POET)");
+  createTitle("Tau_idIsovloose", "Isovloose id (POET)");
+  createTitle("Tau_idIsoloose", "Isoloose id (POET)");
+  createTitle("Tau_idIsomedium", "Isomedium id (POET)");
+  createTitle("Tau_idIsotight", "Isotight id (POET)");
+  createTitle("Tau_idAntieletight", "antieletight id (POET)");
+  createTitle("Tau_idAntimutight", "antimutight id (POET)");
   
   createTitle("nPhoton", "Photons after basic selection (pt > 5 )"); 
   createTitle("Photon_pt", "pt"); 
