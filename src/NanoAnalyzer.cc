@@ -434,7 +434,7 @@ private:
   std::vector<unsigned int> l1_mask;
 #ifdef CMSSW106plus
   edm::ESGetToken<L1TUtmTriggerMenu, L1TUtmTriggerMenuRcd> l1_es_token;
-#elif CMSSW7plus
+#elif defined CMSSW7plus
   edm::ESGetToken<L1GtTriggerMenu, L1GtTriggerMenuRcd> l1_es_token; 
 #endif
   edm::InputTag l1_input;
