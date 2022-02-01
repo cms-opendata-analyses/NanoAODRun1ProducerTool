@@ -7,15 +7,16 @@
 // ****************************************************
 // for implementation history, see testnanoreadme.txt *
 // ****************************************************
-// Direct contributors:  A. Anuar, A. Bermudez, A. Geiser (coordinator), 
-// N.Z. Jomhari, S. Wunsch, Q. Wang, H. Yang, Y. Yang, 2018-2021. 
+// Direct contributors:  A. Anuar, E. Carrera, A. Bermudez, 
+// A. Geiser (coordinator), N.Z. Jomhari, S. Wunsch, Q. Wang, 
+// H. Yang, Y. Yang, 2018-2022. 
 
 // ******************************************
 // automatically set appropriate CMSSW flag *
 // ******************************************
 // recognize automatically (no user action needed): 
 // CMSSW is tied to particular compiler versions
-// 42X taken from 4_2_8, 53X from 5_3_32, 7XX from 7_6_4
+// 42X taken from 4_2_8, 53X from 5_3_32, 7XX from 7_6_4, 106plus from 10_6_4
 #define GCC_VERSION ( 10000 * __GNUC__ + 100 * __GNUC_MINOR__ + __GNUC_PATCHLEVEL__ )
 #if GCC_VERSION < 40305
 // Early Run 1 legacy CMSSW42X (e.g. 2010, 4_2_8)
@@ -431,9 +432,9 @@ private:
   // L1 bit branches and needed auxiliary objects (Afiq)
   unordered_map<std::string, array<uint8_t, 2> > l1_bit;
   std::vector<unsigned int> l1_mask;
-#if defined(CMSSW10plus)
+#ifdef CMSSW106plus
   edm::ESGetToken<L1TUtmTriggerMenu, L1TUtmTriggerMenuRcd> l1_es_token;
-#elseif CMSSW7plus
+#elif CMSSW7plus
   edm::ESGetToken<L1GtTriggerMenu, L1GtTriggerMenuRcd> l1_es_token; 
 #endif
   edm::InputTag l1_input;
@@ -502,7 +503,7 @@ private:
   EDGetTokenT<trigger::TriggerEvent> trigEvn; //Qun 
 #endif
   // tokens that are the same for AOD and mini (some still duplicated in AOD/mini above, to be cleaned up)
-#ifdef CMSSW10plus
+#ifdef CMSSW106plus
   EDGetTokenT<GlobalAlgBlkBxCollection> l1_tkn;
 #else
   EDGetTokenT<L1GlobalTriggerReadoutRecord> l1_tkn; 
@@ -1273,7 +1274,7 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
     trig_tkn = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults", "", hlt_proc));
   if (!custom_flag.empty())
     custom_tkn = consumes<edm::TriggerResults>(custom_tag);
-#ifdef CMSSW10plus
+#ifdef CMSSW106plus
   l1_tkn = consumes<GlobalAlgBlkBxCollection>(l1_input); // Afiq
 #else
   l1_tkn = consumes<L1GlobalTriggerReadoutRecord>(l1_input); 
@@ -1388,7 +1389,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<edm::TriggerResults> trigger_handle;
   edm::Handle<edm::TriggerResults> custom_handle;
 
-#ifndef CMSSW10plus
+#ifndef CMSSW106plus
   edm::Handle<L1GlobalTriggerReadoutRecord> l1_handle;
 #else
   edm::Handle<GlobalAlgBlkBxCollection> l1_handle;
@@ -1615,7 +1616,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     // for L1 trigger (Afiq)
     const std::vector<bool> *wordp = nullptr;
-#ifndef CMSSW10plus
+#ifndef CMSSW106plus
     wordp = &l1_handle->decisionWord();
 #else
     wordp = &l1_handle->at(0, 0).getAlgoDecisionFinal();
@@ -3243,7 +3244,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     // https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonID
     // use main vertex vertex
     //bool mu_highPtId = muon::isHighPtMuon(*recoMuon,*PV_ite, reco::TunePType = muon::improvedTuneP);
-#ifdef CMSSW10plus
+#ifdef CMSSW106plus
     UChar_t mu_highPtId = 2*muon::isHighPtMuon(*recoMuon,*PV_ite);
     mu_highPtId = mu_highPtId + muon::isTrackerHighPtMuon(*recoMuon,*PV_ite);
 #elif defined CMSSW7plus
@@ -4092,8 +4093,12 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // cout << "hello after missing hits" << endl;
 
+#ifdef CMSSW106plus
+      // argument type has changed
+      bool passelectronveto = !ConversionTools::hasMatchedConversion(*itElec, *hConversions, beamspot1.position());
+#else
       bool passelectronveto = !ConversionTools::hasMatchedConversion(*itElec, hConversions, beamspot1.position());
-
+#endif
       // cout << "hello after veto" << endl;
       
       float el_pfIso = 999;
@@ -6124,7 +6129,7 @@ void NanoAnalyzer::update_L1_branch(const edm::EventSetup &iStp)
     it->second[1] = 0;
   l1_mask.clear();
 
-#ifndef CMSSW10plus
+#ifndef CMSSW106plus
   edm::ESHandle<L1GtTriggerMenu> l1_rcd;
   iStp.get<L1GtTriggerMenuRcd>().get(l1_rcd);
   const AlgorithmMap &l1_map = l1_rcd.product()->gtAlgorithmAliasMap();
@@ -6136,7 +6141,11 @@ void NanoAnalyzer::update_L1_branch(const edm::EventSetup &iStp)
   const auto &l1_map = iStp.getHandle(l1_es_token)->getAlgorithmMap();
 #endif
 
+#ifndef CMSSW106plus
   for (CItAlgo it = l1_map.begin(); it != l1_map.end(); ++it) {
+#else
+  for (auto it = l1_map.begin(); it != l1_map.end(); ++it) {
+#endif
     const std::string &seed = it->first;
 
     // check if the seed already exists
@@ -6146,7 +6155,7 @@ void NanoAnalyzer::update_L1_branch(const edm::EventSetup &iStp)
       array<uint8_t, 2> default_bitmask = {{0, 0}};
       l1_bit.insert( std::make_pair(seed, default_bitmask) );
 
-#ifndef CMSSW10plus
+#ifndef CMSSW106plus
       l1_bit.at(seed)[0] = it->second.algoBitNumber();
 #else
       l1_bit.at(seed)[0] = it->second.getIndex();
@@ -6178,7 +6187,7 @@ void NanoAnalyzer::fillDescriptions(edm::ConfigurationDescriptions & description
   desc.add<std::string>("triggerName_", "@");
   desc.add<std::string>("triggerName", "@");
   // L1 triggers (Afiq)
-#ifndef CMMSSW10plus
+#ifndef CMMSSW106plus
   desc.add<edm::InputTag>("L1Input", edm::InputTag("gtDigis"));
 #else
   desc.add<edm::InputTag>("L1Input", edm::InputTag("gtStage2Digis"));
