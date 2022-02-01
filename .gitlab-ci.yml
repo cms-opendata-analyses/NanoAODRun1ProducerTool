@@ -23,7 +23,7 @@ variables:
     - cmsenv
     - mkdir -p NanoAOD/NanoAnalyzer
     # Mind trailing slashes
-    - rsync -av --exclude '**.git/' --exclude '**/.SCRAM/' "${CI_PROJECT_DIR}/" "${CMSSW_BASE}/src/NanoAOD/NanoAnalyzer/"
+    - rsync -av --exclude '**.git/' --exclude '**/.SCRAM/' --exclude "${CMSSW_BASE}/" "${CI_PROJECT_DIR}/" "${CMSSW_BASE}/src/NanoAOD/NanoAnalyzer/"
     - scram b
 
 cmssw_compile_4_2_8:
@@ -75,6 +75,7 @@ cmssw_compile_10_6_4:
     - set +u && source ${CMS_PATH}/cmsset_default.sh; set -u
     - cd ${CMSSW_RELEASE}/src
     - cmsenv
+    - ln -s NanoAOD/NanoAnalyzer/files files
     - cmsRun NanoAOD/NanoAnalyzer/${NANOANALYZER}
 
 cmssw_run_data_4_2_8:
