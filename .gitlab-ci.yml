@@ -1,5 +1,6 @@
 stages:
   - compile
+  - run
 
 variables:
   CMS_PATH: /cvmfs/cms.cern.ch
@@ -24,7 +25,6 @@ variables:
     # Mind trailing slashes
     - rsync -av --exclude '**.git/' --exclude '**/.SCRAM/' "${CI_PROJECT_DIR}/" "${CMSSW_BASE}/src/NanoAOD/NanoAnalyzer/"
     - scram b
-
 
 cmssw_compile_4_2_8:
   extends: .cmssw_compile
@@ -61,3 +61,66 @@ cmssw_compile_10_6_4:
   variables:
     CMSSW_RELEASE: CMSSW_10_6_4
     SCRAM_ARCH: slc7_amd64_gcc700
+
+.cmssw_run:
+  stage: run
+  tags:
+    - cvmfs
+  artifacts:
+    expire_in: 6 hours
+    paths:
+      - ${CMSSW_RELEASE}/src/test.root
+  scripts:
+    - shopt -s expand_aliases
+    - set +u && source ${CMS_PATH}/cmsset_default.sh; set -u
+    - cd ${CMSSW_RELEASE}/src
+    - cmsenv
+    - cmsRun NanoAOD/NanoAnalyzer/${NANOANALYZER}
+
+cmssw_run_data_4_2_8:
+  extends: .cmssw_run
+  dependencies:
+    - cmssw_compile_4_2_8
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest
+    entrypoint: [""]
+  variables:
+    CMSSW_RELEASE: CMSSW_4_2_8
+    SCRAM_ARCH: slc5_amd64_gcc481
+    NANOANALYZER: nanoanalyzer_cfg_2010Data.py
+
+cmssw_run_mc_4_2_8:
+  extends: .cmssw_run
+  dependencies:
+    - cmssw_compile_4_2_8
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest
+    entrypoint: [""]
+  variables:
+    CMSSW_RELEASE: CMSSW_4_2_8
+    SCRAM_ARCH: slc5_amd64_gcc481
+    NANOANALYZER: nanoanalyzer_cfg_2011MC.py
+
+cmssw_run_data_5_3_32:
+  extends: .cmssw_run
+  dependencies:
+    - cmssw_compile_5_3_32
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc6-cms:latest
+    entrypoint: [""]
+  variables:
+    CMSSW_RELEASE: CMSSW_5_3_32
+    SCRAM_ARCH: slc6_amd64_gcc700
+    NANOANALYZER: nanoanalyzer_cfg_2011Data.py
+
+cmssw_run_mc_5_3_32:
+  extends: .cmssw_run
+  dependencies:
+    - cmssw_compile_5_3_32
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc6-cms:latest
+    entrypoint: [""]
+  variables:
+    CMSSW_RELEASE: CMSSW_5_3_32
+    SCRAM_ARCH: slc6_amd64_gcc700
+    NANOANALYZER: nanoanalyzer_cfg_2011MC.py
