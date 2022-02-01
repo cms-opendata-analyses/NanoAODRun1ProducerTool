@@ -100,7 +100,7 @@ cmssw_run_mc_4_2_8:
   variables:
     CMSSW_RELEASE: CMSSW_4_2_8
     SCRAM_ARCH: slc5_amd64_gcc481
-    NANOANALYZER: nanoanalyzer_cfg_2011MC.py
+    NANOANALYZER: nanoanalyzer_cfg_2010MC.py
 
 cmssw_run_data_5_3_32:
   extends: .cmssw_run
