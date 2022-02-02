@@ -432,10 +432,11 @@ private:
   // L1 bit branches and needed auxiliary objects (Afiq)
   unordered_map<std::string, array<uint8_t, 2> > l1_bit;
   std::vector<unsigned int> l1_mask;
-#ifdef CMSSW106plus
+#if defined(CMSSW106plus)
   edm::ESGetToken<L1TUtmTriggerMenu, L1TUtmTriggerMenuRcd> l1_es_token;
-#elif defined CMSSW7plus
-  edm::ESGetToken<L1GtTriggerMenu, L1GtTriggerMenuRcd> l1_es_token; 
+#elif defined(CMSSW7plus)
+  // not needed
+  // edm::ESGetToken<L1GtTriggerMenu, L1GtTriggerMenuRcd> l1_es_token; 
 #endif
   edm::InputTag l1_input;
   
