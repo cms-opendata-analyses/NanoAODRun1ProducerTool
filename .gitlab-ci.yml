@@ -44,14 +44,14 @@ cmssw_compile_5_3_32:
     CMSSW_RELEASE: CMSSW_5_3_32
     SCRAM_ARCH: slc6_amd64_gcc700
 
-# cmssw_compile_7_6_4:
-#   extends: .cmssw_compile
-#   image:
-#     name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/cc7-cms:latest
-#     entrypoint: [""]
-#   variables:
-#     CMSSW_RELEASE: CMSSW_7_6_4
-#     SCRAM_ARCH: slc7_amd64_gcc493
+cmssw_compile_7_6_4:
+  extends: .cmssw_compile
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/cc7-cms:latest
+    entrypoint: [""]
+  variables:
+    CMSSW_RELEASE: CMSSW_7_6_4
+    SCRAM_ARCH: slc7_amd64_gcc493
 
 cmssw_compile_10_6_4:
   extends: .cmssw_compile
