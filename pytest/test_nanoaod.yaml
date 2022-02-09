@@ -5,4 +5,4 @@ histo1D:
   Jet_pt:
     title: "Jet pt"
     bins: [100, 0, 1000.]
-    test_mean: [30,40]
+    test_mean: [20,40]
