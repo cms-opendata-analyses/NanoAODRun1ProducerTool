@@ -1,6 +1,7 @@
 stages:
   - compile
   - run
+  - test
 
 variables:
   CMS_PATH: /cvmfs/cms.cern.ch
@@ -125,3 +126,42 @@ cmssw_run_mc_5_3_32:
     CMSSW_RELEASE: CMSSW_5_3_32
     SCRAM_ARCH: slc6_amd64_gcc700
     NANOANALYZER: nanoanalyzer_cfg_2011MC.py
+
+
+.pytest:
+  stage: test
+  image: rootproject/root:6.22.08-centos7
+  before_script:
+    - export PATH=$HOME/.local/bin:$PATH
+    - pip3 install -qq --user pytest pyyaml
+  script:
+    - pytest pytest/test_nanoaod.yaml
+      --input=CMSSW_*/src/test.root
+      --output=nanoaod.histos.root
+      --junit-xml=nanoaod.junit.xml
+  artifacts:
+    paths:
+      - nanoaod.histos.root
+    reports:
+      junit: nanoaod.junit.xml
+    expire_in: 7 days
+
+pytest_data_4_2_8:
+  extends: .pytest
+  dependencies:
+    - cmssw_run_4_2_8
+
+pytest_mc_4_2_8:
+  extends: .pytest
+  dependencies:
+    - cmssw_mc_4_2_8
+
+pytest_data_5_3_32:
+  extends: .pytest
+  dependencies:
+    - cmssw_run_5_3_32
+
+pytest_mc_5_3_32:
+  extends: .pytest
+  dependencies:
+    - cmssw_mc_5_3_32
