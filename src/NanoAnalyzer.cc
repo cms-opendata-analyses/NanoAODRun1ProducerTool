@@ -63,7 +63,8 @@
 // is already implemented; checks and aborts in case of inconsistency;
 // should be activated by default if trigger is implemented for dataset
 // (protection against inconsistencies in NanoTrigger implementation) 
-#define trigcheckabort
+// and deactivated otherwise (i.e. in general)
+//#define trigcheckabort
 
 #ifdef CMSSW7plus
 // activate this when you read from miniAOD for validation (Run 2/3 only!)
@@ -475,6 +476,7 @@ private:
   edm::EDGetTokenT<edm::ValueMap<reco::DeDxData>> dedxMapPixelTag_;
   // nuha: conversion collection
   EDGetTokenT<reco::ConversionCollection> hConvTkn;
+  EDGetTokenT<double> hrhoTkn;
 #endif
 #ifdef miniAOD
   // miniAOD collections
@@ -1103,6 +1105,9 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   triggerName_ = iConfig.getParameter<std::string>("triggerName"); //Qun
 
   l1_input = iConfig.getParameter<edm::InputTag>("L1Input"); // Afiq
+#if defined(CMSSW106plus)
+  l1_es_token = esConsumes<L1TUtmTriggerMenu, L1TUtmTriggerMenuRcd, edm::Transition::BeginRun>();
+#endif
 
   // https://github.com/cms-sw/cmssw/blob/CMSSW_9_4_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L100
   // https://github.com/cms-sw/cmssw/blob/CMSSW_9_4_X/PhysicsTools/NanoAOD/plugins/IsoValueMapProducer.cc#L49
@@ -1183,6 +1188,8 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   // muCorrmetTkn = consumes< std::vector<reco::CaloMET> >(edm::InputTag("corMetGlobalMuons"));
   // nuha: input tag for conversion collection
   hConvTkn = consumes<reco::ConversionCollection>(edm::InputTag("allConversions"));
+  //hrhoTkn = consumes<double>(edm::InputTag("fixedGridRhoAll"));
+  hrhoTkn = consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"));
   
 #ifdef Compatibility
   // official nanoAOD uses primary vertex without beam spot constraint
@@ -1502,7 +1509,9 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByToken(trigEvn, triggerEventHandle_); //Qun
   // nuha
   iEvent.getByToken(hConvTkn, hConversions);
-  
+  // POET
+  iEvent.getByToken(hrhoTkn, rhoHandle);
+
   //// dEdx (from example M. Soares)
   //int stripmap = 1;
   //edm::Handle<edm::ValueMap<reco::DeDxData>> dedxStMap;
@@ -2419,7 +2428,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //     5 : isDirectPromptTauDecayProduct, 6 : isDirectHadronDecayProduct, 7 : isHardProcess, 
 //     8 : fromHardProcess, 9 : isHardProcessTauDecayProduct, 10 : isDirectHardProcessTauDecayProduct, 
 //    11 : fromHardProcessBeforeFSR, 12 : isFirstCopy, 13 : isLastCopy, 14 : isLastCopyBeforeFSR,
-#ifdef CMMSW7plus
+#ifdef CMSSW7plus
           uint statusflags = genp.statusFlags().isPrompt()*pow(2,0) 
             + genp.statusFlags().isDecayedLeptonHadron()*pow(2,1)
             + genp.statusFlags().isTauDecayProduct()*pow(2,2) 
@@ -4675,8 +4684,8 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 #endif
       // need to adjust to correct type for 2010
       // nice "feature" how to calcuate the index!
-#ifdef CMSSW42X
-      // even this gave error 
+#if defined(CMSSW42X) || defined(CMSSW7plus)
+      // for 42X, even this gave error 
       //reco::PFTauCollection::const_iterator idx = it - taus->begin();
       // the following code has been skipped 
       // (either flags or "operator" do not work on CMSSW_4_2_8)
@@ -4691,6 +4700,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       value_tau_idantimutight[value_tau_n] = 0;
 #else
       // this should work both for AOD and miniAOD
+      // (for the moment for 5_3_32 only)
       const auto idx = it - taus->begin();
       value_tau_iddecaymode[value_tau_n] = tausDecayMode->operator[](idx).second;
       value_tau_idisoraw[value_tau_n] = tausRawIso->operator[](idx).second;
@@ -6188,7 +6198,7 @@ void NanoAnalyzer::fillDescriptions(edm::ConfigurationDescriptions & description
   desc.add<std::string>("triggerName_", "@");
   desc.add<std::string>("triggerName", "@");
   // L1 triggers (Afiq)
-#ifndef CMMSSW106plus
+#ifndef CMSSW106plus
   desc.add<edm::InputTag>("L1Input", edm::InputTag("gtDigis"));
 #else
   desc.add<edm::InputTag>("L1Input", edm::InputTag("gtStage2Digis"));
