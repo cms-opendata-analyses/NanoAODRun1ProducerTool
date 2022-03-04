@@ -36,6 +36,15 @@ cmssw_compile_4_2_8:
     CMSSW_RELEASE: CMSSW_4_2_8
     SCRAM_ARCH: slc5_amd64_gcc481
 
+cmssw_compile_4_4_7:
+  extends: .cmssw_compile
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest
+    entrypoint: [""]
+  variables:
+    CMSSW_RELEASE: CMSSW_4_4_7
+    SCRAM_ARCH: slc5_amb64_gcc481    
+
 cmssw_compile_5_3_32:
   extends: .cmssw_compile
   image:
