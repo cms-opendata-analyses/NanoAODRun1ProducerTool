@@ -43,7 +43,7 @@ cmssw_compile_4_4_7:
     entrypoint: [""]
   variables:
     CMSSW_RELEASE: CMSSW_4_4_7
-    SCRAM_ARCH: slc5_amb64_gcc434    
+    SCRAM_ARCH: slc5_amd64_gcc434    
 
 cmssw_compile_5_3_32:
   extends: .cmssw_compile
