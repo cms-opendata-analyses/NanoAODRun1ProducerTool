@@ -5904,8 +5904,8 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Tau_idIsoloose", value_tau_idisoloose, "Tau_idIsoloose[nTau]/F");
   t_event->Branch("Tau_idIsomedium", value_tau_idisomedium, "Tau_idIsomedium[nTau]/F");
   t_event->Branch("Tau_idIsotight", value_tau_idisotight, "Tau_idIsotight[nTau]/F");
-  t_event->Branch("Tau_idAntieletight", value_tau_idantieletight, "Tau_idantieletight[nTau]/F");
-  t_event->Branch("Tau_idAntimutight", value_tau_idantimutight, "Tau_idantimutight[nTau]/F");
+  t_event->Branch("Tau_idAntieletight", value_tau_idantieletight, "Tau_idAntieletight[nTau]/F");
+  t_event->Branch("Tau_idAntimutight", value_tau_idantimutight, "Tau_idAntimutight[nTau]/F");
 
   // Photons
   t_event->Branch("nPhoton", &value_ph_n, "nPhoton/i");

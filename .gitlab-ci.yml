@@ -112,6 +112,18 @@ cmssw_run_mc_4_2_8:
     SCRAM_ARCH: slc5_amd64_gcc481
     NANOANALYZER: nanoanalyzer_cfg_2010MC.py
 
+cmssw_run_data_4_4_7:
+  extends: .cmssw_run
+  dependencies:
+    - cmssw_compile_4_4_7
+  image:
+    name: gitlab-registry.cern.ch/cms-cloud/cmssw-docker/slc5-cms:latest
+    entrypoint: [""]
+  variables:
+    CMSSW_RELEASE: CMSSW_4_4_7
+    SCRAM_ARCH: slc5_amd64_gcc434
+    NANOANALYZER: nanoanalyzer_cfg_2011Datapp2.76.py
+
 cmssw_run_data_5_3_32:
   extends: .cmssw_run
   dependencies:
@@ -168,6 +180,13 @@ pytest_mc_4_2_8:
     - cmssw_run_mc_4_2_8
   variables:
     CMSSW_VERSION: CMSSW_4_2_8
+
+pytest_data_4_4_7:
+  extends: .pytest
+  dependencies:
+    - cmssw_run_data_4_4_7
+  variables:
+    CMSSW_VERSION: CMSSW_4_4_7
 
 pytest_data_5_3_32:
   extends: .pytest
