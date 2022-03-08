@@ -1,7 +1,6 @@
 The following are instructions on how to set up and compile the code on 
 an sl7 cms workgroup server on lxplus or at DESY, 
 with CMSSW_4_2_8 (2010 data and MC).
-They will be complemented by instructions for other configurations.
 
   open a "fresh" xterm window on your sl7 machine at DESY or CERN:
 xterm &
@@ -80,5 +79,6 @@ git pull
 
    to compile:
 scram b
+(ignore ****WARNING: Invalid tool EgammaAnalysis/ElectronTools. Please fix src/NanoAOD/NanoAnalyzer/BuildFile.xml file.)
 
-Instructions how to run will follow
+For instructions how to run see run_readme.txt

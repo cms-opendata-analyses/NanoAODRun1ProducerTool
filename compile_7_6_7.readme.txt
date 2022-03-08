@@ -1,6 +1,6 @@
 The following are instructions on how to set up and compile the code on 
 an sl7 cms workgroup server on lxplus or at DESY, 
-with CMSSW_5_3_32 (2011/12 data and MC).
+with CMSSW_7_6_7 (2015 data and MC) using slc6.
 
   open a "fresh" xterm window on your sl7 machine at DESY or CERN:
 xterm &
@@ -39,20 +39,20 @@ Singularity> source /cvmfs/cms.cern.ch/cmsset_default.sh
    check compiler version (optional):
 Singularity> echo $SCRAM_ARCH
            -> slc6_amd64_gcc700  
-   (might be reset to slc6_amd64_gcc472 upon cmsrel later)
+   (might be reset to slc6_amd64_gcc483 upon cmsrel later)
 
 once (first time only):
 ----------------------- 
    on the top directory in which you would like to install the code,
    (dot *not* mkdir the CMSSW directory beforehand) 
-   create the CMSSW 5_3_32 environment:
-cmsrel CMSSW_5_3_32 
+   create the CMSSW 7_6_7 environment:
+cmsrel CMSSW_7_6_7 
    (ignore potential "Release ... is not available" error message)
    this will create the corresponding directory with subdirectories
 
 every time:
 -----------
-cd CMSSW_5_3_32/src
+cd CMSSW_7_6_7/src
 
     make sure you have access rights to CERN git.
     (if you do not have them yet the git clone command will give an error)
@@ -61,7 +61,7 @@ kinit "yourCERNusername"@CERN.CH
 
 once (first time only):
 -----------------------
-    in the src directory, set up .../CMSSW_5_3_32/src/NanoAOD/NanoAnalyzer/:
+    in the src directory, set up .../CMSSW_7_6_7/src/NanoAOD/NanoAnalyzer/:
 git clone https://:@gitlab.cern.ch:8443/cms-opendata/cms-opendata-nanoaodplus/nanoaodplus_v1.git NanoAOD/NanoAnalyzer
 
 every time
