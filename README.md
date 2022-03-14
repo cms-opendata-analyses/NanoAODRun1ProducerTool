@@ -22,4 +22,4 @@ compile_7_6_7.readme.txt
 compile_10_6_4.readme.txt
 
    for instructions how to run in various configurations, see
-runreadme.txt
+run_readme.txt
