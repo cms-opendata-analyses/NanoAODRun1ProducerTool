@@ -68,6 +68,8 @@
 
 #ifdef CMSSW7plus
 // activate this when you read from miniAOD for validation (Run 2/3 only!)
+//    can alternatively be activated at compile time by   
+//    scram b USER_CXXFLAGS="-DminiAOD"
 //#define miniAOD
 #endif
 
@@ -1139,7 +1141,11 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
     exit(1);
   }
   else {
-    std::cout << "CMSSW flag set to CMSSW" << CMSSW << std::endl;   
+#ifndef miniAOD
+    std::cout << "CMSSW flag set to CMSSW" << CMSSW << " for AOD" << std::endl;   
+#else
+    std::cout << "CMSSW flag set to CMSSW" << CMSSW << " for miniAOD" << std::endl;   
+#endif
   }
 
   // for debug: get and print some info on map
@@ -1377,12 +1383,13 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Handle<reco::TrackCollection> gmuons;
   Handle<pat::MuonCollection> muons;
   Handle<pat::ElectronCollection> electrons;
+  Handle<reco::ConversionCollection> hConversions;
   Handle<pat::PhotonCollection> photons;
   Handle<pat::TauCollection> taus;
   Handle<pat::METCollection> calomet;
   Handle<pat::METCollection> met;
   Handle<pat::JetCollection> jets;  
-  Handle<pat::JetTagCollection> btags;  
+  //Handle<pat::JetTagCollection> btags;  
   Handle<pat::JetCollection> fatjets;  
   //Handle<pat::TrackJetCollection> trackjets;  
 #endif
@@ -1699,7 +1706,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	      TrigObj_eta.clear();
 	      TrigObj_phi.clear();
 
-              //cout << "hello TrigObj" << endl;
+              // cout << "hello TrigObj" << endl;
 
               // if not to be skipped
               if (!skiptrigger) {
@@ -1713,10 +1720,16 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 		edm::InputTag triggerEventTag_("hltTriggerSummaryAOD", "", "HLT");  
 		iEvent.getByLabel(triggerEventTag_,triggerEventHandle_);
 #endif
+#ifndef miniAOD
+#ifndef CMSSW106plus
+                // for all except 2015 miniAOD MC 
+        // (need to use pat::TriggerObjectStandAlone "selectedPatTrigger") 
 		if (!triggerEventHandle_.isValid()) {
 		  std::cout << "HLTEventAnalyzerAOD::analyze: Error in getting TriggerEvent product from Event!" << std::endl;
 		  return;		  
 		}
+#endif
+#endif
 		if (triggerEventHandle_.isValid()) {
                   /*   reactivate this later!
 		  cout << "Used Processname: " << triggerEventHandle_->usedProcessName() << endl;
@@ -2166,7 +2179,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   if (!isData) {
 
-    //cout << "hello gen" << endl;
+    // cout << "hello gen" << endl;
 
 #ifndef CMSSW7plus   
     iEvent.getByLabel("genParticles", genParticles);
@@ -4092,8 +4105,13 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       // cout << "hello before POET" << endl;
 
+
       // and now using the POET code
+#ifndef miniAOD
       reco::GsfElectronCollection::const_iterator itElec = it;
+#else 
+      pat::ElectronCollection::const_iterator itElec = it;
+#endif
 #ifndef CMSSW7plus
       // *** this is mostly negative!? fix! ***
       int missing_hits = itElec->gsfTrack()->trackerExpectedHitsInner().numberOfHits()-itElec->gsfTrack()->hitPattern().numberOfHits();
@@ -4104,10 +4122,18 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       // cout << "hello after missing hits" << endl;
 
 #ifdef CMSSW106plus
-      // argument type has changed
+      // argument type has changed for UL
       bool passelectronveto = !ConversionTools::hasMatchedConversion(*itElec, *hConversions, beamspot1.position());
 #else
+#ifndef miniAOD
+      // for Run 1 and 2015 AOD; to be fixed for miniAOD 2015!
       bool passelectronveto = !ConversionTools::hasMatchedConversion(*itElec, hConversions, beamspot1.position());
+#else
+      // to satisfy compiler; *** to be fixed for miniAOD 2015! ***
+      //cout << beamspot1.position() << endl;
+      //bool passelectronveto = true;
+      bool passelectronveto = (beamspot1.x0() !=0);
+#endif
 #endif
       // cout << "hello after veto" << endl;
       
@@ -5004,10 +5030,12 @@ cout<<"---------------------------------"<<endl;*/
       //cout<<looseJetID<<endl;
       //float NHF = it->neutralHadronEnergyFraction();
       value_jet_btag[value_jet_n] = -1.;
+#ifndef miniAOD
       // from POET: (can this work??)
       if (btags.isValid() && (it - jets->begin()) < btags->size()) {
 	value_jet_btag[value_jet_n] = btags->operator[](it - jets->begin()).second;
       }
+#endif
 
       /*
       float NEMF = it->neutralEmEnergyFraction();

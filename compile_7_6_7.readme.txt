@@ -76,7 +76,10 @@ whenever you want to update the code to the latest version (not first time)
 ---------------------------------------------------------------------------
 git pull
 
-   to compile:
+   compile for use on AOD:
 scram b
+
+   or instead compile for use on miniAOD:
+scram b USER_CXXFLAGS="-DminiAOD"
 
 For instructions how to run see run_readme.txt

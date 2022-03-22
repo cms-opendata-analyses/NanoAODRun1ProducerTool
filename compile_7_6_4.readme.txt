@@ -64,7 +64,10 @@ git pull
    set the right environment
 cmsenv
 
-   compile:
+   compile for use on AOD:
 scram b
 
-Instructions how to run will follow
+   or instead compile for use on miniAOD:
+scram b USER_CXXFLAGS="-DminiAOD"
+
+For instructions how to run see run_readme.txt

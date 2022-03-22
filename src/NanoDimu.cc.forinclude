@@ -464,7 +464,9 @@ if (nanoext) {
       // loop over miniAOD PackedCandidates with full track info
       // (some low pt tracks will be missed)
       for (pat::PackedCandidateCollection::const_iterator icSum1 = tracks->begin(); icSum1 != tracks->end(); ++icSum1) {
+#ifdef CMSSW10plus
 	if (!(icSum1->hasTrackDetails())) continue;
+#endif
         auto itSum1 = icSum1->bestTrack();
         if (itSum1 == nullptr) continue; 
 #endif

@@ -7,8 +7,8 @@ compile_4_2_8.readme.txt   for  2010 0.9 and 7 TeV pp data and MC, and
 compile_4_4_7.readme.txt   for  2011 2.76 TeV pp data
 compile_5_3_32.readme.txt  for  2011 7 TeV data and MC, and 
                                 2012 8 TeV data and MC
-compile_7_6_7.readme.txt   for  2015 13 TeV AOD data and MC, on slc6
-compile_7_6_4.readme.txt   for  2015 13 TeV AOD data and MC, on el7
+compile_7_6_7.readme.txt   for  2015 13 TeV AOD or miniAOD data and MC, on slc6
+compile_7_6_4.readme.txt   for  2015 13 TeV AOD or miniAOD data and MC, on el7
 compile_10_6_4.readme.txt  for  2016 13 TeV UL AOD data and MC (not yet public),
                                 for cross-validation with nanoAODv8
 
@@ -23,7 +23,7 @@ module load cmssw
    set the cmssw environment:
 cmsenv
 
-   run the configuration:
+   run the configuration: (needs to match compilation for AOD or miniAOD)
 cmsRun jobname.py
 
 The following example configurations are provided so far:
@@ -32,9 +32,11 @@ nanoanalyzer_cfg_2010MC.py    for 2010 7 TeV pp MC (similar for 0.9/2.76 TeV)
 nanoanalyzer_cfg_2011Datapp2.76.py  for 2011 2.76 TeV pp data 
 nanoanalyzer_cfg_2011Data.py  for 2011 7 TeV pp data (similar for 2012 8 TeV)
 nanoanalyzer_cfg_2011MC.py    for 2011 7 TeV pp MC (similar for 2012 8 TeV)
+nanoanalyzer_cfg_2015Data.py  for 2015 13 TeV pp data
+nanoanalyzer_cfg_2015miniMC.py  for 2015 13 TeV pp miniAOD MC
 
-configurations for the 2015 data will be provided as soon as the corresponding 
-validation will be completed
+The configurations for the 2015 data have been technically validated,
+but not yet been validated for content 
 
 Run 2 UL data have not yet been released.
 Official CMS nanoAOD will be the main reference for these. 

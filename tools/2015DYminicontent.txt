@@ -1,0 +1,66 @@
+[?1034hType                                  Module                      Label             Process        Full Name
+------------------------------------------------------------------------------------------------------------
+LHEEventProduct                       "externalLHEProducer"       ""                "LHE"          LHEEventProduct_externalLHEProducer__LHE
+GenEventInfoProduct                   "generator"                 ""                "SIM"          GenEventInfoProduct_generator__SIM
+edm::TriggerResults                   "TriggerResults"            ""                "SIM"          edmTriggerResults_TriggerResults__SIM
+edm::TriggerResults                   "TriggerResults"            ""                "HLT"          edmTriggerResults_TriggerResults__HLT
+HcalNoiseSummary                      "hcalnoise"                 ""                "RECO"         HcalNoiseSummary_hcalnoise__RECO
+L1GlobalTriggerReadoutRecord          "gtDigis"                   ""                "RECO"         L1GlobalTriggerReadoutRecord_gtDigis__RECO
+double                                "fixedGridRhoAll"           ""                "RECO"         double_fixedGridRhoAll__RECO
+double                                "fixedGridRhoFastjetAll"    ""                "RECO"         double_fixedGridRhoFastjetAll__RECO
+double                                "fixedGridRhoFastjetAllCalo"   ""                "RECO"         double_fixedGridRhoFastjetAllCalo__RECO
+double                                "fixedGridRhoFastjetCentral"   ""                "RECO"         double_fixedGridRhoFastjetCentral__RECO
+double                                "fixedGridRhoFastjetCentralCalo"   ""                "RECO"         double_fixedGridRhoFastjetCentralCalo__RECO
+double                                "fixedGridRhoFastjetCentralChargedPileUp"   ""                "RECO"         double_fixedGridRhoFastjetCentralChargedPileUp__RECO
+double                                "fixedGridRhoFastjetCentralNeutral"   ""                "RECO"         double_fixedGridRhoFastjetCentralNeutral__RECO
+edm::TriggerResults                   "TriggerResults"            ""                "RECO"         edmTriggerResults_TriggerResults__RECO
+reco::BeamHaloSummary                 "BeamHaloSummary"           ""                "RECO"         recoBeamHaloSummary_BeamHaloSummary__RECO
+reco::BeamSpot                        "offlineBeamSpot"           ""                "RECO"         recoBeamSpot_offlineBeamSpot__RECO
+vector<l1extra::L1EmParticle>         "l1extraParticles"          "Isolated"        "RECO"         l1extraL1EmParticles_l1extraParticles_Isolated_RECO
+vector<l1extra::L1EmParticle>         "l1extraParticles"          "NonIsolated"     "RECO"         l1extraL1EmParticles_l1extraParticles_NonIsolated_RECO
+vector<l1extra::L1EtMissParticle>     "l1extraParticles"          "MET"             "RECO"         l1extraL1EtMissParticles_l1extraParticles_MET_RECO
+vector<l1extra::L1EtMissParticle>     "l1extraParticles"          "MHT"             "RECO"         l1extraL1EtMissParticles_l1extraParticles_MHT_RECO
+vector<l1extra::L1HFRings>            "l1extraParticles"          ""                "RECO"         l1extraL1HFRingss_l1extraParticles__RECO
+vector<l1extra::L1JetParticle>        "l1extraParticles"          "Central"         "RECO"         l1extraL1JetParticles_l1extraParticles_Central_RECO
+vector<l1extra::L1JetParticle>        "l1extraParticles"          "Forward"         "RECO"         l1extraL1JetParticles_l1extraParticles_Forward_RECO
+vector<l1extra::L1JetParticle>        "l1extraParticles"          "IsoTau"          "RECO"         l1extraL1JetParticles_l1extraParticles_IsoTau_RECO
+vector<l1extra::L1JetParticle>        "l1extraParticles"          "Tau"             "RECO"         l1extraL1JetParticles_l1extraParticles_Tau_RECO
+vector<l1extra::L1MuonParticle>       "l1extraParticles"          ""                "RECO"         l1extraL1MuonParticles_l1extraParticles__RECO
+edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >    "reducedEgamma"             "reducedEBRecHits"   "PAT"          EcalRecHitsSorted_reducedEgamma_reducedEBRecHits_PAT
+edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >    "reducedEgamma"             "reducedEERecHits"   "PAT"          EcalRecHitsSorted_reducedEgamma_reducedEERecHits_PAT
+edm::SortedCollection<EcalRecHit,edm::StrictWeakOrdering<EcalRecHit> >    "reducedEgamma"             "reducedESRecHits"   "PAT"          EcalRecHitsSorted_reducedEgamma_reducedESRecHits_PAT
+edm::TriggerResults                   "TriggerResults"            ""                "PAT"          edmTriggerResults_TriggerResults__PAT
+edm::ValueMap<float>                  "offlineSlimmedPrimaryVertices"   ""                "PAT"          floatedmValueMap_offlineSlimmedPrimaryVertices__PAT
+pat::PackedTriggerPrescales           "patTrigger"                ""                "PAT"          patPackedTriggerPrescales_patTrigger__PAT
+pat::PackedTriggerPrescales           "patTrigger"                "l1max"           "PAT"          patPackedTriggerPrescales_patTrigger_l1max_PAT
+pat::PackedTriggerPrescales           "patTrigger"                "l1min"           "PAT"          patPackedTriggerPrescales_patTrigger_l1min_PAT
+vector<PileupSummaryInfo>             "slimmedAddPileupInfo"      ""                "PAT"          PileupSummaryInfos_slimmedAddPileupInfo__PAT
+vector<pat::Electron>                 "slimmedElectrons"          ""                "PAT"          patElectrons_slimmedElectrons__PAT
+vector<pat::Jet>                      "slimmedJets"               ""                "PAT"          patJets_slimmedJets__PAT
+vector<pat::Jet>                      "slimmedJetsAK8"            ""                "PAT"          patJets_slimmedJetsAK8__PAT
+vector<pat::Jet>                      "slimmedJetsPuppi"          ""                "PAT"          patJets_slimmedJetsPuppi__PAT
+vector<pat::Jet>                      "slimmedJetsAK8PFCHSSoftDropPacked"   "SubJets"         "PAT"          patJets_slimmedJetsAK8PFCHSSoftDropPacked_SubJets_PAT
+vector<pat::Jet>                      "slimmedJetsCMSTopTagCHSPacked"   "SubJets"         "PAT"          patJets_slimmedJetsCMSTopTagCHSPacked_SubJets_PAT
+vector<pat::MET>                      "slimmedMETs"               ""                "PAT"          patMETs_slimmedMETs__PAT
+vector<pat::MET>                      "slimmedMETsPuppi"          ""                "PAT"          patMETs_slimmedMETsPuppi__PAT
+vector<pat::Muon>                     "slimmedMuons"              ""                "PAT"          patMuons_slimmedMuons__PAT
+vector<pat::PackedCandidate>          "lostTracks"                ""                "PAT"          patPackedCandidates_lostTracks__PAT
+vector<pat::PackedCandidate>          "packedPFCandidates"        ""                "PAT"          patPackedCandidates_packedPFCandidates__PAT
+vector<pat::PackedGenParticle>        "packedGenParticles"        ""                "PAT"          patPackedGenParticles_packedGenParticles__PAT
+vector<pat::Photon>                   "slimmedPhotons"            ""                "PAT"          patPhotons_slimmedPhotons__PAT
+vector<pat::Tau>                      "slimmedTaus"               ""                "PAT"          patTaus_slimmedTaus__PAT
+vector<pat::TriggerObjectStandAlone>    "selectedPatTrigger"        ""                "PAT"          patTriggerObjectStandAlones_selectedPatTrigger__PAT
+vector<reco::CATopJetTagInfo>         "caTopTagInfosPAT"          ""                "PAT"          recoCATopJetTagInfos_caTopTagInfosPAT__PAT
+vector<reco::CaloCluster>             "reducedEgamma"             "reducedEBEEClusters"   "PAT"          recoCaloClusters_reducedEgamma_reducedEBEEClusters_PAT
+vector<reco::CaloCluster>             "reducedEgamma"             "reducedESClusters"   "PAT"          recoCaloClusters_reducedEgamma_reducedESClusters_PAT
+vector<reco::Conversion>              "reducedEgamma"             "reducedConversions"   "PAT"          recoConversions_reducedEgamma_reducedConversions_PAT
+vector<reco::Conversion>              "reducedEgamma"             "reducedSingleLegConversions"   "PAT"          recoConversions_reducedEgamma_reducedSingleLegConversions_PAT
+vector<reco::GenJet>                  "slimmedGenJets"            ""                "PAT"          recoGenJets_slimmedGenJets__PAT
+vector<reco::GenJet>                  "slimmedGenJetsAK8"         ""                "PAT"          recoGenJets_slimmedGenJetsAK8__PAT
+vector<reco::GenParticle>             "prunedGenParticles"        ""                "PAT"          recoGenParticles_prunedGenParticles__PAT
+vector<reco::GsfElectronCore>         "reducedEgamma"             "reducedGedGsfElectronCores"   "PAT"          recoGsfElectronCores_reducedEgamma_reducedGedGsfElectronCores_PAT
+vector<reco::PhotonCore>              "reducedEgamma"             "reducedGedPhotonCores"   "PAT"          recoPhotonCores_reducedEgamma_reducedGedPhotonCores_PAT
+vector<reco::SuperCluster>            "reducedEgamma"             "reducedSuperClusters"   "PAT"          recoSuperClusters_reducedEgamma_reducedSuperClusters_PAT
+vector<reco::Vertex>                  "offlineSlimmedPrimaryVertices"   ""                "PAT"          recoVertexs_offlineSlimmedPrimaryVertices__PAT
+vector<reco::VertexCompositePtrCandidate>    "slimmedSecondaryVertices"   ""                "PAT"          recoVertexCompositePtrCandidates_slimmedSecondaryVertices__PAT
+unsigned int                          "bunchSpacingProducer"      ""                "PAT"          uint_bunchSpacingProducer__PAT
