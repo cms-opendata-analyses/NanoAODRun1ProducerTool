@@ -349,9 +349,12 @@ using std::array;
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/JetExtendedAssociation.h"
 #include "DataFormats/JetReco/interface/JetID.h"
+// dated 2006 -> Run 1? 
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 //#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 //#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+// what about (for run 2? dated 2014)
+//#include "JetMETCorrections/JetCorrector/interface/JetCorrector.h"
 #include "DataFormats/BTauReco/interface/JetTag.h"
 #endif
 #ifdef miniAOD
@@ -1094,7 +1097,7 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
 {
   // configure parameters
   outFile = iConfig.getParameter<std::string>("outFile");
-  // check infile and set isData to true if it does not contain "SIM"
+  // check infile and set isData to true if it does not contain "SIM"?
   isData = iConfig.getParameter<bool>("isData");
   hlt_proc = iConfig.getParameter<std::string>("hltProcess");
   nanoext = iConfig.getParameter<bool>("nanoExtension");
@@ -1213,6 +1216,10 @@ NanoAnalyzer::NanoAnalyzer(const edm::ParameterSet& iConfig)
   genfatjetTkn = consumes<reco::GenJetCollection>(edm::InputTag("ak8GenJets"));//Qun
   // jet correction label, will this work? doesn't so far ...
   mJetCorr = "ak4PFL1FastL2L3Residual";
+  // comment in 
+  // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookJetEnergyCorrections#CorrPatJets
+  // states that from 7_6_4 differentiation between L2L3 for MC 
+  // and L2L3residual for data is no longer needed
 
 #ifndef CMSSW11plus
   // not Run 3
@@ -1455,8 +1462,11 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // for 2010
   mJetCorr = "ak5PFL2L3";
 #else
-  // for 2011/12
-  mJetCorr = "ak5PFL1FastL2L3Residual";
+  // compare e.g. https://github.com/cms-sw/cmssw/blob/master/RecoMET/METPUSubtraction/python/mvaPFMET_Data_cff.py
+  // for 2011/12 data
+  if (isData) mJetCorr = "ak5PFL1FastL2L3Residual";
+  // for 2011/12 MC 
+  else mJetCorr = "ak5PFL1FastL2L3";
 #endif
 
   // choose primary vertices with/without beam spot
