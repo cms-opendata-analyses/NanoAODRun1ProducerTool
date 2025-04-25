@@ -93,10 +93,10 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))  ## <--
 #goodJSON = 'files/Cert_136033-149442_7TeV_Apr21ReReco_Collisions10_JSON_v2.txt'
 
 # "standard" 2011 Golden JSON (recheck for your particular dataset)
-goodJSON = 'files/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt'
+#goodJSON = 'files/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt'
 
 # "standard" 2012 Golden JSON (recheck for your particular dataset)
-#goodJSON = 'files/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt'
+goodJSON = 'files/Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt'
 
 ##################################################################################
 
@@ -125,9 +125,11 @@ process.source = cms.Source("PoolSource",
                             # 2010 MC (test on one file) 
                             #fileNames = cms.untracked.vstring('root://eospublic.cern.ch//eos/opendata/cms/MonteCarlo2010/Summer12/DYToMuMu_M-20_TuneZ2Star_HFshowerLibrary_7TeV_pythia6/AODSIM/LowPU2010_DR42_PU_S0_START42_V17B-v1/10000/0A78309F-AF5B-E211-B615-003048FFCB8C.root')
                             # 2011 Data (test on one file from https://opendata.cern.ch/record/275)
-                            fileNames = cms.untracked.vstring('root://eospublic.cern.ch//eos/opendata/cms/Run2011B/Jet/AOD/12Oct2013-v1/00000/F2B14C11-9047-E311-B1CB-0025901D625A.root')
+                            #fileNames = cms.untracked.vstring('root://eospublic.cern.ch//eos/opendata/cms/Run2011B/Jet/AOD/12Oct2013-v1/00000/F2B14C11-9047-E311-B1CB-0025901D625A.root')
                             # 2011 MC (test on one file)
                             #fileNames = cms.untracked.vstring('root://eospublic.cern.ch//eos/opendata/cms/MonteCarlo2011/Summer11LegDR/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/AODSIM/PU_S13_START53_LV6-v1/00000/0019AB30-B9B7-E311-9E28-003048FF86CA.root')
+                            # 2012 Data (test on one file from https://opendata.cern.ch/record/24450)
+                            fileNames = cms.untracked.vstring('root://eospublic.cern.ch//eos/opendata/cms/Run2012D/JetHT/AOD/22Jan2013-v1/10000/00474B99-2093-E211-AB43-E0CB4E19F98A.root')
 )
 
 ##################################################################################
@@ -153,7 +155,7 @@ process.source.skipEvents = cms.untracked.uint32(0)
 # define your output path and file here (default is test.root)
 # ************************************************************
 process.nano = cms.EDAnalyzer('NanoAnalyzer',
-                              outFile = cms.string('test2011Data.root'),
+                              outFile = cms.string('test2012data.root'),
 
                               # Change this:
                               # If MC:
