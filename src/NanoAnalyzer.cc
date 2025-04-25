@@ -822,7 +822,24 @@ private:
   vector<Int_t> Muon_trkId;    // Trk_Id of track in TRK list
   // clarify overlap with Muon_genPartIdx (one is index, the other Id)
   vector<Int_t> Muon_simId;    // GenPart_Id of particle in GenPart
-    
+
+  UInt_t nPFCands;
+  vector<Int_t> PFCands_charge;
+  vector<Float_t> PFCands_eta;
+  vector<Float_t> PFCands_mass;
+  vector<Int_t> PFCands_pdgId;
+  vector<Float_t> PFCands_phi;
+  vector<Float_t> PFCands_pt;
+  vector<Float_t> PFCands_e;
+  vector<Float_t> PFCands_ptTrk;
+  vector<Float_t> PFCands_etaAtVtx;
+  vector<Float_t> PFCands_phiAtVtx;
+  vector<Float_t> PFCands_caloEnergy;
+  vector<Float_t> PFCands_hcalEnergy;
+  vector<Float_t> PFCands_caloFraction;
+  vector<Float_t> PFCands_hcalFraction;
+  //  vector<Int_t> PFCands_isIsoCH;
+  
   // for dimuon candidates (nonstandard extension)
 #include "NanoDimu.h" 
 
@@ -1048,6 +1065,7 @@ const unsigned nReserve_OtherPV = 3;
 //const unsigned nReserve_OtherPV = 128; 
 const unsigned nReserve_PVtx = 128; 
 const unsigned nReserve_Muon = 128;
+const unsigned nReserve_PFCands = 1024;
 const unsigned nReserve_TrigObj = 1024;
 const unsigned nReserve_Dimu = 256;
 //const unsigned nReserve_D0 = 1024;
@@ -1374,6 +1392,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // nuha
   Handle<reco::ConversionCollection> hConversions;
   Handle<reco::PFCandidateCollection> pfCands;
+  //  Handle<edm::ValueMap<bool>> chargedHadronIsolationHandle;
   Handle<double> rhoHandle;
   Handle<reco::PFTauDiscriminator> tausLooseIso, tausVLooseIso, tausMediumIso, tausTightIso, 
     tausTightEleRej, tausTightMuonRej, tausDecayMode, tausRawIso;
@@ -1443,6 +1462,7 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByLabel("allConversions", hConversions);
   // for photons (POET)
   iEvent.getByLabel("particleFlow", pfCands);
+  //  iEvent.getByLabel("chargedHadronIsolation",chargedHadronIsolationHandle);
   iEvent.getByLabel(InputTag("fixedGridRhoAll"), rhoHandle);
   // for taus (POET)
   iEvent.getByLabel(InputTag("hpsPFTauDiscriminationByDecayModeFinding"),tausDecayMode);
@@ -3813,6 +3833,77 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 ////////////////////////////// Muon Collection End ///////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
+
+//////////////////////////////////////////////////////////////////////////////
+///////////////////////// Particle Flow Collection ///////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+  nPFCands = 0;
+  PFCands_charge.clear();
+  PFCands_eta.clear();
+  PFCands_mass.clear();
+  PFCands_pdgId.clear();
+  PFCands_phi.clear();
+  PFCands_pt.clear();
+  PFCands_e.clear();
+  PFCands_ptTrk.clear();
+  PFCands_etaAtVtx.clear();
+  PFCands_phiAtVtx.clear();
+  PFCands_caloEnergy.clear();
+  PFCands_hcalEnergy.clear();
+  PFCands_caloFraction.clear();
+  PFCands_hcalFraction.clear();
+  //  PFCands_isIsoCH.clear();
+
+  int ic = 0;
+  for (reco::PFCandidateCollection::const_iterator pfCand = pfCands->begin(); pfCand != pfCands->end(); ++pfCand) {
+
+    if(PFCands_pt.size() < nReserve_PFCands){
+      PFCands_charge.push_back(pfCand->charge());
+      PFCands_e.push_back(pfCand->energy());
+      PFCands_eta.push_back(pfCand->eta());
+      PFCands_mass.push_back(pfCand->mass());
+      PFCands_phi.push_back(pfCand->phi());
+      PFCands_pt.push_back(pfCand->pt());
+      int pdgid = pfCand->translateTypeToPdgId(pfCand->particleId());
+      PFCands_pdgId.push_back(pdgid);
+      
+      float caloenergy = pfCand->ecalEnergy()+pfCand->hcalEnergy();
+      PFCands_caloEnergy.push_back(caloenergy);
+      PFCands_hcalEnergy.push_back(pfCand->hcalEnergy());
+      if(pfCand->pt() > 0.5){
+	PFCands_caloFraction.push_back(caloenergy/pfCand->energy());     // will do energy * caloFraction = caloEnergy, so caloFraction = caloEnergy/energy
+	PFCands_hcalFraction.push_back(pfCand->hcalEnergy()/caloenergy); // this one is caloenergy * hcalfrac = hcalEnergy, so hcalFraction = hcalEnergy/caloenergy
+      }else{
+	PFCands_caloFraction.push_back(0);
+	PFCands_hcalFraction.push_back(0);
+      }
+      
+      const reco::Track *assoctrk = nullptr;
+      if((abs(pdgid) == 11 || pdgid == 22) && pfCand->gsfTrackRef().isNonnull()){
+	assoctrk = &*pfCand->gsfTrackRef();
+      }else if(pfCand->trackRef().isNonnull()){
+	assoctrk = &*pfCand->trackRef();
+      }
+      
+      if(assoctrk){
+	PFCands_ptTrk.push_back(assoctrk->pt());
+	PFCands_etaAtVtx.push_back(assoctrk->eta());
+	PFCands_phiAtVtx.push_back(assoctrk->phi());
+      }else{
+	PFCands_ptTrk.push_back(-1);
+	PFCands_etaAtVtx.push_back(-1);
+	PFCands_phiAtVtx.push_back(-1);
+      }
+
+      // const edm::ValueMap<bool> &chargedHadronIsolation = *(chargedHadronIsolationHandle.product());
+      // bool isIsolatedChargedHadron = ((pfCand->pt() > 0.5) && (chargedHadronIsolation[reco::PFCandidateRef(pfCands, ic)]));
+      // PFCands_isIsoCH.push_back(isIsolatedChargedHadron);
+    }
+    ic++;
+  }
+  nPFCands = PFCands_pt.size();
+    
   // cout << "hello electron" << endl; 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -5521,6 +5612,23 @@ NanoAnalyzer::beginJob()
   Muon_trkId.reserve(nReserve_Muon); 
   Muon_simId.reserve(nReserve_Muon); 
 
+  //---------------------- Particle Flow reserve ----------------------- //
+  PFCands_charge.reserve(nReserve_PFCands);
+  PFCands_eta.reserve(nReserve_PFCands);
+  PFCands_mass.reserve(nReserve_PFCands);
+  PFCands_pdgId.reserve(nReserve_PFCands);
+  PFCands_phi.reserve(nReserve_PFCands);
+  PFCands_pt.reserve(nReserve_PFCands);
+  PFCands_e.reserve(nReserve_PFCands);
+  PFCands_ptTrk.reserve(nReserve_PFCands);
+  PFCands_etaAtVtx.reserve(nReserve_PFCands);
+  PFCands_phiAtVtx.reserve(nReserve_PFCands);
+  PFCands_caloEnergy.reserve(nReserve_PFCands);
+  PFCands_hcalEnergy.reserve(nReserve_PFCands);
+  PFCands_caloFraction.reserve(nReserve_PFCands);
+  PFCands_hcalFraction.reserve(nReserve_PFCands);
+
+  
   //------------------------------- Dimuon reserve --------------------------//
 
   Dimu_t1muIdx.reserve(nReserve_Dimu);
@@ -5575,57 +5683,57 @@ NanoAnalyzer::beginJob()
 
   t_event->Branch("CMSSW", &CMSSW, "CMSSW/I");
 
-    // nanoAOD extension
-    // store JSON info
-    t_event->Branch("GoodLumisection", &GoodLumisection, "GoodLumisection/O");
-    // store dataset info
-    t_event->Branch("Dataset_isMC", &MCdataset, "Dataset_isMC/O");
-    t_event->Branch("Dataset_ZeroBias", &ZeroBiasdataset, "Dataset_ZeroBias/O");
-    t_event->Branch("Dataset_MinimumBias", &MinimumBiasdataset, "Dataset_MinimumBias/O");
-    t_event->Branch("Dataset_Jet", &Jetdataset, "Dataset_Jet/O");
-    t_event->Branch("Dataset_MultiJet", &MultiJetdataset, "Dataset_MultiJet/O");
-    t_event->Branch("Dataset_JetMETTauMonitor", &JetMETTauMonitordataset, "Dataset_JetMETTauMonitor/O");
-    t_event->Branch("Dataset_Mu", &Mudataset, "Dataset_Mu/O");
-    t_event->Branch("Dataset_MuMonitor", &MuMonitordataset, "Dataset_MuMonitor/O");
-    t_event->Branch("Dataset_DoubleMu", &DoubleMudataset, "Dataset_DoubleMu/O");
-    t_event->Branch("Dataset_MuHad", &MuHaddataset, "Dataset_MuHad/O");
-    t_event->Branch("Dataset_MuOnia", &MuOniadataset, "Dataset_MuOnia/O");
-    t_event->Branch("Dataset_Charmonium", &Charmoniumdataset, "Dataset_Charmonium/O");
-    t_event->Branch("Dataset_BParking", &BParkingdataset, "Dataset_BParking/O");
-    t_event->Branch("Dataset_BTau", &BTaudataset, "Dataset_BTau/O");
-    t_event->Branch("Dataset_Electron", &Electrondataset, "Dataset_Electron/O");
-    t_event->Branch("Dataset_DoubleElectron", &DoubleElectrondataset, "Dataset_DoubleElectron/O");
-    t_event->Branch("Dataset_Photon", &Photondataset, "Dataset_Photon/O");
-    t_event->Branch("Dataset_EGMonitor", &EGMonitordataset, "Dataset_EGMonitor/O");
-    t_event->Branch("Dataset_MuEG", &MuEGdataset, "Dataset_MuEG/O");
-    t_event->Branch("Dataset_METFwd", &METFwddataset, "Dataset_METFwd/O");
-    t_event->Branch("Dataset_Commissioning", &Commissioningdataset, "Dataset_Commissioning/O");
-    // and info on which other data sets this event occurs
-    t_event->Branch("Alsoon_ZeroBias", &ZeroBiasTrig, "Alsoon_ZeroBias/O");
-    t_event->Branch("Alsoon_MinimumBias", &MinimumBiasTrig, "Alsoon_MinimumBias/O");
-    t_event->Branch("Alsoon_Jet", &JetTrig, "Alsoon_Jet/O");
-    t_event->Branch("Alsoon_MultiJet", &MultiJetTrig, "Alsoon_MultiJet/O");
-    t_event->Branch("Alsoon_JetMETTauMonitor", &JetMETTauMonitorTrig, "Alsoon_JetMETTauMonitor/O");
-    t_event->Branch("Alsoon_Mu", &MuTrig, "Alsoon_Mu/O");
-    t_event->Branch("Alsoon_MuMonitor", &MuMonitorTrig, "Alsoon_MuMonitor/O");
-    t_event->Branch("Alsoon_DoubleMu", &DoubleMuTrig, "Alsoon_DoubleMu/O");
-    t_event->Branch("Alsoon_MuHad", &MuHadTrig, "Alsoon_MuHad/O");
-    t_event->Branch("Alsoon_MuOnia", &MuOniaTrig, "Alsoon_MuOnia/O");
-    t_event->Branch("Alsoon_Charmonium", &CharmoniumTrig, "Alsoon_Charmonium/O");
-    t_event->Branch("Alsoon_BParking", &BParkingTrig, "Alsoon_BParking/O");
-    t_event->Branch("Alsoon_BTau", &BTauTrig, "Alsoon_BTau/O");
-    t_event->Branch("Alsoon_Electron", &ElectronTrig, "Alsoon_Electron/O");
-    t_event->Branch("Alsoon_DoubleElectron", &DoubleElectronTrig, "Alsoon_DoubleElectron/O");
-    t_event->Branch("Alsoon_Photon", &PhotonTrig, "Alsoon_Photon/O");
-    t_event->Branch("Alsoon_EGMonitor", &EGMonitorTrig, "Alsoon_EGMonitor/O");
-    t_event->Branch("Alsoon_MuEG", &MuEGTrig, "Alsoon_MuEG/O");
-    t_event->Branch("Alsoon_METFwd", &METFwdTrig, "Alsoon_METFwd/O");
-    t_event->Branch("Alsoon_Commissioning", &CommissioningTrig, "Alsoon_Commissioning/O");
-
+  // nanoAOD extension
+  // store JSON info
+  t_event->Branch("GoodLumisection", &GoodLumisection, "GoodLumisection/O");
+  // store dataset info
+  t_event->Branch("Dataset_isMC", &MCdataset, "Dataset_isMC/O");
+  t_event->Branch("Dataset_ZeroBias", &ZeroBiasdataset, "Dataset_ZeroBias/O");
+  t_event->Branch("Dataset_MinimumBias", &MinimumBiasdataset, "Dataset_MinimumBias/O");
+  t_event->Branch("Dataset_Jet", &Jetdataset, "Dataset_Jet/O");
+  t_event->Branch("Dataset_MultiJet", &MultiJetdataset, "Dataset_MultiJet/O");
+  t_event->Branch("Dataset_JetMETTauMonitor", &JetMETTauMonitordataset, "Dataset_JetMETTauMonitor/O");
+  t_event->Branch("Dataset_Mu", &Mudataset, "Dataset_Mu/O");
+  t_event->Branch("Dataset_MuMonitor", &MuMonitordataset, "Dataset_MuMonitor/O");
+  t_event->Branch("Dataset_DoubleMu", &DoubleMudataset, "Dataset_DoubleMu/O");
+  t_event->Branch("Dataset_MuHad", &MuHaddataset, "Dataset_MuHad/O");
+  t_event->Branch("Dataset_MuOnia", &MuOniadataset, "Dataset_MuOnia/O");
+  t_event->Branch("Dataset_Charmonium", &Charmoniumdataset, "Dataset_Charmonium/O");
+  t_event->Branch("Dataset_BParking", &BParkingdataset, "Dataset_BParking/O");
+  t_event->Branch("Dataset_BTau", &BTaudataset, "Dataset_BTau/O");
+  t_event->Branch("Dataset_Electron", &Electrondataset, "Dataset_Electron/O");
+  t_event->Branch("Dataset_DoubleElectron", &DoubleElectrondataset, "Dataset_DoubleElectron/O");
+  t_event->Branch("Dataset_Photon", &Photondataset, "Dataset_Photon/O");
+  t_event->Branch("Dataset_EGMonitor", &EGMonitordataset, "Dataset_EGMonitor/O");
+  t_event->Branch("Dataset_MuEG", &MuEGdataset, "Dataset_MuEG/O");
+  t_event->Branch("Dataset_METFwd", &METFwddataset, "Dataset_METFwd/O");
+  t_event->Branch("Dataset_Commissioning", &Commissioningdataset, "Dataset_Commissioning/O");
+  // and info on which other data sets this event occurs
+  t_event->Branch("Alsoon_ZeroBias", &ZeroBiasTrig, "Alsoon_ZeroBias/O");
+  t_event->Branch("Alsoon_MinimumBias", &MinimumBiasTrig, "Alsoon_MinimumBias/O");
+  t_event->Branch("Alsoon_Jet", &JetTrig, "Alsoon_Jet/O");
+  t_event->Branch("Alsoon_MultiJet", &MultiJetTrig, "Alsoon_MultiJet/O");
+  t_event->Branch("Alsoon_JetMETTauMonitor", &JetMETTauMonitorTrig, "Alsoon_JetMETTauMonitor/O");
+  t_event->Branch("Alsoon_Mu", &MuTrig, "Alsoon_Mu/O");
+  t_event->Branch("Alsoon_MuMonitor", &MuMonitorTrig, "Alsoon_MuMonitor/O");
+  t_event->Branch("Alsoon_DoubleMu", &DoubleMuTrig, "Alsoon_DoubleMu/O");
+  t_event->Branch("Alsoon_MuHad", &MuHadTrig, "Alsoon_MuHad/O");
+  t_event->Branch("Alsoon_MuOnia", &MuOniaTrig, "Alsoon_MuOnia/O");
+  t_event->Branch("Alsoon_Charmonium", &CharmoniumTrig, "Alsoon_Charmonium/O");
+  t_event->Branch("Alsoon_BParking", &BParkingTrig, "Alsoon_BParking/O");
+  t_event->Branch("Alsoon_BTau", &BTauTrig, "Alsoon_BTau/O");
+  t_event->Branch("Alsoon_Electron", &ElectronTrig, "Alsoon_Electron/O");
+  t_event->Branch("Alsoon_DoubleElectron", &DoubleElectronTrig, "Alsoon_DoubleElectron/O");
+  t_event->Branch("Alsoon_Photon", &PhotonTrig, "Alsoon_Photon/O");
+  t_event->Branch("Alsoon_EGMonitor", &EGMonitorTrig, "Alsoon_EGMonitor/O");
+  t_event->Branch("Alsoon_MuEG", &MuEGTrig, "Alsoon_MuEG/O");
+  t_event->Branch("Alsoon_METFwd", &METFwdTrig, "Alsoon_METFwd/O");
+  t_event->Branch("Alsoon_Commissioning", &CommissioningTrig, "Alsoon_Commissioning/O");
+  
   //}
-
+  
   if (!isData) {
-
+    
     std::cout << "This is MC" << std::endl;
     //---------------------- Create branch of GenPart's tree -------------------//
     
@@ -5776,6 +5884,22 @@ NanoAnalyzer::beginJob()
   t_event->Branch("Muon_isGlobal", Muon_isGlobal.data(), "Muon_isGlobal[nMuon]/O");
   t_event->Branch("Muon_isTracker", Muon_isTracker.data(), "Muon_isTracker[nMuon]/O");
 
+  t_event->Branch("nPFCands", &nPFCands, "nPFCands/i");
+  t_event->Branch("PFCands_charge", PFCands_charge.data(), "PFCands_charge[nPFCands]/I");
+  t_event->Branch("PFCands_eta", PFCands_eta.data(), "PFCands_eta[nPFCands]/F");
+  t_event->Branch("PFCands_mass", PFCands_mass.data(), "PFCands_mass[nPFCands]/F");
+  t_event->Branch("PFCands_pdgId", PFCands_pdgId.data(), "PFCands_pdgId[nPFCands]/I");
+  t_event->Branch("PFCands_phi", PFCands_phi.data(), "PFCands_phi[nPFCands]/F");
+  t_event->Branch("PFCands_pt", PFCands_pt.data(), "PFCands_pt[nPFCands]/F");
+  t_event->Branch("PFCands_e", PFCands_e.data(), "PFCands_e[nPFCands]/F");
+  t_event->Branch("PFCands_ptTrk", PFCands_ptTrk.data(), "PFCands_ptTrk[nPFCands]/F");
+  t_event->Branch("PFCands_etaAtVtx", PFCands_etaAtVtx.data(), "PFCands_etaAtVtx[nPFCands]/F");
+  t_event->Branch("PFCands_phiAtVtx", PFCands_phiAtVtx.data(), "PFCands_phiAtVtx[nPFCands]/F");
+  t_event->Branch("PFCands_caloEnergy", PFCands_caloEnergy.data(), "PFCands_caloEnergy[nPFCands]/F");
+  t_event->Branch("PFCands_hcalEnergy", PFCands_hcalEnergy.data(), "PFCands_hcalEnergy[nPFCands]/F");
+  t_event->Branch("PFCands_caloFraction", PFCands_caloFraction.data(), "PFCands_caloFraction[nPFCands]/F");
+  t_event->Branch("PFCands_hcalFraction", PFCands_hcalFraction.data(), "PFCands_hcalFraction[nPFCands]/F");
+  
   if (nanoext) {
     // nanoAOD extension
     t_event->Branch("Muon_Id", Muon_Id.data(), "Muon_Id[nMuon]/I");
