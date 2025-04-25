@@ -17,7 +17,7 @@ Once (first time only):
 
 Clone the GitHub repository to `NanoAOD/NanoAnalyzer/`:
 ```
-git clone https://github.com/cms-opendata-analyses/NanoAODRun1ProducerTool.git NanoAOD/NanoAnalyzer/
+git clone -b addRun1PFCands https://github.com/cms-opendata-analyses/NanoAODRun1ProducerTool.git NanoAOD/NanoAnalyzer/
 ```
 
 `NanoAOD/NanoAnalyzer/` is the name of the folder. The code won’t compile if it is not cloned to this folder.
