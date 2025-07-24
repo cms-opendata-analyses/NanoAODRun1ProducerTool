@@ -838,7 +838,6 @@ private:
   vector<Float_t> PFCands_hcalEnergy;
   vector<Float_t> PFCands_caloFraction;
   vector<Float_t> PFCands_hcalFraction;
-  //  vector<Int_t> PFCands_isIsoCH;
   
   // for dimuon candidates (nonstandard extension)
 #include "NanoDimu.h" 
@@ -3853,7 +3852,6 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   PFCands_hcalEnergy.clear();
   PFCands_caloFraction.clear();
   PFCands_hcalFraction.clear();
-  //  PFCands_isIsoCH.clear();
 
   int ic = 0;
   for (reco::PFCandidateCollection::const_iterator pfCand = pfCands->begin(); pfCand != pfCands->end(); ++pfCand) {
@@ -3895,10 +3893,6 @@ NanoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	PFCands_etaAtVtx.push_back(-1);
 	PFCands_phiAtVtx.push_back(-1);
       }
-
-      // const edm::ValueMap<bool> &chargedHadronIsolation = *(chargedHadronIsolationHandle.product());
-      // bool isIsolatedChargedHadron = ((pfCand->pt() > 0.5) && (chargedHadronIsolation[reco::PFCandidateRef(pfCands, ic)]));
-      // PFCands_isIsoCH.push_back(isIsolatedChargedHadron);
     }
     ic++;
   }
